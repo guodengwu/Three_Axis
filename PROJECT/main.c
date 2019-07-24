@@ -20,7 +20,7 @@ void timer_event(void)
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
-		usart.tx_cmd = _CMD_TX_GET_STATE;
+		usart.tx_cmd = _CMD_TX_GET_VERSION;
 		//SYS_PRINTF("1 s.\r\n");
 		//UART4_SendByte(1);
 	}
@@ -41,6 +41,5 @@ void main(void)
 		UsartCmdProcess();//串口指令处理函数
 		UsartCmdReply();//串口指令回复
 		soft_reset();
-		usart.tx_cmd = _CMD_TX_GET_STATE;
 	}
 } 

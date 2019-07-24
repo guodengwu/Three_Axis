@@ -3,14 +3,14 @@
 #include "motor.h"
 
 usart_t      usart;
-#define USART_TXBUFF_SIZE		20
-#define USART_RXBUFF_SIZE		20
+#define USART_TXBUFF_SIZE		30
+#define USART_RXBUFF_SIZE		30
 
 //usart_t      usart;
 //_ACKData_t ack_data;
 //===================================================================================================
-static uint8_t       usart_rx_buf        [USART_RXBUFF_SIZE];
-static uint8_t       usart_tx_buf        [USART_TXBUFF_SIZE];
+uint8_t       usart_rx_buf        [USART_RXBUFF_SIZE];
+uint8_t       usart_tx_buf        [USART_TXBUFF_SIZE];
 static uint8_t       data_buf[20];
 
 static uint8_t  UsartRxGetINT8U (uint8_t *buf,uint32_t *idx);
@@ -84,10 +84,9 @@ void UsartCmdReply(void)
 		case _CMD_TX_RESET://0x66,//»Ø¸´ _CMD_RX_RESET
 			if(Sys.DevAction == ActionState_Doing)	{
 				data_buf[idx++] = 0;
-			}
-			else	{
+			}else	{
 				data_buf[idx++] = 1;
-			}
+			}			
 			PackageSendData(cmd, data_buf, idx);			
 			break;
 		case _CMD_TX_GET_VERSION://0x67,//»Ø¸´ _CMD_RX_GET_VERSION

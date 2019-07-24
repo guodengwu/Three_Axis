@@ -1,8 +1,8 @@
 #include "includes.h"
 
 COMx_Define COM3,COM4;
-#define BRT_115200             (65536 - MAIN_Fosc / 115200 / 4)
-#define BRT_9600             (65536 - MAIN_Fosc / 9600 / 4)
+#define BRT_115200             (65536 - (MAIN_Fosc / 115200 / 4))
+#define BRT_9600             (65536 - (MAIN_Fosc / 9600 / 4))
 
 u8 	xdata UART4_RXBuff[UART4_RXLEN];	//接收缓冲
 RINGBUFF_T uart4_rxring;
@@ -17,11 +17,19 @@ void UART3_config(void)
     T4T3M = 0x0a;
     COM3.TX_busy = DEF_Idle;
 }
+
 //用于485通讯 使用定时器4做波特率发生器
 void UART4_config(void)
 {
+	GPIO_InitTypeDef	GPIO_InitStructure;
+	
     P_SW2 = 0x00;                               //RXD4/P0.2, TXD4/P0.3
 //	P_SW2 = 0x04;                               //RXD4_2/P5.2, TXD4_2/P5.3
+//	P0M0 = 0x00;                                //设置P0.0~P0.7为双向口模式
+//    P0M1 = 0x00;
+	/*GPIO_InitStructure.Pin  = GPIO_Pin_2|GPIO_Pin_3;
+	GPIO_InitStructure.Mode = GPIO_PullUp;
+	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);*/
 	/*S4CON = 0x50;//使用定时器4 允许接收
     T4L = BRT_9600;
     T4H = BRT_9600 >> 8;
@@ -30,8 +38,8 @@ void UART4_config(void)
 	S4CON = 0x10;		//8位数据,可变波特率
 	S4CON |= 0x40;		//串口4选择定时器4为波特率发生器
 	T4T3M |= 0x20;		//定时器4时钟为Fosc,即1T
-	T4L = BRT_9600;		//设定定时初值
-	T4H = BRT_9600 >> 8;		//设定定时初值
+	T4L = 0x41;		//设定定时初值
+	T4H = 0xfd;		//设定定时初值
 	T4T3M |= 0x80;		//启动定时器4
 	UART4_INT_ENABLE();//允许中断
     COM4.TX_busy = DEF_Idle;
@@ -44,8 +52,7 @@ void UART4_SendByte(char dat) 	//写入发送缓冲，指针+1
 	//if(COM3.TX_busy == 0)		//空闲
 	{  
 		S4BUF = dat;
-		//COM4.TX_busy = DEF_Busy;		//标志忙
-		//SET_TI3();				
+		//COM4.TX_busy = DEF_Busy;		//标志忙	
 	}
 }
 
