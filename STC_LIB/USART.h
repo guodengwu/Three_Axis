@@ -20,7 +20,11 @@ typedef struct
 } COMx_Define; 
 
 #define UART4_RXLEN		30
-#define		SET_TI4()			S4CON |=  2
+
+#define		UART4_INT_ENABLE()		IE2 |=  (1<<4)	//允许串口3中断
+#define		UART4_INT_DISABLE()		IE2 &= ~(1<<4)	//允许串口3中断
+
+#define		SET_TI4()			(S4CON |= 2)
 #define usart4_tx_int_enable()     SET_TI4()
 
 void UART3_SendByte(char dat) ;

@@ -20,12 +20,20 @@ void UART3_config(void)
 //用于485通讯 使用定时器4做波特率发生器
 void UART4_config(void)
 {
-//    P_SW2 = 0x00;                               //RXD4/P0.2, TXD4/P0.3
-	P_SW2 = 0x04;                               //RXD4_2/P5.2, TXD4_2/P5.3
-	S4CON = 0x50;
+    P_SW2 = 0x00;                               //RXD4/P0.2, TXD4/P0.3
+//	P_SW2 = 0x04;                               //RXD4_2/P5.2, TXD4_2/P5.3
+	/*S4CON = 0x50;//使用定时器4 允许接收
     T4L = BRT_9600;
     T4H = BRT_9600 >> 8;
     T4T3M = 0xA0;
+	IE2   |=  (1<<4);		*/
+	S4CON = 0x10;		//8位数据,可变波特率
+	S4CON |= 0x40;		//串口4选择定时器4为波特率发生器
+	T4T3M |= 0x20;		//定时器4时钟为Fosc,即1T
+	T4L = BRT_9600;		//设定定时初值
+	T4H = BRT_9600 >> 8;		//设定定时初值
+	T4T3M |= 0x80;		//启动定时器4
+	UART4_INT_ENABLE();//允许中断
     COM4.TX_busy = DEF_Idle;
 	RingBuffer_Init(&uart4_rxring, UART4_RXBuff, 1, UART4_RXLEN);
 }

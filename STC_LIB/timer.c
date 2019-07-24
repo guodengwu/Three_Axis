@@ -1,6 +1,7 @@
 #include	"timer.h"
 
 u8 _100ms_EVENT;
+u8 _1s_EVENT;
 struct SYS_TIM  SysTim;
 /********************* Timer0中断函数************************/
 void TM0_Isr() interrupt 1 using 1
@@ -9,6 +10,7 @@ void TM0_Isr() interrupt 1 using 1
 	if(SysTim.SumMs>=1000)	{//1s
 		SysTim.SumMs = 0;
 		SysTim.SumSec ++;
+		_1s_EVENT = 1;
 	}
 	if((SysTim.SumMs%100)==0)	{//1s
 		_100ms_EVENT = 1;
@@ -20,9 +22,10 @@ void SystickInit_Tmer0(void)
 {
 	u32 timedata;
 	
+	//AUXR =0x00;   //12T
     TMOD = 0x00;                                //模式0
 	timedata = MAIN_Fosc/12/1000;
-	timedata -= 65536;
+	timedata = 65536 - timedata;
     TL0 = timedata&0xff;                                 //65536-11.0592M/12/1000
     TH0 = (timedata>>8)&0xff;
     TR0 = 1;                                    //启动定时器

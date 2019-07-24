@@ -55,16 +55,17 @@ static void	GPIO_config(void)
 //	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 //	GPIO_Inilize(GPIO_P5,&GPIO_InitStructure);	
 
-//	GPIO_InitStructure.Pin  = GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6||GPIO_Pin_6|GPIO_Pin_7;    //4 5 管脚
-//	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
-//	GPIO_Inilize(GPIO_P6,&GPIO_InitStructure);	        //初始化 P3
+	GPIO_InitStructure.Pin  = /*GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6||GPIO_Pin_6|*/GPIO_Pin_7;    //4 5 管脚
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
+	GPIO_Inilize(GPIO_P6,&GPIO_InitStructure);	        //初始化 P3
 	
  	GPIO_InitStructure.Pin  = GPIO_Pin_1|GPIO_Pin_2/*|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7*/;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P7,&GPIO_InitStructure);
-	
+
 	LIGHT_CTRL1=0;
 	LIGHT_CTRL2=0;
+	P67 = 1;
 }
 #if 0
 #if 1
@@ -144,7 +145,7 @@ void	ADC_config(void)
 void bsp(void)
 {
     GPIO_config();          //IO配置函数
-	UART3_config();//用于串口调试打印
+	//UART3_config();//用于串口调试打印
 	UART4_config();
 	/*	UART1_config();//接上控
     UART3_config();

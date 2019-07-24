@@ -18,6 +18,7 @@ struct SYS_TIM
 };
 extern struct SYS_TIM  SysTim;
 extern u8 _100ms_EVENT;
+extern u8 _1s_EVENT;
 
 void	SystickInit_Tmer0(void);
 void TimerStart(u8 TIM);
