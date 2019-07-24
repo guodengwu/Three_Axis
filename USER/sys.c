@@ -16,7 +16,7 @@ void SysDataInit(void)
 	IOState.state2.ubyte = DEF_False;
 	IOState.HongWaiState.ubyte = DEF_False;
 	
-	DevState.ubyte = DEV_STATE_IDLE;
+	DevState.ubyte = DEV_STATE_IDLE;//»úÆ÷×´Ì¬
 	
 	SysHDError.E1.ubyte = DEF_False;
 	SysHDError.E2.ubyte = DEF_False;

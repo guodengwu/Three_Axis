@@ -56,9 +56,9 @@ void UsartCmdReply(void)
 	cmd = pUsart->tx_cmd;
 	switch(cmd)	{
 		case _CMD_TX_GET_STATE://0x64,//回复 _CMD_RX_GET_STATE
-			data_buf[idx++] = IOState.state1.ubyte;
+			data_buf[idx++] = IOState.state1.ubyte;//开关状态
 			data_buf[idx++] = IOState.state2.ubyte;
-		    data_buf[idx++] = SysMotor.ALLMotorState.ubyte;
+		    data_buf[idx++] = SysMotor.ALLMotorState.ubyte;//所有电机状态
 			data_buf[idx++] = 0;
 			data_buf[idx++] = IOState.HongWaiState.ubyte;
 			data_buf[idx++] = DevState.ubyte;
@@ -130,6 +130,10 @@ void  UsartCmdProcess (void)
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
 				if(iPara==2)	{
 					pUsart->tx_cmd = _CMD_TX_RESET;
+					DevState.bits.State = DEV_STATE_RESET;//复位中
+					if(Sys.DevAction != ActionState_Doing)	{
+						DevState.bits.SubState = 4;
+					}
 				}
 				break;
 			case _CMD_RX_GET_VERSION://0X04,//获取版本
@@ -147,7 +151,8 @@ void  UsartCmdProcess (void)
 			case _CMD_RX_SYS_TEST://0X06,//系统测试
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
 				if(iPara==1)	{
-					DevState.bits.State = DEV_STATE_TEST;
+					DevState.bits.State = DEV_STATE_TEST;//设备状态 独立部件运行
+					DevState.bits.SubState = 1;//电机运行中
 					iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
 					if(iPara==3)	{
 						SysMotor.ALLMotorState.bits.b0 = DEF_Busy;

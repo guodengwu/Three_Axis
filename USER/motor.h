@@ -3,6 +3,9 @@
 
 #include "includes.h"
 
+#define MOTOR_TO_MAX         DEF_TRUE        // To Max
+#define MOTOR_TO_MIN         DEF_FALSE       // To Min
+
 typedef enum {
     MOTOR_X      = 0,
     MOTOR_Y,
@@ -34,10 +37,11 @@ typedef struct Motor_t  {
 	INT16S CurPos;
 	INT16U ObjPos;
 	INT16U Param;
+	u8 dir;
 }TMotor;
 
 typedef struct _SysMotor  {
-	BIT8 ALLMotorState;
+	BIT8 ALLMotorState;//所有电机状态 0-空闲 1-运行中
 	TMotor motor[MOTOR_NUMS];
 }SysMotor_t;
 
