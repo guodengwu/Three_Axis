@@ -428,6 +428,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\sys.c</FilePath>
             </File>
+            <File>
+              <FileName>motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\motor.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

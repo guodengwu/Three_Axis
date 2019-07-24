@@ -1,5 +1,6 @@
 #include	"timer.h"
 
+u8 _100ms_EVENT;
 struct SYS_TIM  SysTim;
 /********************* Timer0ÖÐ¶Ïº¯Êý************************/
 void TM0_Isr() interrupt 1 using 1
@@ -8,6 +9,9 @@ void TM0_Isr() interrupt 1 using 1
 	if(SysTim.SumMs>=1000)	{//1s
 		SysTim.SumMs = 0;
 		SysTim.SumSec ++;
+	}
+	if((SysTim.SumMs%100)==0)	{//1s
+		_100ms_EVENT = 1;
 	}
 }
 

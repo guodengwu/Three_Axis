@@ -17,6 +17,7 @@ struct SYS_TIM
     uint32_t  SumMinute;      //¿€º”∑÷÷” ˝
 };
 extern struct SYS_TIM  SysTim;
+extern u8 _100ms_EVENT;
 
 void	SystickInit_Tmer0(void);
 void TimerStart(u8 TIM);

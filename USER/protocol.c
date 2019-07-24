@@ -1,5 +1,6 @@
 #include "protocol.h"
 #include "misc.h"
+#include "motor.h"
 
 usart_t      usart;
 #define USART_TXBUFF_SIZE		20
@@ -43,20 +44,59 @@ void ProDataInit(void)
     usart.tx_complete  = &uart_message_tx_handler;
 }
 
-//协议指令回复
+//串口指令回复
 void UsartCmdReply(void)
 {
-	uint8_t idx=0;
+	uint8_t idx=0,cmd;
 	usart_t *pUsart = &usart;
 	
-	if(pUsart->tx_flag == DEF_Busy)	{//发送忙 等待空闲
+	if(pUsart->tx_flag == DEF_Busy || pUsart->tx_cmd == _CMD_TX_NONE)	{//发送忙 等待空闲
 		return;
 	}
-	switch(pUsart->tx_cmd)	{
-		case _CMD_TX_GET_VERSION:
-			data_buf[0] = 1;
-			strcpy(data_buf+1, VERSION);
-			PackageSendData(_CMD_TX_GET_VERSION, data_buf, strlen(VERSION)+1); 
+	cmd = pUsart->tx_cmd;
+	switch(cmd)	{
+		case _CMD_TX_GET_STATE://0x64,//回复 _CMD_RX_GET_STATE
+			data_buf[idx++] = IOState.state1.ubyte;
+			data_buf[idx++] = IOState.state2.ubyte;
+		    data_buf[idx++] = SysMotor.ALLMotorState.ubyte;
+			data_buf[idx++] = 0;
+			data_buf[idx++] = IOState.HongWaiState.ubyte;
+			data_buf[idx++] = DevState.ubyte;
+			data_buf[idx++] = SysHDError.E1.ubyte;
+			data_buf[idx++] = SysHDError.E2.ubyte;
+			data_buf[idx++] = SysLogicErr.logic;
+			data_buf[idx++] = SysMotor.motor[MOTOR_X].CurPos>>8;
+			data_buf[idx++] = SysMotor.motor[MOTOR_X].CurPos&0xff;
+			data_buf[idx++] = SysMotor.motor[MOTOR_Y].CurPos>>8;
+			data_buf[idx++] = SysMotor.motor[MOTOR_Y].CurPos&0xff;
+			data_buf[idx++] = Sys.DevAction;
+			PackageSendData(cmd, data_buf, idx);
+			break;
+		case _CMD_TX_SHIP://0X65,//回复 _CMD_RX_SHIP
+			if(Sys.DevAction == ActionState_Doing)	{
+				data_buf[idx++] = 0;
+			}else	{
+				Sys.DevAction = ActionState_DoReady;
+				data_buf[idx++] = 1;
+			}
+			PackageSendData(cmd, data_buf, idx);
+			break;
+		case _CMD_TX_RESET://0x66,//回复 _CMD_RX_RESET
+			if(Sys.DevAction == ActionState_Doing)	{
+				data_buf[idx++] = 0;
+			}
+			else	{
+				data_buf[idx++] = 1;
+			}
+			PackageSendData(cmd, data_buf, idx);			
+			break;
+		case _CMD_TX_GET_VERSION://0x67,//回复 _CMD_RX_GET_VERSION
+			data_buf[idx++] = 1;
+			strcpy(data_buf+idx, VERSION);
+			PackageSendData(cmd, data_buf, strlen(VERSION)+idx); 
+			break;
+		case _CMD_TX_CLR_RESULT://0x68,//回复 _CMD_RX_CLR_RESULT
+			//data_buf[idx++] = Sys.DevAction;
 			break;
 		default:
 			break;
@@ -68,25 +108,72 @@ void  UsartCmdProcess (void)
 {
     uint8_t cmd,iPara;
 	usart_t *pUsart = &usart;
+	u32 temp;
 
 	if(pUsart->rx_flag==DEF_No)	{//无数据接收 返回
 		return;
 	}
     
     if (pUsart->rx_err == MSG_ERR_NONE) {//数据解析无错误
-//		pUsart->rx_cmd = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);                                 /* First byte contains command      */
-		switch(pUsart->rx_cmd)	{
-			case _CMD_RX_GET_STATE:
+		cmd	= pUsart->rx_cmd;
+		switch(cmd)	{
+			case _CMD_RX_GET_STATE://0X01,//查询系统状态
 				pUsart->tx_cmd = _CMD_TX_GET_STATE;
 				break;
-			case _CMD_RX_GET_VERSION:
-				pUsart->tx_cmd = _CMD_TX_GET_VERSION;
+			case _CMD_RX_SHIP:	//0X02,//出货指令			
+				pUsart->tx_cmd = _CMD_TX_SHIP;
+				temp = pUsart->rx_idx+6;
+				SysMotor.motor[MOTOR_X].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&temp);
+				SysMotor.motor[MOTOR_Y].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&temp);
+				break;
+			case _CMD_RX_RESET://0X03,//复位
+				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
+				if(iPara==2)	{
+					pUsart->tx_cmd = _CMD_TX_RESET;
+				}
+				break;
+			case _CMD_RX_GET_VERSION://0X04,//获取版本
+				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
+				if(iPara==2)	{
+					pUsart->tx_cmd = _CMD_TX_GET_VERSION;
+				}
+				break;
+			case _CMD_RX_CLR_RESULT://	0X05,//清除运行结果
+				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
+				if(iPara==2)	{
+					pUsart->tx_cmd = _CMD_TX_CLR_RESULT;
+				}
+				break;
+			case _CMD_RX_SYS_TEST://0X06,//系统测试
+				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
+				if(iPara==1)	{
+					DevState.bits.State = DEV_STATE_TEST;
+					iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
+					if(iPara==3)	{
+						SysMotor.ALLMotorState.bits.b0 = DEF_Busy;
+						SysMotor.motor[MOTOR_X].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+					}else if(iPara==4)	{
+						SysMotor.ALLMotorState.bits.b1 = DEF_Busy;
+						SysMotor.motor[MOTOR_Y].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+					}else if(iPara==5)	{
+						SysMotor.ALLMotorState.bits.b3 = DEF_Busy;
+						SysMotor.motor[MOTOR_TuiGan].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+					}else if(iPara==6)	{
+						SysMotor.ALLMotorState.bits.b4 = DEF_Busy;
+						SysMotor.motor[MOTOR_CeMen].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+					}else if(iPara==7)	{
+						SysMotor.ALLMotorState.bits.b5 = DEF_Busy;
+						SysMotor.motor[MOTOR_QuHuoKou].Param = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+					}else if(iPara==8)	{
+						SysMotor.ALLMotorState.bits.b6 = DEF_Busy;
+						SysMotor.motor[MOTOR_QuHuoMen].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+					}
+				}
+				break;
 			default:
 				pUsart->tx_cmd = _CMD_TX_NONE;
-		}
-		
+		}		
 	}else {//数据解析异常
-        //UsartSendError(&msg_pkt_usart[0], pUsart->rx_err);
         pUsart->rx_err = MSG_ERR_NONE;        // clear rx error
     }		
 	pUsart->rx_flag = DEF_No;//清解析完成标志
@@ -160,14 +247,14 @@ static uint8_t uart_message_rx_handler(usart_t *pUsart, uint8_t rx_dat)
 
 static void PackageSendData(uint8_t cmd, uint8_t *pdat, uint8_t len)
 {
-	uint8_t idx=0,datlen;
+	uint8_t idx=0;
 	uint8_t temp;
 
 	usart.tx_flag = DEF_Busy;//串口发送忙标记
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD0;
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD1;
 	usart.tx_buf[idx++] = cmd;
-	usart.tx_buf[idx++] = len;
+	usart.tx_buf[idx++] = len + PRO_EXTENT_LEN;
 	if (len) {
         memcpy(&usart.tx_buf[idx], pdat, len);
     }
@@ -183,11 +270,15 @@ static void uart_message_tx_handler(usart_t *pUsart)
 {
 	//INT8U  tx_dat;	
 	
-	if(usart.tx_idx<=usart.tx_len)	{
+	if(pUsart->tx_idx<=pUsart->tx_len)	{
 		//tx_dat = usart.tx_buf[usart.tx_idx++];
-		UART4_SendByte(usart.tx_buf[usart.tx_idx++]);
+		UART4_SendByte(pUsart->tx_buf[pUsart->tx_idx++]);
 	}else {
-		usart.tx_flag = DEF_Idle;//发送完成
+		if(pUsart->tx_cmd == _CMD_TX_RESET)	{//指令发送完成后 再复位
+			Sys.state |= SYSSTATE_RESET;
+		}
+		pUsart->tx_cmd = _CMD_TX_NONE;
+		pUsart->tx_flag = DEF_Idle;//发送完成
 	}
 }
 

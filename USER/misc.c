@@ -1,5 +1,14 @@
 #include "misc.h"
 
+void delay_us(u32 us)
+{
+	u16 i,j;
+	
+	for(i=0;i<us;i++)	{
+		for(j=0;j<20;j++)
+				_nop_();
+	}
+}
 
 //自己写的log函数
 float MYLOG(float a)
