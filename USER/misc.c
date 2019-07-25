@@ -12,10 +12,12 @@ void delay_us(u32 us)
 
 INT8U CRC8_XOR(INT8U *dat, INT8U len)
 {
-	INT16U crc=0,j;
-	for(j=0; j<len; j++)
+	INT8U crc,j;
+	
+	crc = dat[0];
+	for(j=1; j<len; j++)
 	{
-		crc = crc + dat[j];
+		crc ^= dat[j];
 	}
 	return crc;
 }

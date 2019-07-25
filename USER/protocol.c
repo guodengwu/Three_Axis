@@ -250,7 +250,7 @@ static uint8_t uart_message_rx_handler(usart_t *pUsart, uint8_t rx_dat)
 static void PackageSendData(uint8_t cmd, uint8_t *pdat, uint8_t len)
 {
 	uint8_t idx=0;
-	uint8_t temp;
+	//uint8_t temp;
 
 	usart.tx_flag = DEF_Busy;//串口发送忙标记
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD0;
@@ -261,8 +261,7 @@ static void PackageSendData(uint8_t cmd, uint8_t *pdat, uint8_t len)
         memcpy(&usart.tx_buf[idx], pdat, len);
     }
 	idx += len;
-	temp = CRC8_XOR(usart.tx_buf, idx);
-	usart.tx_buf[idx++] = temp;
+	usart.tx_buf[idx++] = CRC8_XOR(usart.tx_buf, idx);
 	usart.tx_len = idx;
 	usart.tx_idx = 0;
 	usart4_tx_int_enable();
@@ -272,7 +271,7 @@ static void uart_message_tx_handler(usart_t *pUsart)
 {
 	INT8U  tx_dat;	
 	
-	if(pUsart->tx_idx<=pUsart->tx_len)	{
+	if(pUsart->tx_idx<pUsart->tx_len)	{
 		tx_dat = pUsart->tx_buf[usart.tx_idx];
 		UART4_SendByte(tx_dat);
 		pUsart->tx_idx++;

@@ -21,7 +21,6 @@ void timer_event(void)
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
 		usart.tx_cmd = _CMD_TX_GET_VERSION;
-		//SYS_PRINTF("1 s.\r\n");
 	}
 }
 
