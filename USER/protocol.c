@@ -107,16 +107,15 @@ void  UsartCmdProcess (void)
 	usart_t *pUsart = &usart;
 	u32 temp;
 
-	if(RingBuffer_Pop(&uart4_rxring, &rxdat) == 0)//无数据
+	if(RingBuffer_Pop(&uart4_rxring, (void *)&rxdat) == 0)//无数据
 		return;
 	uart_message_rx_handler(&usart, rxdat);
 	if(pUsart->rx_flag==DEF_No)	{//无数据接收 返回
 		return;
 	}
-    
+
     if (pUsart->rx_err == MSG_ERR_NONE) {//数据解析无错误
 		cmd	= pUsart->rx_cmd;
-		BSP_PRINTF("A");
 		switch(cmd)	{
 			case _CMD_RX_GET_STATE://0X01,//查询系统状态
 				pUsart->tx_cmd = _CMD_TX_GET_STATE;
@@ -212,18 +211,22 @@ static uint8_t uart_message_rx_handler(usart_t *pUsart, uint8_t rx_dat)
             break;
         case PRO_RX_STATE_LEN:                    /* waiting for 'len' LOW byte                     */
             pUsart->rx_len      = rx_dat&0XFF;
-            if (/*(pUsart->rx_len < PRO_EXTENT_LEN) || */(pUsart->rx_len > pUsart->rx_bufsize)) {
+			if(pUsart->rx_len==0)	{
+				pUsart->rx_state = PRO_RX_STATE_CHKSUM;
+			}
+			else if (/*(pUsart->rx_len < PRO_EXTENT_LEN) || */(pUsart->rx_len > pUsart->rx_bufsize)) {
                 pUsart->rx_state = PRO_RX_STATE_SD0;/* Can not handle this size ...                    */
                 pUsart->rx_err   = MSG_ERR_LENGTH;
 				pUsart->rx_flag		 = DEF_Yes;
-            } else {
-                pUsart->rx_crc  ^= rx_dat;
+            } else {              
                 pUsart->rx_state = PRO_RX_STATE_DATA;
             }
+			pUsart->rx_crc  ^= rx_dat;
             break;
         case PRO_RX_STATE_DATA:                    /* waiting for data                                */
             if (pUsart->rx_cnt < pUsart->rx_bufsize) {
-                pUsart->rx_buf[pUsart->rx_cnt++] = rx_dat;
+                pUsart->rx_buf[pUsart->rx_cnt] = rx_dat;
+				pUsart->rx_cnt ++;
             }
             pUsart->rx_crc ^= rx_dat;
             if ((pUsart->rx_len /*- SENSOR_END_LEN*/) <= pUsart->rx_cnt) {
