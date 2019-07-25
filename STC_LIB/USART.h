@@ -24,12 +24,16 @@ typedef struct
 #define		UART4_INT_ENABLE()		IE2 |=  (1<<4)	//允许串口3中断
 #define		UART4_INT_DISABLE()		IE2 &= ~(1<<4)	//允许串口3中断
 
+#define		UART3_INT_ENABLE()		IE2 |=  (1<<3)	//允许串口3中断
+#define		UART3_INT_DISABLE()		IE2 &= ~(1<<3)	//允许串口3中断
+
 #define		SET_TI4()			(S4CON |= 2)
 #define usart4_tx_int_enable()     SET_TI4()
 
-void UART3_SendByte(char dat) ;
+void UART3_SendByte(char dat);
 void UART3_config(void);
 void UART4_config(void);
 void UART4_SendByte(char dat);
+
 #endif
 

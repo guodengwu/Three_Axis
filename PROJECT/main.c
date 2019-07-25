@@ -33,7 +33,7 @@ void main(void)
 	ProDataInit();	
 	ES = 1;
     EA = 1;
-	//SYS_PRINTF("Sys Startup.\r\n");
+	SYS_PRINTF("Sys Startup.\r\n");
 	while(1)
 	{
 		timer_event();

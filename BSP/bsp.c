@@ -145,7 +145,7 @@ void	ADC_config(void)
 void bsp(void)
 {
     GPIO_config();          //IO配置函数
-	//UART3_config();//用于串口调试打印
+	UART3_config();//用于串口调试打印
 	UART4_config();
 	/*	UART1_config();//接上控
     UART3_config();
