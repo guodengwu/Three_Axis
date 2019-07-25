@@ -24,5 +24,6 @@ void	SystickInit_Tmer0(void);
 void TimerStart(u8 TIM);
 void TimerStop(u8 TIM);
 void TimerSetValue(u8 TIM, u16 value);
+//void SysTimDataInit(void);
 
 #endif

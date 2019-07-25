@@ -1,6 +1,6 @@
 #include "motor.h"
 
-SysMotor_t SysMotor;
+SysMotor_t xdata SysMotor;
 
 void MotorInit(void)
 {
@@ -12,7 +12,7 @@ void MotorInit(void)
 	}
 	SysMotor.ALLMotorState.ubyte = 0;
 }
-
+/*
 void MotorSetDir(void)
 {
 
@@ -49,5 +49,5 @@ void MotorTest(void)
 	}else	if(SysMotor.ALLMotorState.bits.b6 == DEF_Busy)	{//测试取货门电机
 		
 	}
-}	
+}	*/
 

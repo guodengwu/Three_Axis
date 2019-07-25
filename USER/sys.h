@@ -79,6 +79,6 @@ extern _sys_status_t Sys;
 extern _sys_error_t SysHDError;
 
 void CheckIOState(void);
-
+void SysDataInit(void);
 #endif
 

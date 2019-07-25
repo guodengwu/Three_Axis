@@ -10,6 +10,17 @@ void delay_us(u32 us)
 	}
 }
 
+INT8U CRC8_XOR(INT8U *dat, INT8U len)
+{
+	INT16U crc=0,j;
+	for(j=0; j<len; j++)
+	{
+		crc = crc + dat[j];
+	}
+	return crc;
+}
+
+#if 0
 //自己写的log函数
 float MYLOG(float a)
 {
@@ -58,15 +69,6 @@ INT16U CRC16_Sum(INT8U *dat, INT8U len)
 	return crc;
 }
 
-INT8U CRC8_XOR(INT8U *dat, INT8U len)
-{
-	INT16U crc=0,j;
-	for(j=0; j<len; j++)
-	{
-		crc = crc + dat[j];
-	}
-	return crc;
-}
 /*********************************************************************
  *  FUNCTION: FloatTo4uint8Format							          *
  *																	  *
@@ -147,4 +149,4 @@ u8 BCD_Decimal(u8 bcd)
 	Decimal=bcd>>4;
 	return(Decimal=Decimal*10+(bcd&=0x0F));
 }
-	
+#endif

@@ -6,12 +6,10 @@ usart_t      usart;
 #define USART_TXBUFF_SIZE		30
 #define USART_RXBUFF_SIZE		30
 
-//usart_t      usart;
-//_ACKData_t ack_data;
 //===================================================================================================
-uint8_t       usart_rx_buf        [USART_RXBUFF_SIZE];
-uint8_t       usart_tx_buf        [USART_TXBUFF_SIZE];
-static uint8_t       data_buf[20];
+uint8_t   xdata    usart_rx_buf        [USART_RXBUFF_SIZE];
+uint8_t   xdata    usart_tx_buf        [USART_TXBUFF_SIZE];
+static uint8_t   xdata    data_buf[20];
 
 static uint8_t  UsartRxGetINT8U (uint8_t *buf,uint32_t *idx);
 static uint16_t  UsartRxGetINT16U (uint8_t *buf,uint32_t *idx);
@@ -258,7 +256,7 @@ static void PackageSendData(uint8_t cmd, uint8_t *pdat, uint8_t len)
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD0;
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD1;
 	usart.tx_buf[idx++] = cmd;
-	usart.tx_buf[idx++] = len + PRO_EXTENT_LEN;
+	usart.tx_buf[idx++] = len;
 	if (len) {
         memcpy(&usart.tx_buf[idx], pdat, len);
     }
@@ -272,11 +270,12 @@ static void PackageSendData(uint8_t cmd, uint8_t *pdat, uint8_t len)
 
 static void uart_message_tx_handler(usart_t *pUsart)
 {
-	//INT8U  tx_dat;	
+	INT8U  tx_dat;	
 	
 	if(pUsart->tx_idx<=pUsart->tx_len)	{
-		//tx_dat = usart.tx_buf[usart.tx_idx++];
-		UART4_SendByte(pUsart->tx_buf[pUsart->tx_idx++]);
+		tx_dat = pUsart->tx_buf[usart.tx_idx];
+		UART4_SendByte(tx_dat);
+		pUsart->tx_idx++;
 	}else {
 		if(pUsart->tx_cmd == _CMD_TX_RESET)	{//指令发送完成后 再复位
 			Sys.state |= SYSSTATE_RESET;

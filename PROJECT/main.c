@@ -22,14 +22,14 @@ void timer_event(void)
 		_1s_EVENT = 0;
 		usart.tx_cmd = _CMD_TX_GET_VERSION;
 		//SYS_PRINTF("1 s.\r\n");
-		//UART4_SendByte(1);
 	}
 }
 
 void main(void)
 {
 	SystickInit_Tmer0();
-	bsp();
+	bsp();	
+	SysDataInit();
 	MotorInit();
 	ProDataInit();	
 	ES = 1;
