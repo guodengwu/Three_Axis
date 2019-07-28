@@ -26,15 +26,27 @@ void SysDataInit(void)
 
 void CheckIOState(void)
 {
-	IOState.state1.bits.b0 = X_MOTOR_RightLimit;
-	IOState.state1.bits.b1 = X_MOTOR_LeftLimit;
-	IOState.state1.bits.b2 = CeMenJinHuoKou;
-	IOState.state1.bits.b3 = CeMenMaxLimit;
-	IOState.state1.bits.b4 = CeMenMinLimit;
-	IOState.state1.bits.b5 = ChuHuoKouOpen;
-	IOState.state1.bits.b6 = ChuHuoKouClose;
-	IOState.state1.bits.b7 = 0;
+	IOState.state1.bits.b0 = X_MOTOR_RightLimit_IN;	
+	IOState.state1.bits.b1 = X_MOTOR_LeftLimit_IN;
+	if(X_MOTOR_RightLimit_IN==1 || X_MOTOR_LeftLimit_IN==1)	{//x碰到上限/下限 强制停止电机
+		MotorStop(DEF_Success);
+	}
+	IOState.state1.bits.b2 = CeMenCloseLimit_IN;
+	IOState.state1.bits.b3 = CeMenOpenLimit_IN;
+	if(CeMenCloseLimit_IN==1 || CeMenOpenLimit_IN==1)	{//侧门开门/关门到位 强制停止电机
+		MotorStop(DEF_Success);
+	}
+	IOState.state1.bits.b4 = CeMenMaxLimit_IN;
+	IOState.state1.bits.b5 = CeMenMinLimit_IN;
+	if(CeMenMinLimit_IN==1)	{
+		MotorStop(DEF_Success);
+	}
+	IOState.state1.bits.b6 = ChuHuoKouOpenLimit_IN;
+	IOState.state1.bits.b7 = ChuHuoKouCloseLimit_IN;
 	
-	IOState.state2.bits.b0 = Y_MOTOR_MinLimit;
-	IOState.state2.bits.b1 = Y_MOTOR_MaxLimit;
+	IOState.state2.bits.b0 = Y_MOTOR_MinLimit_IN;
+	IOState.state2.bits.b1 = Y_MOTOR_MaxLimit_IN;
+	if(Y_MOTOR_MinLimit_IN==1 || Y_MOTOR_MaxLimit_IN==1)	{//y碰到上限/下限 强制停止电机
+		MotorStop(DEF_Success);
+	}
 }

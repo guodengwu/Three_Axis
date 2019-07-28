@@ -14,8 +14,8 @@
  ******************************************************************/
 void timer_event(void)
 {
-	if(_100ms_EVENT)	{
-		_100ms_EVENT = 0;
+	if(_10ms_EVENT)	{
+		_10ms_EVENT = 0;
 		CheckIOState();
 	}
 	if(_1s_EVENT)	{

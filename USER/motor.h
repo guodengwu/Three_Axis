@@ -6,18 +6,20 @@
 #define MOTOR_TO_MAX         DEF_TRUE        // To Max
 #define MOTOR_TO_MIN         DEF_FALSE       // To Min
 
+#define	MOTOR_RUN_TIMEOUT		600000 //6s
+
 typedef enum {
-    MOTOR_X      = 0,
-    MOTOR_Y,
-	MOTOR_Z,
-	MOTOR_TuiGan,
-	MOTOR_CeMen,
-	MOTOR_QuHuoKou,
-	MOTOR_QuHuoMen,
+    MOTOR_X_ID      = 0,
+    MOTOR_Y_ID,
+	MOTOR_Z_ID,
+	MOTOR_T_ID,
+	MOTOR_D_ID,
+	MOTOR_L_ID,
+	MOTOR_QuHuoMen_ID,
 } MOTOR_ID;
-#define MOTOR_ID_MIN 			MOTOR_X
-#define MOTOR_ID_MAX 			MOTOR_QuHuoMen
-#define MOTOR_NUMS       	(MOTOR_QuHuoMen - MOTOR_X + 1)
+#define MOTOR_ID_MIN 			MOTOR_X_ID
+#define MOTOR_ID_MAX 			MOTOR_QuHuoMen_ID
+#define MOTOR_NUMS       	(MOTOR_ID_MAX - MOTOR_ID_MIN + 1)
 
 typedef struct {
     INT8U   is_run;
@@ -40,8 +42,23 @@ typedef struct Motor_t  {
 	u8 dir;
 }TMotor;
 
+typedef union _allmotor_state {
+    struct {
+		CPU_INT08U 	XMotor	:1;
+		CPU_INT08U  YMotor	:1;
+		CPU_INT08U  ZMotor	:1;
+		CPU_INT08U  TMotor	:1;
+		CPU_INT08U  DMotor	:1;
+		CPU_INT08U  LMotor	:1;
+		CPU_INT08U  QuHuoMenMotor	:1;
+		CPU_INT08U  UNUSED	:1;
+	}bits;
+	CPU_INT08U  ubyte;
+}allmotor_state_t;
+
 typedef struct _SysMotor  {
-	BIT8 ALLMotorState;//所有电机状态 0-空闲 1-运行中
+	u8 MotorIDRunning;
+	allmotor_state_t ALLMotorState;//所有电机状态 0-空闲 1-运行中
 	TMotor motor[MOTOR_NUMS];
 }SysMotor_t;
 
@@ -55,14 +72,19 @@ enum eMotorState {
 
 enum eActionState {
     ActionState_Idle     = 0,    // Action State:IDLE
-    ActionState_Doing       = 1,    // Action State:Doing
-    ActionState_OK          = 2,    // Action State:OK
-    ActionState_Fail        = 3,     // Action State:Fail
-	ActionState_DoReady		= 4,
+	ActionState_Busy,
+    ActionState_Doing       ,    // Action State:Doing
+    ActionState_OK          ,    // Action State:OK
+    ActionState_Fail        ,     // Action State:Fail
+	ActionState_DoReady		,
 };
 
 extern SysMotor_t SysMotor;
 
 void MotorInit(void);
+void MotorStart(void);
+void MotorStop(u8 stop_type);
+void MotorTest(void);
+void SoftTimerStop(_softtimer_t *psofttimer);
 
 #endif

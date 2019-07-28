@@ -6,13 +6,13 @@ static void	GPIO_config(void)
 {
 	GPIO_InitTypeDef	GPIO_InitStructure;		        //结构定义
 //输入
-	GPIO_InitStructure.Pin  = GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
+	GPIO_InitStructure.Pin  = /*GPIO_Pin_4|*/GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
 	GPIO_InitStructure.Mode = GPIO_HighZ;
 	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);
 		GPIO_InitStructure.Pin  = /*GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|*/GPIO_Pin_7;
 	//GPIO_InitStructure.Mode = GPIO_HighZ;
 	GPIO_Inilize(GPIO_P1,&GPIO_InitStructure);
-		GPIO_InitStructure.Pin  = GPIO_Pin_1/*|GPIO_Pin_5|GPIO_Pin_6*/|GPIO_Pin_7;
+		GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1/*|GPIO_Pin_5|GPIO_Pin_6*/|GPIO_Pin_7;
 	//GPIO_InitStructure.Mode = GPIO_HighZ;
 	GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);	
 		GPIO_InitStructure.Pin  = GPIO_Pin_1;
@@ -31,41 +31,49 @@ static void	GPIO_config(void)
 
 //输出
 	
-//	GPIO_InitStructure.Pin  = GPIO_Pin_4;
-//	GPIO_InitStructure.Mode = GPIO_OUT_PP;
-//	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);	
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P0,&GPIO_InitStructure);	
+	
+	GPIO_InitStructure.Pin  = GPIO_Pin_0;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P1,&GPIO_InitStructure);	
 //	
-//	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1/*|GPIO_Pin_4*/|GPIO_Pin_5/*|GPIO_Pin_7*/;
-//	GPIO_InitStructure.Mode = GPIO_OUT_PP;
-//	GPIO_Inilize(GPIO_P1,&GPIO_InitStructure);	
-//	
-//	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
-//	GPIO_InitStructure.Mode = GPIO_OUT_PP;
-//	GPIO_Inilize(GPIO_P2,&GPIO_InitStructure);	
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P2,&GPIO_InitStructure);	
 //	
 //	GPIO_InitStructure.Pin  = GPIO_Pin_1|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_7;    //4 5 管脚
 //	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 //	GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);	        //初始化 P3
 //	
-//	GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1/*|GPIO_Pin_2*/|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_7;
-//	GPIO_InitStructure.Mode = GPIO_OUT_PP;
-//	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|/*GPIO_Pin_1|*/GPIO_Pin_2/*|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_7*/;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
 //	
-//	GPIO_InitStructure.Pin  = GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_5;
-//	GPIO_InitStructure.Mode = GPIO_OUT_PP;
-//	GPIO_Inilize(GPIO_P5,&GPIO_InitStructure);	
+	GPIO_InitStructure.Pin  = GPIO_Pin_4|GPIO_Pin_5;
+	GPIO_InitStructure.Mode = GPIO_OUT_PP;
+	GPIO_Inilize(GPIO_P5,&GPIO_InitStructure);	
 
-	GPIO_InitStructure.Pin  = /*GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6||GPIO_Pin_6|*/GPIO_Pin_7;    //4 5 管脚
+	GPIO_InitStructure.Pin  = GPIO_Pin_4|GPIO_Pin_1|GPIO_Pin_2;    //4 5 管脚
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 	GPIO_Inilize(GPIO_P6,&GPIO_InitStructure);	        //初始化 P3
 	
- 	GPIO_InitStructure.Pin  = GPIO_Pin_1|GPIO_Pin_2/*|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7*/;
+ 	GPIO_InitStructure.Pin  = GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P7,&GPIO_InitStructure);
 
-	LIGHT_CTRL1=0;
-	LIGHT_CTRL2=0;
-	P67 = 1;
+	LIGHT_CTRL1_OUT = 0;
+	LIGHT_CTRL2_OUT = 0;
+	X_MOTOR_ENABLE1 = 0;
+	X_MOTOR_ENABLE2 = 0;
+	Y_MOTOR_ENABLE1 = 0;
+	Y_MOTOR_ENABLE2 = 0;
+	Z_MOTOR_ENABLE = 0;
+	T_MOTOR_ENABLE = 0;	
+	D_MOTOR_ENABLE = 0;
+	L_MOTOR_ENABLE = 0;
+	QuHuoMen_MOTOR_ENABLE = 0;
 }
 #if 0
 #if 1
@@ -139,6 +147,7 @@ void	ADC_config(void)
 	ADC_PowerControl(ENABLE);							//单独的ADC电源操作函数, ENABLE或DISABLE
 }
 #endif
+
 ///////////////////////////////////////////////////////////
 //函数名:   bsp
 //功能:    板载硬件初始化
@@ -147,14 +156,8 @@ void bsp(void)
     GPIO_config();          //IO配置函数
 	UART3_config();//用于串口调试打印
 	UART4_config();
-	/*	UART1_config();//接上控
-    UART3_config();
-		Timer1_config();//电机运动计时
-		Init_Display();
-		motor_init();		
-		EXTI_config();
-		ADC_config();
-      */
+	Timer1Init();
+	Timer2Init();
 }
 
 void soft_reset(void)

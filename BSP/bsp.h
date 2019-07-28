@@ -6,19 +6,48 @@
 #include "includes.h"
 
 /////////////////////////////////
-#define     X_MOTOR_LeftLimit    			P17
-#define     X_MOTOR_RightLimit    			P07
-#define     Y_MOTOR_MaxLimit    			P31
-#define     Y_MOTOR_MinLimit    			P65
+#define     X_MOTOR_LeftLimit_IN    			P17
+#define     X_MOTOR_RightLimit_IN    			P07
+#define     Y_MOTOR_MaxLimit_IN    			P65
+#define     Y_MOTOR_MinLimit_IN    			P31
 
-#define     CeMenJinHuoKou	    			P17	//侧门进货口
-#define     CeMenMaxLimit    			P07	//侧门上限位
-#define     CeMenMinLimit    			P31 //侧门下限位
-#define     ChuHuoKouOpen    				P65 //出货口开门
-#define     ChuHuoKouClose    				P65 //出货口关门
+#define     ChuHuoKouOpenLimit_IN    				P37 //出货口开门到位
+#define     ChuHuoKouCloseLimit_IN    				P41 //出货口关门到位
+#define     CeMenOpenLimit_IN	    			P70	//侧门开门到位
+#define     CeMenCloseLimit_IN	    			P06	//侧门关门到位
+#define     CeMenMaxLimit_IN    			P30	//侧门上限位
+#define     CeMenMinLimit_IN    			P05 //侧门下限位
+//////////////////////////////////
+#define     X_MOTOR_PWM1    				P24
+#define     X_MOTOR_PWM2    				P25
+#define     X_MOTOR_ENABLE1    			P42
+#define     X_MOTOR_ENABLE2    			P21
 
-#define     LIGHT_CTRL1    			P71
-#define     LIGHT_CTRL2    			P72
+#define     Y_MOTOR_PWM1    			P22
+#define     Y_MOTOR_PWM2    			P23
+#define     Y_MOTOR_ENABLE1    			P73
+#define     Y_MOTOR_ENABLE2    			P20
+
+#define     Z_MOTOR_PWM1    			P27
+#define     Z_MOTOR_PWM2    			P00
+#define     Z_MOTOR_ENABLE    			P26
+#define     T_MOTOR_PWM1    				P77
+#define     T_MOTOR_PWM2    				P74
+#define     T_MOTOR_ENABLE    			P01
+
+#define     D_MOTOR_PWM1    				P76
+#define     D_MOTOR_PWM2    				P75
+#define     D_MOTOR_ENABLE    			P10
+#define     L_MOTOR_PWM1    				P64
+#define     L_MOTOR_PWM2    				P40
+#define     L_MOTOR_ENABLE    			P62
+
+#define     QuHuoMen_MOTOR_PWM1    				P54
+#define     QuHuoMen_MOTOR_PWM2    				P55
+#define     QuHuoMen_MOTOR_ENABLE    			P61
+///////////////////////////////////
+#define     LIGHT_CTRL1_OUT    			P71
+#define     LIGHT_CTRL2_OUT    			P72
 
 void bsp(void);
 void soft_reset(void);
