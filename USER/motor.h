@@ -36,9 +36,9 @@ typedef struct {
 typedef struct Motor_t  {
 	motor_state_t       status;
 	//Position_t CurPos;
-	INT16S CurPos;
-	INT16U ObjPos;
-	INT16U Param;
+	INT32S CurPos;
+	INT32U ObjPos;
+	INT32U Param;
 	u8 dir;
 }TMotor;
 

@@ -155,18 +155,21 @@ void  UsartCmdProcess (void)
 				pUsart->tx_cmd = _CMD_TX_SYS_TEST;
 				temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); //动作类型
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);//电机类型 
-				SysMotor.MotorIDRunning = iPara - 3;
-				if(SysMotor.MotorIDRunning>=MOTOR_X_ID && SysMotor.MotorIDRunning <= MOTOR_QuHuoMen_ID)	{//检测测试电机类型是否符合要求
+				//SysMotor.MotorIDRunning = iPara - 3;
+				iPara -= 3;
+				if(iPara>=MOTOR_X_ID && iPara <= MOTOR_QuHuoMen_ID)	{//检测测试电机类型是否符合要求
 				}else {
 					break;
-				}
+				}	
+				iPara += 3;				
 				if(temp==1)	{//执行测试					
 					if(DevState.bits.SubState == 1)	{//有电机运行 忙碌中 拒绝执行新的测试请求
 						pUsart->tx_idx = 0;				
 						data_buf[pUsart->tx_idx++] = iPara;
 						data_buf[pUsart->tx_idx++] = ActionState_Busy;//
 						return;
-					}											
+					}	
+					SysMotor.MotorIDRunning = iPara - 3;					
 					DevState.bits.State = DEV_STATE_TEST;//设备状态 独立部件运行
 					if(iPara==3)	{
 						SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
@@ -180,7 +183,7 @@ void  UsartCmdProcess (void)
 					}
 					else if(iPara==5)	{
 						SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
-						SysMotor.motor[MOTOR_Z_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+						SysMotor.motor[MOTOR_Z_ID].Param = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 						
 					}
 					else if(iPara==6)	{

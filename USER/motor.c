@@ -41,8 +41,8 @@ void MotorStart(void)
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//测试x电机
 		X_MOTOR_PWM1 = 1;
 		X_MOTOR_PWM2 = 0;
-		X_MOTOR_ENABLE1 = 1;
-		X_MOTOR_ENABLE2 = 0;
+		X_MOTOR_ENABLE1 = 0;
+		X_MOTOR_ENABLE2 = 1;
 		motor_timeout = 3000;//30s
 		//BSP_PRINTF("x motor testing.\r\n");
 		//SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;
@@ -50,15 +50,15 @@ void MotorStart(void)
 	}else	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//测试y电机
 		Y_MOTOR_PWM1 = 1;
 		Y_MOTOR_PWM2 = 0;
-		Y_MOTOR_ENABLE1 = 1;
-		Y_MOTOR_ENABLE2 = 0;
+		Y_MOTOR_ENABLE1 = 0;
+		Y_MOTOR_ENABLE2 = 1;
 		motor_timeout = 3000;
 		//SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;
 	}
 	else	if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{//测试z电机
 		Z_MOTOR_PWM1 = 1;
 		Z_MOTOR_PWM2 = 0;
-		//SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_Z_ID].Param*10);		
+		//SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_Z_ID].Param*10);	//运行时间	
 		Z_MOTOR_ENABLE = 1;
 		motor_timeout = 3000;
 		//SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_Doing;
@@ -95,7 +95,7 @@ void MotorStart(void)
 		L_MOTOR_PWM2 = 0;
 		L_MOTOR_ENABLE = 1;
 		motor_timeout = 3000;
-		//SoftTimerStart(Timer1, SysMotor.motor[MOTOR_L_ID].Param*10);
+		//SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_L_ID].Param*10);//运行时间
 		//SysMotor.motor[MOTOR_L_ID].status.action = ActionState_Doing;
 		//return;
 	}

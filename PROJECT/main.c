@@ -16,7 +16,7 @@ void timer_event(void)
 {
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;
-		CheckIOState();
+		//CheckIOState();
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
