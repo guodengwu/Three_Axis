@@ -114,6 +114,7 @@ void MotorStart(void)
 	SysMotor.motor[runing_id].status.action = ActionState_Doing;
 	SoftTimerStart(&Timer2Soft, motor_timeout);//电机运行超时控制
 }
+
 //
 void MotorStop(u8 stop_type)
 {
@@ -128,44 +129,28 @@ void MotorStop(u8 stop_type)
 	}
 	
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//停止x电机
-		X_MOTOR_ENABLE1 = 0;
-		X_MOTOR_ENABLE2 = 0;
-		SysMotor.ALLMotorState.bits.XMotor = DEF_Stop;
-
+		StopXMotor();
 	}else	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//停止y电机
-		Y_MOTOR_ENABLE1 = 0;
-		Y_MOTOR_ENABLE2 = 0;
-		SysMotor.ALLMotorState.bits.YMotor = DEF_Stop;
+		StopYMotor();
 
 	}
 	else	if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{//停止z电机
-		Z_MOTOR_PWM1 = 0;
-		Z_MOTOR_PWM2 = 0;		
-		Z_MOTOR_ENABLE = 0;
-		SysMotor.ALLMotorState.bits.ZMotor = DEF_Stop;
+		StopZMotor();
 
 	}
 	else	if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//停止推杆电机
-		T_MOTOR_PWM1 = 0;
-		T_MOTOR_PWM2 = 0;
-		T_MOTOR_ENABLE = 0;		
-		SysMotor.ALLMotorState.bits.TMotor = DEF_Stop;
+		StopTMotor();
 
 	}
 	else	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{//停止侧门电机
-		D_MOTOR_PWM1 = 0;
-		D_MOTOR_PWM2 = 0;
-		D_MOTOR_ENABLE = 0;
-		SysMotor.ALLMotorState.bits.DMotor = DEF_Stop;
+		StopDMotor();
 
 	}
 	else	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{//停止履带电机
-		L_MOTOR_ENABLE = 0;
-		SysMotor.ALLMotorState.bits.LMotor = DEF_Stop;
+		StopLMotor();
 	}
 	else	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{//停止取货门电机
-		QuHuoMen_MOTOR_ENABLE = 0;
-		SysMotor.ALLMotorState.bits.QuHuoMenMotor =  DEF_Stop;
+		StopQuHuoMenMotor();		
 	}
 	if(stop_type==DEF_Success)	{
 		SysMotor.motor[runing_id].status.action = ActionState_OK;
@@ -190,3 +175,52 @@ void MotorTest(void)
 	}
 }	
 
+
+void StopXMotor(void)
+{
+	X_MOTOR_ENABLE1 = 0;
+	X_MOTOR_ENABLE2 = 0;
+	SysMotor.ALLMotorState.bits.XMotor = DEF_Stop;
+}
+
+void StopYMotor(void)
+{
+	Y_MOTOR_ENABLE1 = 0;
+	Y_MOTOR_ENABLE2 = 0;
+	SysMotor.ALLMotorState.bits.YMotor = DEF_Stop;
+}
+
+void StopZMotor(void)
+{
+	Z_MOTOR_PWM1 = 0;
+	Z_MOTOR_PWM2 = 0;		
+	Z_MOTOR_ENABLE = 0;
+	SysMotor.ALLMotorState.bits.ZMotor = DEF_Stop;
+}
+
+void StopTMotor(void)
+{
+	T_MOTOR_PWM1 = 0;
+	T_MOTOR_PWM2 = 0;
+	T_MOTOR_ENABLE = 0;	
+	SysMotor.ALLMotorState.bits.TMotor = DEF_Stop;
+}
+
+void StopDMotor(void)
+{
+	D_MOTOR_PWM1 = 0;
+	D_MOTOR_PWM2 = 0;
+	D_MOTOR_ENABLE = 0;
+	SysMotor.ALLMotorState.bits.DMotor = DEF_Stop;
+}
+
+void StopLMotor(void)
+{
+	L_MOTOR_ENABLE = 0;
+	SysMotor.ALLMotorState.bits.LMotor = DEF_Stop;
+}
+void StopQuHuoMenMotor(void)
+{
+	QuHuoMen_MOTOR_ENABLE = 0;
+	SysMotor.ALLMotorState.bits.QuHuoMenMotor =  DEF_Stop;
+}

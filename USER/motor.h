@@ -8,6 +8,13 @@
 
 #define	MOTOR_RUN_TIMEOUT		600000 //6s
 
+#define XMOTOR_LEN_MAX			600//mm
+#define YMOTOR_LEN_MAX			1435//mm
+
+#define	MicroSteps				20//码盘细分
+#define XMotor_NumPerRound		100//x电机一圈100mm
+#define YMotor_NumPerRound		200//y电机一圈200mm
+
 typedef enum {
     MOTOR_X_ID      = 0,
     MOTOR_Y_ID,
@@ -79,6 +86,17 @@ enum eActionState {
 	ActionState_DoReady		,
 };
 
+enum eMotorAbort {
+	MotorAbort_Normal    = 0,       // Motor Abort:Normal
+	MotorAbort_OverSteps = 1,       // Motor Abort:Over steps
+	MotorAbort_Stuck   = 2,       // Motor Abort:door opened
+	MotorAbort_LimitOpt  = 3,        // Motor Abort:touch limit opt
+	MotorAbort_Min_LimitOpt  = 4,
+	MotorAbort_Max_LimitOpt  = 5,
+	MotorAbort_OpenOpt  = 6,
+	MotorAbort_CloseOpt  = 7,
+};
+
 extern SysMotor_t SysMotor;
 
 void MotorInit(void);
@@ -86,5 +104,12 @@ void MotorStart(void);
 void MotorStop(u8 stop_type);
 void MotorTest(void);
 void SoftTimerStop(_softtimer_t *psofttimer);
+void StopXMotor(void);
+void StopYMotor(void);
+void StopZMotor(void);
+void StopLMotor(void);
+void StopTMotor(void);
+void StopDMotor(void);
+void StopQuHuoMenMotor(void);
 
 #endif

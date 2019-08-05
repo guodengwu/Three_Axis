@@ -438,6 +438,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\motor.c</FilePath>
             </File>
+            <File>
+              <FileName>encoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\encoder.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

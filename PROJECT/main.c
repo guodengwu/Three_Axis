@@ -2,6 +2,7 @@
 #include "includes.h"
 #include "protocol.h"
 #include "motor.h"
+#include "encoder.h"
 
 /******************************************************************
  - 实验平台：SW1A_51&ARM开发板
@@ -16,7 +17,9 @@ void timer_event(void)
 {
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;
-		//CheckIOState();
+		CheckIOState();
+		//ReadEncoder(EncoderX_ID);
+		//ReadEncoder(EncoderY_ID);
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
