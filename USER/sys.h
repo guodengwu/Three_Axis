@@ -62,8 +62,8 @@ enum dev_ship_state {//³ö»õ×´Ì¬
 
 enum dev_logic_err {
 	LE_NONE = 0,
-	LE_XMOTOR = 1,
-	LE_YMOTOR = 20,
+	LE_XMOTOR_DuZhuan = 1,//¶Â×ª
+	LE_YMOTOR_DuZhuan = 20,
 	LE_ZMOTOR = 30,
 	LE_TuiGan = 40,
 	LE_CeMen = 50,

@@ -75,6 +75,41 @@ void CalcXYMotorPos(void)
 	SysMotor.motor[MOTOR_X_ID].CurPos = encoder[EncoderX_ID].pluse*XMotor_StepsPerum;	
 	SysMotor.motor[MOTOR_Y_ID].CurPos = encoder[EncoderY_ID].pluse*YMotor_StepsPerum;	
 }
+//码盘异常检测 在运动状态下 持续10s码盘读数无变化
+void CheckMaPan(void)
+{
+	static XCurPos=0,YCurPos=0;
+	static XPosChangeCnt=0,YPosChangeCnt=0;
+	
+	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
+		if(XCurPos==SysMotor.motor[MOTOR_X_ID].CurPos)	{
+			XPosChangeCnt++;
+			if(XPosChangeCnt>10)	{
+				SysHDError.E2.bits.b2 = 1;//X 码盘异常
+			}
+		}
+		else	{
+			XPosChangeCnt = 0;
+			SysHDError.E2.bits.b2 = 0;
+		}
+	}
+	else 
+		XPosChangeCnt = 0;
+	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
+		if(YCurPos==SysMotor.motor[MOTOR_Y_ID].CurPos)	{
+			YPosChangeCnt++;
+			if(YPosChangeCnt>10)	{
+				SysHDError.E2.bits.b3 = 1;//Y 码盘异常
+			}
+		}
+		else	{
+			YPosChangeCnt = 0;
+			SysHDError.E2.bits.b3 = 0;
+		}
+	}
+	else
+		YPosChangeCnt = 0;
+}
 
 void MotorStart(void)
 {

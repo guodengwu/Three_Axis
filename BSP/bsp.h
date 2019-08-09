@@ -17,6 +17,8 @@
 #define     CeMenCloseLimit_IN	    			P06	//侧门关门到位
 #define     CeMenMaxLimit_IN    			P30	//侧门上限位
 #define     CeMenMinLimit_IN    			P05 //侧门下限位
+#define		X_MotorDuZhuan_IN				P32
+#define		Y_MotorDuZhuan_IN				P33
 
 #define		X_ENCODER_IN					P34
 #define		Y_ENCODER_IN					P35

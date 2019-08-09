@@ -116,5 +116,5 @@ void StopQuHuoMenMotor(void);
 void MotorReset(u8 id);
 void CalcXYMotorPos(void);
 void XYMotorResetCheck();
-
+void CheckMaPan(void);
 #endif

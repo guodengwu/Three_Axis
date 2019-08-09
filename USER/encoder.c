@@ -44,22 +44,20 @@ void ReadEncoder(TMotor *pMotor)
 	if(pMotor->id==EncoderX_ID)		{
 		reghigh = TH0;
 		reglow = TL0;
-//		TH0 = 0;
-//		TL0 = 0;
 		regval = reghigh<<8 | reglow;
-		if(Time0RegBk >= regval)	{
+		if(regval >= Time0RegBk)	{
 			regdiff = regval - Time0RegBk;
 		}
 		else 
-			regdiff = 0xffff - Time0RegBk + regval;
+			regdiff = 0xffff - Time0RegBk + regval;		
+		/*if(regdiff>0)
+			SYS_PRINTF("  :%d %d %d\r\n",regdiff,regval,Time0RegBk);*/
 		Time0RegBk = regval;
 	}else if(pMotor->id==EncoderY_ID)	{
 		reghigh = TH1;
 		reglow = TL1;
-//		TH1 = 0;
-//		TL1 = 0;
 		regval = reghigh<<8 | reglow;
-		if(Time1RegBk >= regval)	{
+		if(regval >= Time1RegBk)	{
 			regdiff = regval - Time1RegBk;
 		}
 		else 
@@ -68,8 +66,12 @@ void ReadEncoder(TMotor *pMotor)
 	}	
 	if(pMotor->dir==MOTOR_TO_MIN)	{
 		encoder[pMotor->id].pluse -= regdiff;
+		//encoder[pMotor->id].diff = regdiff;
 	}else if(pMotor->dir==MOTOR_TO_MAX)		{
 		encoder[pMotor->id].pluse += regdiff;
+		//encoder[pMotor->id].diff = regdiff;
 	}	
 	
 }
+
+

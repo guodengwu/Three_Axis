@@ -15,7 +15,7 @@ enum EncoderNUM{
 
 typedef struct _Encoder  {
 	s32 pluse;
-	
+	//u16 diff;
 }Encoder_t;
 
 extern Encoder_t encoder[ENCODER_NUMS];

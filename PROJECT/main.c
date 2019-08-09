@@ -24,6 +24,7 @@ void timer_event(void)
 		_10ms_EVENT = 0;
 		CheckIOState();
 		CalcXYMotorPos();
+		CheckMaPan();
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
