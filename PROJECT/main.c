@@ -13,23 +13,32 @@
  - 返回说明：无
  - 备注说明：使用51单片机，外部晶体频率:22.1184MHZ-1T模式
  ******************************************************************/
+ u8 pos_buf[10];
 void timer_event(void)
 {
+	if(_3ms_EVENT)	{
+		_3ms_EVENT = 0;
+		RS485TxToRx();
+	}
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;
 		CheckIOState();
-		//ReadEncoder(EncoderX_ID);
-		//ReadEncoder(EncoderY_ID);
+		CalcXYMotorPos();
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
 		//usart.tx_cmd = _CMD_TX_GET_VERSION;
+		sprintf(pos_buf,"%d %d",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
+		SYS_PRINTF("x pos:%s\r\n",pos_buf);
+		sprintf(pos_buf,"%d %d",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
+		SYS_PRINTF("y pos:%s\r\n",pos_buf);
+		soft_reset();
 	}
 }
 
 void main(void)
 {
-	SystickInit_Tmer0();
+	SystickInit_Tmer();
 	bsp();	
 	SysDataInit();
 	MotorInit();
@@ -37,11 +46,14 @@ void main(void)
 	ES = 1;
     EA = 1;
 	SYS_PRINTF("Sys Startup.\r\n");
+	EncoderDataInit();
+	MotorReset(MOTOR_X_ID);//X Y电机复位
+	MotorReset(MOTOR_Y_ID);
+	
 	while(1)
 	{
 		timer_event();
 		UsartCmdProcess();//串口指令处理函数
-		UsartCmdReply();//串口指令回复
-		soft_reset();
+		UsartCmdReply();//串口指令回复		
 	}
 } 

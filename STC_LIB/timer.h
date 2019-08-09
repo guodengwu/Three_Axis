@@ -36,10 +36,11 @@ extern _softtimer_t Timer1Soft;
 extern _softtimer_t Timer2Soft;
 extern u8 _10ms_EVENT;
 extern u8 _1s_EVENT;
+extern u8 _3ms_EVENT;
 
-void	SystickInit_Tmer0(void);
-void Timer1Init(void);
-void Timer2Init(void);
+void	SystickInit_Tmer(void);
+void Timer4Init(void);
+//void Timer2Init(void);
 void TimerStart(u8 TIM);
 void TimerStop(u8 TIM);
 void TimerSetValue(u8 TIM, u16 value);

@@ -1,4 +1,5 @@
 #include "motor.h"
+#include "encoder.h"
 
 SysMotor_t xdata SysMotor;
 
@@ -6,6 +7,7 @@ void MotorInit(void)
 {
 	u8 i;
 	for(i=MOTOR_X_ID;i<MOTOR_QuHuoMen_ID;i++)	{
+		SysMotor.motor[i].id = i;
 		SysMotor.motor[i].status.is_run = MotorState_Stop;
 		SysMotor.motor[i].status.action = ActionState_Idle;
 		SysMotor.motor[i].CurPos = 0;
@@ -28,6 +30,51 @@ void MotorDisable(void)
 {
 
 }*/
+void MotorReset(u8 id)
+{
+	if(id == MOTOR_X_ID)	{
+		Sys.state |= SYSSTATE_XMOTORRESET;
+		SysMotor.motor[MOTOR_X_ID].dir = MOTOR_TO_MIN;
+		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
+	}else 	if(id == MOTOR_Y_ID)	{
+		Sys.state |= SYSSTATE_YMOTORRESET;
+		SysMotor.motor[MOTOR_Y_ID].dir = MOTOR_TO_MIN;
+		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
+	}
+	MotorStart();
+}
+
+void XYMotorResetCheck()
+{
+	if(Sys.state & SYSSTATE_XMOTORRESET)	{
+		if(SysMotor.motor[MOTOR_X_ID].status.abort_type == MotorAbort_Min_LimitOpt)	{
+			Sys.state &= ~SYSSTATE_XMOTORRESET;
+			//StopXMotor();
+			SysMotor.motor[MOTOR_X_ID].CurPos = 0;
+			SYS_PRINTF("x motor reset ok.\r\n");
+		}
+	}
+	if(Sys.state & SYSSTATE_YMOTORRESET)	{
+		if(SysMotor.motor[MOTOR_Y_ID].status.abort_type == MotorAbort_Min_LimitOpt)	{
+			Sys.state &= ~SYSSTATE_YMOTORRESET;
+			//StopYMotor();
+			SysMotor.motor[MOTOR_Y_ID].CurPos = 0;
+			SYS_PRINTF("y motor reset ok.\r\n");
+		}
+	}
+}
+
+void CalcXYMotorPos(void)
+{
+	/*if((SysMotor.ALLMotorState.bits.XMotor != DEF_Run) || (SysMotor.ALLMotorState.bits.YMotor != DEF_Run))	{
+		return;
+	}*/
+	ReadEncoder(&SysMotor.motor[MOTOR_X_ID]);	
+	ReadEncoder(&SysMotor.motor[MOTOR_Y_ID]);
+
+	SysMotor.motor[MOTOR_X_ID].CurPos = encoder[EncoderX_ID].pluse*XMotor_StepsPerum;	
+	SysMotor.motor[MOTOR_Y_ID].CurPos = encoder[EncoderY_ID].pluse*YMotor_StepsPerum;	
+}
 
 void MotorStart(void)
 {
@@ -39,8 +86,14 @@ void MotorStart(void)
 	}
 	runing_id = SysMotor.MotorIDRunning;
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//测试x电机
-		X_MOTOR_PWM1 = 1;
-		X_MOTOR_PWM2 = 0;
+		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
+			X_MOTOR_PWM1 = 1;
+			X_MOTOR_PWM2 = 0;
+		}
+		else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX)	{
+			X_MOTOR_PWM1 = 0;
+			X_MOTOR_PWM2 = 1;
+		}
 		X_MOTOR_ENABLE1 = 0;
 		X_MOTOR_ENABLE2 = 1;
 		motor_timeout = 3000;//30s
@@ -48,8 +101,14 @@ void MotorStart(void)
 		//SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;
 		
 	}else	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//测试y电机
-		Y_MOTOR_PWM1 = 1;
-		Y_MOTOR_PWM2 = 0;
+		if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{
+			Y_MOTOR_PWM1 = 1;
+			Y_MOTOR_PWM2 = 0;
+		}
+		else if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX)	{
+			Y_MOTOR_PWM1 = 0;
+			Y_MOTOR_PWM2 = 1;
+		}
 		Y_MOTOR_ENABLE1 = 0;
 		Y_MOTOR_ENABLE2 = 1;
 		motor_timeout = 3000;
@@ -154,8 +213,10 @@ void MotorStop(u8 stop_type)
 	}
 	if(stop_type==DEF_Success)	{
 		SysMotor.motor[runing_id].status.action = ActionState_OK;
+		SysMotor.motor[runing_id].status.abort_type = MotorAbort_Normal;
 	}else if(stop_type==DEF_Fail)	{
 		SysMotor.motor[runing_id].status.action = ActionState_Fail;
+		SysMotor.motor[runing_id].status.abort_type = MotorAbort_Timeout;
 	}
 }
 

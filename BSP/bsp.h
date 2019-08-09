@@ -51,6 +51,8 @@
 ///////////////////////////////////
 #define     LIGHT_CTRL1_OUT    			P71
 #define     LIGHT_CTRL2_OUT    			P72
+#define     RS485_CTRL    			P43
+
 
 void bsp(void);
 void soft_reset(void);

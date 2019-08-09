@@ -2,9 +2,10 @@
 #define __ENCODER_H
 
 #include "includes.h"
+#include "motor.h"
 
 enum EncoderNUM{
-    EncoderX_ID      = 0,
+    EncoderX_ID      = MOTOR_X_ID,
     EncoderY_ID,
 };
 
@@ -19,7 +20,9 @@ typedef struct _Encoder  {
 
 extern Encoder_t encoder[ENCODER_NUMS];
 
-s32 ReadEncoder(u8 id);
+void ReadEncoder(TMotor *pMotor);
+void EncoderDataInit(void);
+void EncoderReset(u8 id);
 
 #endif
 

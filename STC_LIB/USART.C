@@ -10,7 +10,7 @@ RINGBUFF_T uart4_rxring;
 void UART3_config(void)
 {
 	GPIO_InitTypeDef	GPIO_InitStructure;
-	u16 baud;
+	//u16 baud;
 
 	GPIO_InitStructure.Pin  = GPIO_Pin_1;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
@@ -18,7 +18,7 @@ void UART3_config(void)
 	//    P_SW2 = 0x00;                               // RXD3/P0.0, TXD3/P0.1
 	P_SW2 |= 0x02;                               // RXD3_2/P5.0, TXD3_2/P5.1
 	
-	baud = BRT_57600;
+	/*baud = BRT_57600;
 	S3CON = 0x10;		//8位数据,可变波特率
 	S3CON |= 0x40;		//串口3选择定时器3为波特率发生器
 	T4T3M |= 0x02;		//定时器3时钟为Fosc,即1T
@@ -26,14 +26,22 @@ void UART3_config(void)
 	T3H = baud>>8;		//设定定时初值
 	T4T3M |= 0x08;		//启动定时器3
 	UART3_INT_ENABLE();//允许中断
-    COM3.TX_busy = DEF_Idle;
+    COM3.TX_busy = DEF_Idle;*/
+	S3CON |= 0x10;		//8位数据,可变波特率 9600
+	S3CON &= 0xBF;		//串口3选择定时器2为波特率发生器
+	AUXR |= 0x04;		//定时器2时钟为Fosc,即1T
+	T2L = 0x41;		//设定定时初值
+	T2H = 0xFD;		//设定定时初值
+	AUXR |= 0x10;		//启动定时器2
+	UART3_INT_ENABLE();//允许中断
+	COM3.TX_busy = DEF_Idle;
 }
 
 //用于485通讯 使用定时器4做波特率发生器 9600
 void UART4_config(void)
 {
 	GPIO_InitTypeDef	GPIO_InitStructure;
-	u16 baud;
+	//u16 baud;
 	    
 	GPIO_InitStructure.Pin  = GPIO_Pin_3;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
@@ -41,13 +49,20 @@ void UART4_config(void)
 	//	P_SW2 = 0x04;                               //RXD4_2/P5.2, TXD4_2/P5.3
 	P_SW2 &= ~0x04;                               //RXD4/P0.2, TXD4/P0.3
 
-	baud = BRT_9600;
+	/*baud = BRT_9600;
 	S4CON = 0x10;		//8位数据,可变波特率
 	S4CON |= 0x40;		//串口4选择定时器4为波特率发生器
 	T4T3M |= 0x20;		//定时器4时钟为Fosc,即1T
 	T4L = baud;//(baud&0xff);		//设定定时初值
 	T4H = baud>>8;//baud>>8;		//设定定时初值
 	T4T3M |= 0x80;		//启动定时器4
+	UART4_INT_ENABLE();//允许中断*/
+	S4CON |= 0x10;		//8位数据,可变波特率 9600
+	S4CON &= 0xBF;		//串口4选择定时器2为波特率发生器
+	AUXR |= 0x04;		//定时器2时钟为Fosc,即1T
+	T2L = 0x41;		//设定定时初值
+	T2H = 0xFD;		//设定定时初值
+	AUXR |= 0x10;		//启动定时器2
 	UART4_INT_ENABLE();//允许中断
 	RingBuffer_Init(&uart4_rxring, UART4_RXBuff, 1, UART4_RXLEN);
 }

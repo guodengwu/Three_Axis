@@ -3,8 +3,8 @@
 
 #include "includes.h"
 
-#define MOTOR_TO_MAX         DEF_TRUE        // To Max
-#define MOTOR_TO_MIN         DEF_FALSE       // To Min
+#define MOTOR_TO_MAX         DEF_True        // To Max
+#define MOTOR_TO_MIN         DEF_False       // To Min
 
 #define	MOTOR_RUN_TIMEOUT		600000 //6s
 
@@ -14,6 +14,8 @@
 #define	MicroSteps				20//码盘细分
 #define XMotor_NumPerRound		100//x电机一圈100mm
 #define YMotor_NumPerRound		200//y电机一圈200mm
+#define XMotor_StepsPerum		(XMotor_NumPerRound/MicroSteps)//5mm
+#define YMotor_StepsPerum		(YMotor_NumPerRound/MicroSteps)//10mm
 
 typedef enum {
     MOTOR_X_ID      = 0,
@@ -41,10 +43,10 @@ typedef struct {
 } Position_t;
 */
 typedef struct Motor_t  {
+	u8 id;
 	motor_state_t       status;
-	//Position_t CurPos;
 	INT32S CurPos;
-	INT32U ObjPos;
+	INT32S ObjPos;
 	INT32U Param;
 	u8 dir;
 }TMotor;
@@ -88,7 +90,7 @@ enum eActionState {
 
 enum eMotorAbort {
 	MotorAbort_Normal    = 0,       // Motor Abort:Normal
-	MotorAbort_OverSteps = 1,       // Motor Abort:Over steps
+	MotorAbort_Timeout = 1,       // Motor Abort:Over steps
 	MotorAbort_Stuck   = 2,       // Motor Abort:door opened
 	MotorAbort_LimitOpt  = 3,        // Motor Abort:touch limit opt
 	MotorAbort_Min_LimitOpt  = 4,
@@ -111,5 +113,8 @@ void StopLMotor(void);
 void StopTMotor(void);
 void StopDMotor(void);
 void StopQuHuoMenMotor(void);
+void MotorReset(u8 id);
+void CalcXYMotorPos(void);
+void XYMotorResetCheck();
 
 #endif

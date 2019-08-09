@@ -104,6 +104,7 @@ extern usart_t      usart;
 void ProDataInit(void);
 void UsartCmdReply(void);
 void  UsartCmdProcess (void);
+void RS485TxToRx(void);
 
 #endif
 

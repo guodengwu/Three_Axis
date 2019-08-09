@@ -42,6 +42,19 @@ void ProDataInit(void)
     usart.tx_complete  = &uart_message_tx_handler;
 }
 
+void RS485TxToRx(void)
+{
+	static u8 txflag;
+	if(usart.tx_flag == DEF_Idle)	{
+		txflag ++;
+		if(txflag>1)	{
+			txflag = 0;
+			RS485_CTRL = 0;
+		}
+	}
+	else
+		txflag = 0;
+}
 //串口指令回复
 void UsartCmdReply(void)
 {
@@ -303,6 +316,7 @@ static void PackageSendData(uint8_t cmd, uint8_t *pdat, uint8_t len)
 	//uint8_t temp;
 
 	usart.tx_flag = DEF_Busy;//串口发送忙标记
+	RS485_CTRL = 1;
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD0;
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD1;
 	usart.tx_buf[idx++] = cmd;

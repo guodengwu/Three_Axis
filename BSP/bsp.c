@@ -1,4 +1,5 @@
 #include "bsp.h"
+//#include "encoder.h"
 
 ////////////////////////////////////
 //IO配置函数
@@ -47,7 +48,7 @@ static void	GPIO_config(void)
 //	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 //	GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);	        //初始化 P3
 //	
-	GPIO_InitStructure.Pin  = GPIO_Pin_0|/*GPIO_Pin_1|*/GPIO_Pin_2/*|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_7*/;
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|/*GPIO_Pin_1|*/GPIO_Pin_2|GPIO_Pin_3/*|GPIO_Pin_4|GPIO_Pin_7*/;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
 //	
@@ -74,6 +75,7 @@ static void	GPIO_config(void)
 	D_MOTOR_ENABLE = 0;
 	L_MOTOR_ENABLE = 0;
 	QuHuoMen_MOTOR_ENABLE = 0;
+	RS485_CTRL = 0;//默认接收模式
 }
 #if 0
 #if 1
@@ -156,8 +158,8 @@ void bsp(void)
     GPIO_config();          //IO配置函数
 	UART3_config();//用于串口调试打印
 	UART4_config();
-	Timer1Init();
-	Timer2Init();
+	//Timer1Init();
+	Timer4Init();
 }
 
 void soft_reset(void)
