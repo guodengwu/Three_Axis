@@ -75,23 +75,8 @@ void CheckIOState(void)
 			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Max_LimitOpt;
 		}
 	}
-	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
-		if(X_MotorDuZhuan_IN==0)	{
-			StopXMotor();
-			SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Stuck;
-			SysHDError.E1.bits.b0 = 1;
-			SysLogicErr.logic = LE_XMOTOR_DuZhuan;
-		}
-	}
-	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
-		if(Y_MotorDuZhuan_IN==0)	{
-			StopYMotor();
-			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Stuck;
-			SysHDError.E1.bits.b1 = 1;
-			SysLogicErr.logic = LE_YMOTOR_DuZhuan;			
-		}		
-	}
 }
+
 
 /*void CheckDevAction(void)
 {

@@ -108,8 +108,12 @@ void UsartCmdReply(void)
 		case _CMD_TX_CLR_RESULT://0x68,//回复 _CMD_RX_CLR_RESULT
 			//data_buf[idx++] = Sys.DevAction;
 			break;
-		case _CMD_TX_SYS_TEST:
+		case _CMD_TX_SYS_TEST://0x69,//回复 _CMD_RX_SYS_TEST
 			PackageSendData(cmd, data_buf, pUsart->tx_idx);
+			break;
+		case _CMD_TX_SHIP_OK://0X6b,//回复 _CMD_RX_SHIP_OK
+			PackageSendData(cmd, data_buf, 0);
+			SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
 			break;
 		default:
 			break;
@@ -158,9 +162,16 @@ void  UsartCmdProcess (void)
 					pUsart->tx_cmd = _CMD_TX_GET_VERSION;
 				}
 				break;
-			case _CMD_RX_CLR_RESULT://	0X05,//清除运行结果
+			case _CMD_RX_CLR_RESULT://	0X05,//机器复位 清除运行结果
+				temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); //动作类型
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
 				if(iPara==2)	{
+					if(temp==0)	{//查询结果
+					
+					}else if(temp==1)	{//执行复位
+						MotorReset(MOTOR_X_ID);//X Y电机复位
+						MotorReset(MOTOR_Y_ID);
+					}
 					pUsart->tx_cmd = _CMD_TX_CLR_RESULT;
 				}
 				break;
@@ -230,6 +241,10 @@ void  UsartCmdProcess (void)
 					data_buf[pUsart->tx_idx++] = SysMotor.motor[SysMotor.MotorIDRunning].status.action;										
 				}
 				break;
+			case _CMD_RX_SHIP_OK:	{
+				pUsart->tx_cmd = _CMD_TX_SHIP_OK;
+				break;
+			}
 			default:
 				pUsart->tx_cmd = _CMD_TX_NONE;
 				break;
