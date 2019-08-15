@@ -15,12 +15,21 @@ void MotorInit(void)
 	SysMotor.MotorIDRunning = 0xff;
 	SysMotor.ALLMotorState.ubyte = 0;
 }
-/*
-void MotorSetDir(void)
+
+void XYMotorSetDir(void)
 {
-
+	if(SysMotor.motor[MOTOR_X_ID].CurPos >= SysMotor.motor[MOTOR_X_ID].ObjPos)	{
+		SysMotor.motor[MOTOR_X_ID].dir = MOTOR_TO_MIN;
+	}
+	else
+		SysMotor.motor[MOTOR_X_ID].dir = MOTOR_TO_MAX;
+	if(SysMotor.motor[MOTOR_Y_ID].CurPos >= SysMotor.motor[MOTOR_Y_ID].ObjPos)	{
+		SysMotor.motor[MOTOR_Y_ID].dir = MOTOR_TO_MIN;
+	}
+	else
+		SysMotor.motor[MOTOR_Y_ID].dir = MOTOR_TO_MAX;
 }
-
+/*
 void MotorEnable(void)
 {
 
@@ -111,6 +120,33 @@ void CheckMaPan(void)
 	}
 	else
 		YPosChangeCnt = 0;
+}
+
+void XYMotorArrived(void)
+{
+	//static u8 arriveflag = 0;
+	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
+		if(SysMotor.motor[MOTOR_X_ID].CurPos >= SysMotor.motor[MOTOR_X_ID].ObjPos)	{
+			StopXMotor();
+			SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Normal;
+			SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK;
+			//arriveflag = 1;
+		}
+	}
+	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
+		if(SysMotor.motor[MOTOR_Y_ID].CurPos >= SysMotor.motor[MOTOR_Y_ID].ObjPos)	{
+			StopYMotor();
+			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Normal;
+			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
+			//arriveflag = 2;
+		}
+	}
+	if(SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
+		if(DevState.bits.State == DEV_STATE_SHIPING)	{
+			DevState.bits.SubState = DEV_ShipStateReqShip;
+		}
+		//arriveflag = 0;
+	}
 }
 
 void MotorStart(void)
@@ -305,7 +341,7 @@ void MotorTest(void)
 	DevState.bits.SubState = 1;//电机运行中
 	MotorStart();
 	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{
-		SoftTimerStart(Timer1, SysMotor.motor[MOTOR_L_ID].Param*10);
+		SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_L_ID].Param*10);
 	}
 	else if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{
 		SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_Z_ID].Param*10);

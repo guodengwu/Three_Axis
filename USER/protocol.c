@@ -72,7 +72,7 @@ void UsartCmdReply(void)
 		    data_buf[idx++] = SysMotor.ALLMotorState.ubyte;//所有电机状态
 			data_buf[idx++] = 0;
 			data_buf[idx++] = IOState.HongWaiState.ubyte;
-			data_buf[idx++] = DevState.ubyte;
+			data_buf[idx++] = DevState.ubyte;//机器状态
 			data_buf[idx++] = SysHDError.E1.ubyte;
 			data_buf[idx++] = SysHDError.E2.ubyte;
 			data_buf[idx++] = SysLogicErr.logic;
@@ -80,7 +80,7 @@ void UsartCmdReply(void)
 			data_buf[idx++] = SysMotor.motor[MOTOR_X_ID].CurPos&0xff;
 			data_buf[idx++] = SysMotor.motor[MOTOR_Y_ID].CurPos>>8;
 			data_buf[idx++] = SysMotor.motor[MOTOR_Y_ID].CurPos&0xff;
-			data_buf[idx++] = Sys.DevAction;
+			data_buf[idx++] = Sys.DevAction;//动作结果
 			PackageSendData(cmd, data_buf, idx);
 			break;
 		case _CMD_TX_SHIP://0X65,//回复 _CMD_RX_SHIP
@@ -114,6 +114,7 @@ void UsartCmdReply(void)
 		case _CMD_TX_SHIP_OK://0X6b,//回复 _CMD_RX_SHIP_OK
 			PackageSendData(cmd, data_buf, 0);
 			SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
+			MotorStart();
 			break;
 		default:
 			break;
@@ -145,6 +146,12 @@ void  UsartCmdProcess (void)
 				temp = pUsart->rx_idx+6;
 				SysMotor.motor[MOTOR_X_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&temp);
 				SysMotor.motor[MOTOR_Y_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&temp);
+				DevState.bits.State = DEV_STATE_SHIPING;
+				DevState.bits.SubState = DEV_ShipStateMotorUp;
+				SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
+				SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
+				XYMotorSetDir();
+				MotorStart();
 				break;
 			case _CMD_RX_RESET://0X03,//复位
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
@@ -169,8 +176,12 @@ void  UsartCmdProcess (void)
 					if(temp==0)	{//查询结果
 					
 					}else if(temp==1)	{//执行复位
-						MotorReset(MOTOR_X_ID);//X Y电机复位
-						MotorReset(MOTOR_Y_ID);
+						if(SysMotor.ALLMotorState.ubyte == 0)	{//没有电机运行
+							MotorReset(MOTOR_X_ID);//X Y电机复位
+							MotorReset(MOTOR_Y_ID);
+							DevState.bits.State = DEV_STATE_RESET;
+							DevState.bits.SubState = 0x04;
+						}
 					}
 					pUsart->tx_cmd = _CMD_TX_CLR_RESULT;
 				}
@@ -187,23 +198,23 @@ void  UsartCmdProcess (void)
 				}	
 				iPara += 3;				
 				if(temp==1)	{//执行测试					
-					if(DevState.bits.SubState == 1)	{//有电机运行 忙碌中 拒绝执行新的测试请求
+					/*if(DevState.bits.SubState == 1)	{//有电机运行 忙碌中 拒绝执行新的测试请求
 						pUsart->tx_idx = 0;				
 						data_buf[pUsart->tx_idx++] = iPara;
 						data_buf[pUsart->tx_idx++] = ActionState_Busy;//
 						return;
-					}	
+					}	*/
 					SysMotor.MotorIDRunning = iPara - 3;					
 					DevState.bits.State = DEV_STATE_TEST;//设备状态 独立部件运行
 					if(iPara==3)	{
 						SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 						SysMotor.motor[MOTOR_X_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-						
+						XYMotorSetDir();
 					}
 					else if(iPara==4)	{
 						SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 						SysMotor.motor[MOTOR_Y_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-						
+						XYMotorSetDir();
 					}
 					else if(iPara==5)	{
 						SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
@@ -373,8 +384,8 @@ static uint16_t  UsartRxGetINT16U (uint8_t *buf,uint32_t *idx)
     uint16_t  lowbyte;
     uint16_t  highbyte;
 
-    lowbyte  = UsartRxGetINT8U(buf,idx);
     highbyte = UsartRxGetINT8U(buf,idx);
+    lowbyte = UsartRxGetINT8U(buf,idx);
     return ((highbyte << 8) | lowbyte);
 }
 
@@ -383,7 +394,7 @@ static uint32_t  UsartRxGetINT32U (uint8_t *buf,uint32_t *idx)
     uint32_t  highword;
     uint32_t  lowword;
 
-    lowword = UsartRxGetINT16U(buf,idx);
     highword = UsartRxGetINT16U(buf,idx);
+    lowword = UsartRxGetINT16U(buf,idx);
     return ((highword << 16) | lowword);
 }

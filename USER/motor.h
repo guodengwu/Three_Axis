@@ -118,4 +118,6 @@ void CalcXYMotorPos(void);
 void XYMotorResetCheck();
 void CheckMaPan(void);
 void MotorStuck(void);
+void XYMotorArrived(void);
+void XYMotorSetDir(void);
 #endif

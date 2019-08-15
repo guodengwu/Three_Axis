@@ -56,6 +56,7 @@ void main(void)
 	{
 		timer_event();
 		UsartCmdProcess();//串口指令处理函数
-		UsartCmdReply();//串口指令回复		
+		UsartCmdReply();//串口指令回复	
+		XYMotorArrived();		
 	}
 } 
