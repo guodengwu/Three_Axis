@@ -2,6 +2,7 @@
 #define __MOTOR_H
 
 #include "includes.h"
+#include "PWM.h"
 
 #define MOTOR_TO_MAX         DEF_True        // To Max
 #define MOTOR_TO_MIN         DEF_False       // To Min
@@ -11,11 +12,8 @@
 #define XMOTOR_LEN_MAX			600//mm
 #define YMOTOR_LEN_MAX			1435//mm
 
-#define	MicroSteps				20//码盘细分
-#define XMotor_NumPerRound		100//x电机一圈100mm
-#define YMotor_NumPerRound		200//y电机一圈200mm
-#define XMotor_StepsPerum		(XMotor_NumPerRound/MicroSteps)//5mm
-#define YMotor_StepsPerum		(YMotor_NumPerRound/MicroSteps)//10mm
+#define XMOTOR_MIN_PWM				PWM4
+#define XMOTOR_MAX_PWM				PWM5
 
 typedef enum {
     MOTOR_X_ID      = 0,

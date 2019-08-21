@@ -393,6 +393,11 @@
               <FileType>1</FileType>
               <FilePath>..\STC_LIB\timer.c</FilePath>
             </File>
+            <File>
+              <FileName>PWM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STC_LIB\PWM.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -442,6 +447,11 @@
               <FileName>encoder.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\encoder.c</FilePath>
+            </File>
+            <File>
+              <FileName>velocity_profile.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\velocity_profile.c</FilePath>
             </File>
           </Files>
         </Group>

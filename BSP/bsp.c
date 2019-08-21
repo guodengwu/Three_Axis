@@ -1,5 +1,6 @@
 #include "bsp.h"
 //#include "encoder.h"
+#include "PWM.h"
 
 ////////////////////////////////////
 //IO≈‰÷√∫Ø ˝
@@ -160,6 +161,7 @@ void bsp(void)
 	UART4_config();
 	//Timer1Init();
 	Timer4Init();
+	PWMInit();
 }
 
 void soft_reset(void)
