@@ -15,5 +15,5 @@ sbit PWM5	=P2^5;
 
 void PWMInit(void);
 void StartPWM(u8 pwm, u16 freq, u8 duty);
-void StopPWM(u8 pwm);
+//void StopPWM(u8 pwm);
 #endif

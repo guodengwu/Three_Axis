@@ -158,18 +158,17 @@ void MotorStart(void)
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//测试x电机
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
 			//X_MOTOR_PWM1 = 1;
-			StartPWM(XMOTOR_MIN_PWM, 1000, 50);
-			//StartPWM(XMOTOR_MAX_PWM, 1000, 60);
+			StartPWM(XMOTOR_MIN_PWM, 1000, 20);
 			X_MOTOR_PWM2 = 0;
 		}
 		else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX)	{
 			X_MOTOR_PWM1 = 0;
 			//X_MOTOR_PWM2 = 1;
-			StartPWM(XMOTOR_MAX_PWM, 1000, 50);
+			StartPWM(XMOTOR_MAX_PWM, 1000, 80);
 		}
 		X_MOTOR_ENABLE1 = 0;
 		X_MOTOR_ENABLE2 = 1;
-		motor_timeout = 300;//30s
+		motor_timeout = 3000;//30s
 		//BSP_PRINTF("x motor testing.\r\n");
 		//SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;		
 	}
@@ -186,7 +185,7 @@ void MotorStart(void)
 		}
 		Y_MOTOR_ENABLE1 = 0;
 		Y_MOTOR_ENABLE2 = 1;
-		motor_timeout = 300;
+		motor_timeout = 3000;
 		//SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;
 	}
 	if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{//测试z电机
@@ -349,13 +348,10 @@ void MotorTest(void)
 	}
 }	
 
-
 void StopXMotor(void)
 {
-	StopPWM(XMOTOR_MIN_PWM);
-	StopPWM(XMOTOR_MAX_PWM);
-	X_MOTOR_PWM1 = 0;
-	X_MOTOR_PWM2 = 0;
+	StartPWM(XMOTOR_MIN_PWM, 1000, 0);
+	StartPWM(XMOTOR_MAX_PWM, 1000, 0);
 	X_MOTOR_ENABLE1 = 0;
 	X_MOTOR_ENABLE2 = 0;
 	SysMotor.ALLMotorState.bits.XMotor = DEF_Stop;
@@ -363,7 +359,7 @@ void StopXMotor(void)
 
 void StopYMotor(void)
 {
-	StopPWM(PWM5);
+//	StopPWM(PWM5);
 	Y_MOTOR_ENABLE1 = 0;
 	Y_MOTOR_ENABLE2 = 0;
 	SysMotor.ALLMotorState.bits.YMotor = DEF_Stop;

@@ -13,7 +13,7 @@
  - 返回说明：无
  - 备注说明：使用51单片机，外部晶体频率:22.1184MHZ-1T模式
  ******************************************************************/
- u8 pos_buf[10];
+u8 xdata printfbuf[100];
 void timer_event(void)
 {
 	if(_3ms_EVENT)	{
@@ -30,10 +30,10 @@ void timer_event(void)
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
 		//usart.tx_cmd = _CMD_TX_GET_VERSION;
-		sprintf(pos_buf,"%d %d",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
-		SYS_PRINTF("x pos:%s\r\n",pos_buf);
-		sprintf(pos_buf,"%d %d",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
-		SYS_PRINTF("y pos:%s\r\n",pos_buf);
+		sprintf(printfbuf,"%d %d",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
+		SYS_PRINTF("x pos:%s\r\n",printfbuf);
+		sprintf(printfbuf,"%d %d",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
+		SYS_PRINTF("y pos:%s\r\n",printfbuf);
 		soft_reset();
 	}
 }
@@ -51,7 +51,7 @@ void main(void)
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
 	MotorReset(MOTOR_X_ID);//X Y电机复位
-	MotorReset(MOTOR_Y_ID);
+	//MotorReset(MOTOR_Y_ID);
 	
 	while(1)
 	{
