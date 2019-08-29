@@ -6,7 +6,7 @@
 #define DEF_VEL_MAX             32000//(float)(0.04)//默认最大速度 mm/s
 #define DEF_VEL_MIN             1000//(float)(0.00125)//默认最小速度 mm/s
 
-#define CURVE_BUF_MAX           300//加速点300个  加速间隔100ms
+#define CURVE_BUF_MAX          10//加速点300个  加速间隔100ms
 
 typedef struct {
     //INT8U   flexible;
@@ -17,8 +17,8 @@ typedef struct {
     //INT16U Step;//加速脉冲数
     INT16U   freq_max;//最大频率
     INT16U   freq_min;//最小频率
-    u16 VelCurveBuf[CURVE_BUF_MAX];
-    //INT8U   abort_type;
+    u16 Curve[CURVE_BUF_MAX];
+    s16   index;
 } velocity_profile;
 
 extern velocity_profile X_VelCurve;

@@ -33,7 +33,7 @@ void CheckIOState(void)
 		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK;
 		if(X_MOTOR_RightLimit_IN==0)	{
 			SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-			XYMotorResetCheck();
+			XMotorResetCheck();
 		}else if(X_MOTOR_LeftLimit_IN==0)	{
 			SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Max_LimitOpt;
 		}
@@ -70,7 +70,7 @@ void CheckIOState(void)
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
 		if(Y_MOTOR_MinLimit_IN==0)	{
 			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-			XYMotorResetCheck();
+			YMotorResetCheck();
 		}else if(Y_MOTOR_MaxLimit_IN==0)	{
 			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Max_LimitOpt;
 		}

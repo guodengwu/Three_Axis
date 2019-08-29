@@ -3,6 +3,7 @@
 #include "protocol.h"
 #include "motor.h"
 #include "encoder.h"
+#include "velocity_profile.h"
 
 /******************************************************************
  - 实验平台：SW1A_51&ARM开发板
@@ -24,8 +25,12 @@ void timer_event(void)
 		_10ms_EVENT = 0;
 		CheckIOState();
 		CalcXYMotorPos();
-		//CheckMaPan();
-		MotorStuck();
+		CheckMaPan();
+		MotorStuck();		
+	}
+	if(_100ms_EVENT)	{
+		_100ms_EVENT = 0;
+		XMotorAccDec();
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
@@ -51,7 +56,7 @@ void main(void)
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
 	MotorReset(MOTOR_X_ID);//X Y电机复位
-	//MotorReset(MOTOR_Y_ID);
+	MotorReset(MOTOR_Y_ID);
 	
 	while(1)
 	{

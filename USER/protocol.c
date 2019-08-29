@@ -114,7 +114,7 @@ void UsartCmdReply(void)
 		case _CMD_TX_SHIP_OK://0X6b,//回复 _CMD_RX_SHIP_OK
 			PackageSendData(cmd, data_buf, 0);
 			SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
-			MotorStart();
+			ZMotorStart();
 			break;
 		default:
 			break;
@@ -150,8 +150,8 @@ void  UsartCmdProcess (void)
 				DevState.bits.SubState = DEV_ShipStateMotorUp;
 				SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 				SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
-				XYMotorSetDir();
-				MotorStart();
+				XMotorStart();
+				YMotorStart();
 				break;
 			case _CMD_RX_RESET://0X03,//复位
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
@@ -209,37 +209,37 @@ void  UsartCmdProcess (void)
 					if(iPara==3)	{
 						SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 						SysMotor.motor[MOTOR_X_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-						XYMotorSetDir();
+						XMotorStart();
 					}
 					else if(iPara==4)	{
 						SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 						SysMotor.motor[MOTOR_Y_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-						XYMotorSetDir();
+						YMotorStart();
 					}
 					else if(iPara==5)	{
 						SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
 						SysMotor.motor[MOTOR_Z_ID].Param = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-						
+						ZMotorStart();
 					}
 					else if(iPara==6)	{
 						SysMotor.ALLMotorState.bits.TMotor = DEF_Run;
 						SysMotor.motor[MOTOR_T_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-						
+						TMotorStart();
 					}
 					else if(iPara==7)	{
 						SysMotor.ALLMotorState.bits.DMotor = DEF_Run;
 						SysMotor.motor[MOTOR_D_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-						
+						DMotorStart();
 					}
 					else if(iPara==8)	{
 						SysMotor.ALLMotorState.bits.LMotor = DEF_Run;
 						SysMotor.motor[MOTOR_L_ID].Param = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-						
+						LMotorStart();
 					}
 					else if(iPara==9)	{
 						SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-						
+						QuHuoMenMotorStart();
 					}
 					MotorTest();
 					pUsart->tx_idx = 0;				
@@ -343,6 +343,7 @@ static void PackageSendData(uint8_t cmd, uint8_t *pdat, uint8_t len)
 
 	usart.tx_flag = DEF_Busy;//串口发送忙标记
 	RS485_CTRL = 1;
+	delay_us(4000);
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD0;
 	usart.tx_buf[idx++] = _485_PROTOCOL_RX_SD1;
 	usart.tx_buf[idx++] = cmd;

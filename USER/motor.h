@@ -12,8 +12,11 @@
 #define XMOTOR_LEN_MAX			600//mm
 #define YMOTOR_LEN_MAX			1435//mm
 
-#define XMOTOR_MIN_PWM				PWM4
-#define XMOTOR_MAX_PWM				PWM5
+#define XMOTOR_MIN_PWM				DEF_PWM4
+#define XMOTOR_MAX_PWM				DEF_PWM5
+#define YMOTOR_MIN_PWM				DEF_PWM2
+#define YMOTOR_MAX_PWM				DEF_PWM3
+#define MOTOR_PWM_FREQ				1000
 
 typedef enum {
     MOTOR_X_ID      = 0,
@@ -100,7 +103,7 @@ enum eMotorAbort {
 extern SysMotor_t SysMotor;
 
 void MotorInit(void);
-void MotorStart(void);
+//void MotorStart(void);
 void MotorStop(u8 stop_type);
 void MotorTest(void);
 void SoftTimerStop(_softtimer_t *psofttimer);
@@ -113,9 +116,20 @@ void StopDMotor(void);
 void StopQuHuoMenMotor(void);
 void MotorReset(u8 id);
 void CalcXYMotorPos(void);
-void XYMotorResetCheck();
+void XMotorResetCheck();
+void YMotorResetCheck();
 void CheckMaPan(void);
 void MotorStuck(void);
 void XYMotorArrived(void);
-void XYMotorSetDir(void);
+//void XMotorSetDir(void);
+//void YMotorSetDir(void);
+void XMotorStart(void);
+void YMotorStart(void);
+void ZMotorStart(void);
+void TMotorStart(void);
+void LMotorStart(void);
+void DMotorStart(void);
+void QuHuoMenMotorStart(void);
+void XMotorAccDec(void);
+
 #endif

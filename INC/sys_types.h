@@ -120,7 +120,7 @@
 */
 typedef           unsigned char           uint8_t;      /*          Unsigned  8 bit Quantity          */
 typedef           unsigned short          uint16_t;     /*          Unsigned 16 bit Quantity          */
-typedef           unsigned int           uint32_t;     /*          Unsigned 32 bit Quantity          */
+typedef           unsigned long int           uint32_t;     /*          Unsigned 32 bit Quantity          */
 /************************************** 8-bit DATA TYPE DEFINITION ************************************/
 typedef           unsigned char           INT8U;      /*          Unsigned  8 bit Quantity          */
 typedef             signed char           INT8S;      /*            Signed  8 bit Quantity          */
@@ -140,12 +140,12 @@ typedef volatile      signed short          VINT16S;    /* Volatile   Signed 16 
 //typedef volatile    unsigned short  const   VINT16UC;   /* Volatile Unsigned 16 bit Constant          */
 //typedef volatile      signed short  const   VINT16SC;   /* Volatile   Signed 16 bit Constant          */
 /************************************* 32-bit DATA TYPE DEFINITION ************************************/
-typedef           unsigned int           INT32U;     /*          Unsigned 32 bit Quantity          */
-typedef             signed int           INT32S;     /*            Signed 32 bit Quantity          */
-typedef             unsigned int   const   INT32UC;    /*          Unsigned 32 bit Constant          */
-typedef               signed int   const   INT32SC;    /*            Signed 32 bit Constant          */
-typedef volatile    unsigned int           VINT32U;    /* Volatile Unsigned 32 bit Quantity          */
-typedef volatile      signed int           VINT32S;    /* Volatile   Signed 32 bit Quantity          */
+typedef           unsigned long int           INT32U;     /*          Unsigned 32 bit Quantity          */
+typedef             signed long int           INT32S;     /*            Signed 32 bit Quantity          */
+typedef             unsigned long int   const   INT32UC;    /*          Unsigned 32 bit Constant          */
+typedef               signed long int   const   INT32SC;    /*            Signed 32 bit Constant          */
+typedef volatile    unsigned long int           VINT32U;    /* Volatile Unsigned 32 bit Quantity          */
+typedef volatile      signed long int           VINT32S;    /* Volatile   Signed 32 bit Quantity          */
 //typedef volatile    unsigned int   const   VINT32UC;   /* Volatile Unsigned 32 bit Constant          */
 //typedef volatile      signed int   const   VINT32SC;   /* Volatile   Signed 32 bit Constant          */
 /************************************* 64-bit DATA TYPE DEFINITION ************************************/
@@ -168,8 +168,8 @@ typedef  unsigned  char         CPU_INT08U;             /*  8-bit unsigned integ
 typedef    signed  char         CPU_INT08S;             /*  8-bit   signed integer                    */
 typedef  unsigned  short        CPU_INT16U;             /* 16-bit unsigned integer                    */
 typedef    signed  short        CPU_INT16S;             /* 16-bit   signed integer                    */
-typedef  unsigned  int          CPU_INT32U;             /* 32-bit unsigned integer                    */
-typedef    signed  int          CPU_INT32S;             /* 32-bit   signed integer                    */
+typedef  unsigned long int          CPU_INT32U;             /* 32-bit unsigned integer                    */
+typedef    signed long int          CPU_INT32S;             /* 32-bit   signed integer                    */
 //typedef  unsigned  long  long   CPU_INT64U;             /* 64-bit unsigned integer                    */
 //typedef    signed  long  long   CPU_INT64S;             /* 64-bit   signed integer                    */
 typedef            float        CPU_FP32;               /* 32-bit floating point                      */
@@ -191,12 +191,12 @@ typedef          CPU_UBASE_T    CPU_SIZE_T;
 
 typedef         signed  char    cpu_int8s_t;
 typedef         signed short    cpu_int16s_t;
-typedef         signed  int    cpu_int32s_t;
+typedef         signed long int    cpu_int32s_t;
 //typedef     signed long long    cpu_int64s_t;
 typedef       unsigned  char    cpu_bool_t;
 typedef       unsigned  char    cpu_int8u_t;
 typedef       unsigned short    cpu_int16u_t;
-typedef       unsigned  int    cpu_int32u_t;
+typedef       unsigned long int    cpu_int32u_t;
 //typedef   unsigned long long    cpu_int64u_t;
 typedef                float    cpu_fp32_t;
 typedef               double    cpu_fp64_t;
@@ -215,8 +215,8 @@ typedef         signed  char    int8s_t;    /*            Signed  8 bit Quantity
 typedef       unsigned  char    int8u_t;    /*          Unsigned  8 bit Quantity          */
 typedef         signed short    int16s_t;   /*            Signed 16 bit Quantity          */
 typedef       unsigned short    int16u_t;   /*          Unsigned 16 bit Quantity          */
-typedef         signed  int    int32s_t;   /*            Signed 32 bit Quantity          */
-typedef       unsigned  int    int32u_t;   /*          Unsigned 32 bit Quantity          */
+typedef         signed long int    int32s_t;   /*            Signed 32 bit Quantity          */
+typedef       unsigned long int    int32u_t;   /*          Unsigned 32 bit Quantity          */
 //typedef    signed long  long    int64s_t;   /*            Signed 64 bit Quantity          */
 //typedef  unsigned long  long    int64u_t;   /*          Unsigned 64 bit Quantity          */
 typedef                float    float32_t;  /* Single precision floating point            */
@@ -233,8 +233,8 @@ typedef        signed  char     s8;
 typedef      unsigned  char     u8;
 typedef        signed short     s16;
 typedef      unsigned short     u16;
-typedef        signed  int     s32;
-typedef      unsigned  int     u32;
+typedef        signed long int     s32;
+typedef      unsigned long int     u32;
 
 typedef int (*cmd_call_t)(void *context);
 
