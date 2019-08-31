@@ -28,8 +28,8 @@ void timer_event(void)
 		CheckMaPan();
 		MotorStuck();		
 	}
-	if(_100ms_EVENT)	{
-		_100ms_EVENT = 0;
+	if(_50ms_EVENT)	{
+		_50ms_EVENT = 0;
 		XMotorAccDec();
 	}
 	if(_1s_EVENT)	{

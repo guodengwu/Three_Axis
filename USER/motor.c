@@ -47,12 +47,12 @@ void MotorReset(u8 id)
 		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
 			X_MOTOR_PWM2 = 0;
-			StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 20);
+			StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 			
 		}
 		else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX)	{
 			X_MOTOR_PWM1 = 0;
-			StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 80);
+			StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
 		X_MOTOR_ENABLE1 = 0;
 		X_MOTOR_ENABLE2 = 1;
