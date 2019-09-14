@@ -12,6 +12,12 @@
 #define XMOTOR_LEN_MAX			600//mm
 #define YMOTOR_LEN_MAX			1435//mm
 
+#define XMOTOR_AccDec_LEN			200//mm
+#define YMOTOR_AccDec_LEN			200//mm
+#define MOTOR_CONSTANT_LEN			100//mm
+
+#define MOTOR_LEN_RANG			10//mm
+
 #define XMOTOR_MIN_PWM				DEF_PWM4
 #define XMOTOR_MAX_PWM				DEF_PWM5
 #define YMOTOR_MIN_PWM				DEF_PWM2
@@ -86,7 +92,7 @@ enum eActionState {
     ActionState_Doing       ,    // Action State:Doing
     ActionState_OK          ,    // Action State:OK
     ActionState_Fail        ,     // Action State:Fail
-	ActionState_DoReady		,
+	//ActionState_DoReady		,
 };
 
 enum eMotorAbort {
@@ -131,5 +137,5 @@ void LMotorStart(void);
 void DMotorStart(void);
 void QuHuoMenMotorStart(void);
 void XMotorAccDec(void);
-
+void YMotorAccDec(void);
 #endif

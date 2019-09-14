@@ -20,24 +20,25 @@ void timer_event(void)
 	if(_3ms_EVENT)	{
 		_3ms_EVENT = 0;
 		RS485TxToRx();
+		CalcXYMotorPos();
 	}
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;
-		CheckIOState();
-		CalcXYMotorPos();
+		CheckIOState();		
 		CheckMaPan();
 		MotorStuck();		
 	}
 	if(_50ms_EVENT)	{
 		_50ms_EVENT = 0;
 		XMotorAccDec();
+		YMotorAccDec();
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
 		//usart.tx_cmd = _CMD_TX_GET_VERSION;
-		sprintf(printfbuf,"%d %d",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
+		sprintf(printfbuf,"%d %ld",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
 		SYS_PRINTF("x pos:%s\r\n",printfbuf);
-		sprintf(printfbuf,"%d %d",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
+		sprintf(printfbuf,"%d %ld",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
 		SYS_PRINTF("y pos:%s\r\n",printfbuf);
 		soft_reset();
 	}

@@ -21,7 +21,7 @@ enum EncoderNUM{
 #define ENCODER_NUMS       		(ENCODER_ID_MAX - ENCODER_ID_MIN + 1)
 
 typedef struct _Encoder  {
-	s32 pluse;
+	s16 pluse;
 	//u16 diff;
 }Encoder_t;
 

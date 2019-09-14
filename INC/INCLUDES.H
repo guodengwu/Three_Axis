@@ -18,6 +18,7 @@
 #define __INCLUDES__
 
 #include    <string.h> 
+#include    <math.h> 
 #include "intrins.h"
 //用户头文件加在最后面
 //Your head file add here.

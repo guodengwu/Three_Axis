@@ -11,9 +11,9 @@ uint8_t   xdata    usart_rx_buf        [USART_RXBUFF_SIZE];
 uint8_t   xdata    usart_tx_buf        [USART_TXBUFF_SIZE];
 static uint8_t   xdata    data_buf[20];
 
-static uint8_t  UsartRxGetINT8U (uint8_t *buf,uint32_t *idx);
-static uint16_t  UsartRxGetINT16U (uint8_t *buf,uint32_t *idx);
-static uint32_t  UsartRxGetINT32U (uint8_t *buf,uint32_t *idx);
+static uint8_t  UsartRxGetINT8U (uint8_t *buf,uint16_t *idx);
+static uint16_t  UsartRxGetINT16U (uint8_t *buf,uint16_t *idx);
+static uint32_t  UsartRxGetINT32U (uint8_t *buf,uint16_t *idx);
 static uint8_t uart_message_rx_handler(usart_t *pUsart, uint8_t rx_dat);
 static void uart_message_tx_handler(usart_t *pUsart);
 static void PackageSendData(uint8_t cmd, uint8_t *pdat, uint8_t len);
@@ -87,7 +87,7 @@ void UsartCmdReply(void)
 			if(Sys.DevAction == ActionState_Doing)	{
 				data_buf[idx++] = 0;
 			}else	{
-				Sys.DevAction = ActionState_DoReady;
+			//	Sys.DevAction = ActionState_DoReady;
 				data_buf[idx++] = 1;
 			}
 			PackageSendData(cmd, data_buf, idx);
@@ -144,10 +144,10 @@ void  UsartCmdProcess (void)
 			case _CMD_RX_SHIP:	//0X02,//出货指令			
 				pUsart->tx_cmd = _CMD_TX_SHIP;
 				temp = pUsart->rx_idx+6;
-				SysMotor.motor[MOTOR_X_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&temp);
-				SysMotor.motor[MOTOR_Y_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&temp);
+				SysMotor.motor[MOTOR_X_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&temp);
+				SysMotor.motor[MOTOR_Y_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&temp);
 				DevState.bits.State = DEV_STATE_SHIPING;
-				DevState.bits.SubState = DEV_ShipStateMotorUp;
+				DevState.bits.SubState = DEV_ShipStateMotorUp;//升降机上升
 				SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 				SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 				XMotorStart();
@@ -245,6 +245,7 @@ void  UsartCmdProcess (void)
 					pUsart->tx_idx = 0;				
 					data_buf[pUsart->tx_idx++] = iPara;
 					data_buf[pUsart->tx_idx++] = ActionState_Doing;
+					Sys.DevAction = ActionState_Doing;
 				}
 				else if(temp==0)	{//查询测试情况
 					pUsart->tx_idx = 0;				
@@ -252,7 +253,9 @@ void  UsartCmdProcess (void)
 					data_buf[pUsart->tx_idx++] = SysMotor.motor[SysMotor.MotorIDRunning].status.action;										
 				}
 				break;
-			case _CMD_RX_SHIP_OK:	{
+			case _CMD_RX_SHIP_OK:	{//0X08,//通知出货完成
+				DevState.bits.State = DEV_STATE_IDLE;
+				DevState.bits.SubState = DEV_ShipStateCeMenOpening;
 				pUsart->tx_cmd = _CMD_TX_SHIP_OK;
 				break;
 			}
@@ -375,12 +378,12 @@ static void uart_message_tx_handler(usart_t *pUsart)
 	}
 }
 
-static uint8_t  UsartRxGetINT8U (uint8_t *buf,uint32_t *idx)
+static uint8_t  UsartRxGetINT8U (uint8_t *buf,uint16_t *idx)
 {
     return (buf[(*idx)++]);
 }
 
-static uint16_t  UsartRxGetINT16U (uint8_t *buf,uint32_t *idx)
+static uint16_t  UsartRxGetINT16U (uint8_t *buf,uint16_t *idx)
 {
     uint16_t  lowbyte;
     uint16_t  highbyte;
@@ -390,7 +393,7 @@ static uint16_t  UsartRxGetINT16U (uint8_t *buf,uint32_t *idx)
     return ((highbyte << 8) | lowbyte);
 }
 
-static uint32_t  UsartRxGetINT32U (uint8_t *buf,uint32_t *idx)
+static uint32_t  UsartRxGetINT32U (uint8_t *buf,uint16_t *idx)
 {
     uint32_t  highword;
     uint32_t  lowword;

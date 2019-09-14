@@ -33,10 +33,10 @@
 
 typedef struct _usart {
     uint8_t               rx_state;
-    uint32_t              rx_idx;
-    uint32_t              rx_cnt;
-    uint32_t              rx_len;
-    uint32_t              rx_bufsize;
+    uint16_t              rx_idx;
+    uint16_t              rx_cnt;
+    uint16_t              rx_len;
+    uint16_t              rx_bufsize;
     uint16_t              rx_crc;
     uint16_t              rx_err;
 	uint16_t              rx_cmd;
@@ -45,9 +45,9 @@ typedef struct _usart {
     uint8_t (*rx_indicate)(struct _usart *pUsart, uint8_t rx_dat);
 
     uint8_t               tx_cmd;
-    uint32_t              tx_idx;
-    uint32_t              tx_len;
-    uint32_t              tx_bufsize;
+    uint16_t              tx_idx;
+    uint16_t              tx_len;
+    uint16_t              tx_bufsize;
     uint16_t              tx_crc;
     uint16_t              tx_err;
     uint8_t              *tx_buf;
