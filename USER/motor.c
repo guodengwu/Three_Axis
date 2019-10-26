@@ -98,7 +98,7 @@ void CalcXYMotorUpDownPos(u8 id)
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos + temp;
 	}
 }
-	
+
 void MotorReset(u8 id)
 {
 	if(id == MOTOR_X_ID)	{
@@ -114,8 +114,7 @@ void MotorReset(u8 id)
 			X_MOTOR_PWM1 = 0;
 			StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
-		X_MOTOR_ENABLE1 = 0;
-		X_MOTOR_ENABLE2 = 1;
+		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
 		SYS_PRINTF("x motor reset.\r\n");
 	}else 	if(id == MOTOR_Y_ID)	{
 		Sys.state |= SYSSTATE_YMOTORRESET;
@@ -131,10 +130,11 @@ void MotorReset(u8 id)
 			Y_MOTOR_PWM1 = 0;
 			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);
 		}
-		Y_MOTOR_ENABLE1 = 0;
-		Y_MOTOR_ENABLE2 = 1;
-		//motor_timeout = 3000;
+		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;	
 	}
+	Sys.DevAction = ActionState_Doing;
+	DevState.bits.State = DEV_STATE_RESET;//复位中
+	DevState.bits.SubState = 0x04;//表示三轴板电机正在复位
 	SoftTimerStart(&Timer2Soft, 1000);//电机复位超时控制
 }
 
@@ -354,9 +354,10 @@ void XMotorStart(void)
 			//X_MOTOR_PWM2 = 1;
 			StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
-		X_MOTOR_ENABLE1 = 0;
-		X_MOTOR_ENABLE2 = 1;		
-		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;		
+//		X_MOTOR_ENABLE1 = 0;
+//		X_MOTOR_ENABLE2 = 1;		
+		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
+		Sys.DevAction = ActionState_Doing;
 	}
 }
 
@@ -375,10 +376,11 @@ void YMotorStart(void)
 			Y_MOTOR_PWM1 = 0;
 			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 50);
 		}
-		Y_MOTOR_ENABLE1 = 0;
-		Y_MOTOR_ENABLE2 = 1;
+//		Y_MOTOR_ENABLE1 = 0;
+//		Y_MOTOR_ENABLE2 = 1;
 		Y_VelCurve.index = 0;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;
+		Sys.DevAction = ActionState_Doing;
 	}
 }
 
@@ -467,52 +469,58 @@ void QuHuoMenMotorStart(void)
 		SoftTimerStart(&Timer2Soft, 1000);//电机超时控制
 	}	
 }
-
+void MotorStopTypeSet(u8 stop_type)
+{
+	if(stop_type==DEF_Success)	{
+		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK;
+	}else if(stop_type==DEF_Fail)	{
+		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
+	}
+	SysMotor.motor[MOTOR_X_ID].status.abort_type = stop_type;
+}
 //
 void MotorStop(u8 stop_type)
 {
-	u8 runing_id;
+//	u8 runing_id;
 	
-	if(SysMotor.ALLMotorState.ubyte == 0)	{//没有电机需要运行
-		return;
-	}
-	runing_id = SysMotor.MotorIDRunning;
+//	if(SysMotor.ALLMotorState.ubyte == 0)	{//没有电机需要运行
+//		return;
+//	}
+//	runing_id = SysMotor.MotorIDRunning;
 	if(DevState.bits.State == DEV_STATE_TEST)	{
 		DevState.bits.SubState = 0;//没有电机运行
 	}
-	
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//停止x电机
 		StopXMotor();
+		MotorStopTypeSet(stop_type);
 	}
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//停止y电机
 		StopYMotor();
-
+		MotorStopTypeSet(stop_type);	
 	}
 	if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{//停止z电机
 		StopZMotor();
-
+		MotorStopTypeSet(stop_type);
 	}
 	if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//停止推杆电机
 		StopTMotor();
-
+		MotorStopTypeSet(stop_type);
 	}
 	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{//停止侧门电机
 		StopDMotor();
-
+		MotorStopTypeSet(stop_type);
 	}
 	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{//停止履带电机
 		StopLMotor();
+		MotorStopTypeSet(stop_type);
 	}
 	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{//停止取货门电机
-		StopQuHuoMenMotor();		
+		StopQuHuoMenMotor();
+		MotorStopTypeSet(stop_type);
 	}
 	if(stop_type==DEF_Success)	{
-		SysMotor.motor[runing_id].status.action = ActionState_OK;
-		SysMotor.motor[runing_id].status.abort_type = MotorAbort_Normal;
 		Sys.DevAction = ActionState_OK;
 	}else if(stop_type==DEF_Fail)	{
-		SysMotor.motor[runing_id].status.action = ActionState_Fail;
-		SysMotor.motor[runing_id].status.abort_type = MotorAbort_Timeout;
 		Sys.DevAction = ActionState_Fail;
 	}
 }
@@ -572,18 +580,15 @@ void MotorTest(void)
 
 void StopXMotor(void)
 {
-	StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 0);
-	StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 0);
-	X_MOTOR_ENABLE1 = 0;
-	X_MOTOR_ENABLE2 = 0;
+	StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 1);
+	StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 1);
 	SysMotor.ALLMotorState.bits.XMotor = DEF_Stop;
 }
 
 void StopYMotor(void)
 {
-//	StopPWM(PWM5);
-	Y_MOTOR_ENABLE1 = 0;
-	Y_MOTOR_ENABLE2 = 0;
+	StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 1);
+	StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 1);
 	SysMotor.ALLMotorState.bits.YMotor = DEF_Stop;
 }
 

@@ -35,7 +35,6 @@ void timer_event(void)
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
-		//usart.tx_cmd = _CMD_TX_GET_VERSION;
 		sprintf(printfbuf,"%d %ld",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
 		SYS_PRINTF("x pos:%s\r\n",printfbuf);
 		sprintf(printfbuf,"%d %ld",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
@@ -54,6 +53,7 @@ void main(void)
 	VelocityProfileInit();
 	ES = 1;
     EA = 1;
+	//delay_us(30000);
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
 	MotorReset(MOTOR_X_ID);//X Yµç»ú¸´Î»

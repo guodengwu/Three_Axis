@@ -87,7 +87,6 @@ void UsartCmdReply(void)
 			if(Sys.DevAction == ActionState_Doing)	{
 				data_buf[idx++] = 0;
 			}else	{
-			//	Sys.DevAction = ActionState_DoReady;
 				data_buf[idx++] = 1;
 			}
 			PackageSendData(cmd, data_buf, idx);
@@ -95,8 +94,8 @@ void UsartCmdReply(void)
 		case _CMD_TX_RESET://0x66,//回复 _CMD_RX_RESET
 			if(Sys.DevAction == ActionState_Doing)	{
 				data_buf[idx++] = 0;
-			}else	{
-				data_buf[idx++] = 1;
+			}else	{//1：开始重启
+				data_buf[idx++] = 1;				
 			}			
 			PackageSendData(cmd, data_buf, idx);			
 			break;
@@ -105,8 +104,8 @@ void UsartCmdReply(void)
 			strcpy(data_buf+idx, VERSION);
 			PackageSendData(cmd, data_buf, strlen(VERSION)+idx); 
 			break;
-		case _CMD_TX_CLR_RESULT://0x68,//回复 _CMD_RX_CLR_RESULT
-			//data_buf[idx++] = Sys.DevAction;
+		case _CMD_TX_CLR_RESULT://0x68,//回复 _CMD_RX_CLR_RESULT 机器复位
+			PackageSendData(cmd, data_buf, pUsart->tx_idx);
 			break;
 		case _CMD_TX_SYS_TEST://0x69,//回复 _CMD_RX_SYS_TEST
 			PackageSendData(cmd, data_buf, pUsart->tx_idx);
@@ -153,14 +152,14 @@ void  UsartCmdProcess (void)
 				XMotorStart();
 				YMotorStart();
 				break;
-			case _CMD_RX_RESET://0X03,//复位
+			case _CMD_RX_RESET://0X03,//重启
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
 				if(iPara==2)	{
 					pUsart->tx_cmd = _CMD_TX_RESET;
-					DevState.bits.State = DEV_STATE_RESET;//复位中
-					if(Sys.DevAction != ActionState_Doing)	{
-						DevState.bits.SubState = 4;
-					}
+//					DevState.bits.State = DEV_STATE_RESET;//复位中
+//					if(Sys.DevAction != ActionState_Doing)	{
+//						DevState.bits.SubState = 4;//表示三轴板在复位
+//					}
 				}
 				break;
 			case _CMD_RX_GET_VERSION://0X04,//获取版本
@@ -173,15 +172,26 @@ void  UsartCmdProcess (void)
 				temp = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); //动作类型
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
 				if(iPara==2)	{
+					pUsart->tx_idx = 0;
 					if(temp==0)	{//查询结果
-					
+//						if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run || SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
+//							data_buf[pUsart->tx_idx++] = ActionState_Doing;
+//						}
+//						else	{
+//							data_buf[pUsart->tx_idx++] = ActionState_OK;
+//						}
+						data_buf[pUsart->tx_idx++] = Sys.DevAction;
 					}else if(temp==1)	{//执行复位
 						if(SysMotor.ALLMotorState.ubyte == 0)	{//没有电机运行
+							SysLogicErr.logic = 0;
+							Sys.DevAction = ActionState_Doing;
 							MotorReset(MOTOR_X_ID);//X Y电机复位
 							MotorReset(MOTOR_Y_ID);
-							DevState.bits.State = DEV_STATE_RESET;
-							DevState.bits.SubState = 0x04;
+							data_buf[pUsart->tx_idx++] = ActionState_Doing;
 						}
+						else {
+							data_buf[pUsart->tx_idx++] = ActionState_Busy;
+						}							
 					}
 					pUsart->tx_cmd = _CMD_TX_CLR_RESULT;
 				}
@@ -371,7 +381,9 @@ static void uart_message_tx_handler(usart_t *pUsart)
 		pUsart->tx_idx++;
 	}else {
 		if(pUsart->tx_cmd == _CMD_TX_RESET)	{//指令发送完成后 再复位
-			Sys.state |= SYSSTATE_RESET;
+			if(Sys.DevAction != ActionState_Doing)	{
+				Sys.state |= SYSSTATE_RESET;
+			}
 		}
 		pUsart->tx_cmd = _CMD_TX_NONE;
 		pUsart->tx_flag = DEF_Idle;//发送完成

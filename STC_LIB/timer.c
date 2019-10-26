@@ -153,6 +153,6 @@ void SoftTimerStop(_softtimer_t *psofttimer)
 {
 	psofttimer->cnt = 0;
 	psofttimer->state = STOP;
-	TimerStop(Timer4);
+	//TimerStop(Timer4);
 }
 
