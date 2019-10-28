@@ -104,6 +104,7 @@ enum eMotorAbort {
 	MotorAbort_Max_LimitOpt  = 5,
 	MotorAbort_OpenOpt  = 6,
 	MotorAbort_CloseOpt  = 7,
+	MotorAbort_MaPanError = 8,
 };
 
 extern SysMotor_t SysMotor;

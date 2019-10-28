@@ -45,6 +45,7 @@ void timer_event(void)
 
 void main(void)
 {
+	delay_us(2000);
 	SystickInit_Tmer();
 	bsp();	
 	SysDataInit();
@@ -52,8 +53,7 @@ void main(void)
 	ProDataInit();	
 	VelocityProfileInit();
 	ES = 1;
-    EA = 1;
-	//delay_us(30000);
+    EA = 1;	
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
 	MotorReset(MOTOR_X_ID);//X Yµç»ú¸´Î»

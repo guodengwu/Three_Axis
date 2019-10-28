@@ -84,20 +84,10 @@ void UsartCmdReply(void)
 			PackageSendData(cmd, data_buf, idx);
 			break;
 		case _CMD_TX_SHIP://0X65,//回复 _CMD_RX_SHIP
-			if(Sys.DevAction == ActionState_Doing)	{
-				data_buf[idx++] = 0;
-			}else	{
-				data_buf[idx++] = 1;
-			}
-			PackageSendData(cmd, data_buf, idx);
+			PackageSendData(cmd, data_buf, pUsart->tx_idx);
 			break;
 		case _CMD_TX_RESET://0x66,//回复 _CMD_RX_RESET
-			if(Sys.DevAction == ActionState_Doing)	{
-				data_buf[idx++] = 0;
-			}else	{//1：开始重启
-				data_buf[idx++] = 1;				
-			}			
-			PackageSendData(cmd, data_buf, idx);			
+			PackageSendData(cmd, data_buf, pUsart->tx_idx);			
 			break;
 		case _CMD_TX_GET_VERSION://0x67,//回复 _CMD_RX_GET_VERSION
 			data_buf[idx++] = 1;
@@ -142,24 +132,32 @@ void  UsartCmdProcess (void)
 				break;
 			case _CMD_RX_SHIP:	//0X02,//出货指令			
 				pUsart->tx_cmd = _CMD_TX_SHIP;
+				pUsart->tx_idx = 0;
 				temp = pUsart->rx_idx+6;
-				SysMotor.motor[MOTOR_X_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&temp);
-				SysMotor.motor[MOTOR_Y_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&temp);
-				DevState.bits.State = DEV_STATE_SHIPING;
-				DevState.bits.SubState = DEV_ShipStateMotorUp;//升降机上升
-				SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
-				SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
-				XMotorStart();
-				YMotorStart();
+				if(Sys.DevAction == ActionState_Doing)	{
+					data_buf[pUsart->tx_idx++] = 0;
+				}else	{
+					data_buf[pUsart->tx_idx++] = 1;				
+					SysMotor.motor[MOTOR_X_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&temp);
+					SysMotor.motor[MOTOR_Y_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&temp);
+					DevState.bits.State = DEV_STATE_SHIPING;
+					DevState.bits.SubState = DEV_ShipStateMotorUp;//升降机上升
+					SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
+					SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
+					XMotorStart();
+					YMotorStart();
+				}
 				break;
 			case _CMD_RX_RESET://0X03,//重启
 				iPara = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx); 
 				if(iPara==2)	{
 					pUsart->tx_cmd = _CMD_TX_RESET;
-//					DevState.bits.State = DEV_STATE_RESET;//复位中
-//					if(Sys.DevAction != ActionState_Doing)	{
-//						DevState.bits.SubState = 4;//表示三轴板在复位
-//					}
+					pUsart->tx_idx = 0;
+					if(Sys.DevAction == ActionState_Doing)	{
+						data_buf[pUsart->tx_idx++] = 0;
+					}else	{//1：开始重启
+						data_buf[pUsart->tx_idx++] = 1;				
+					}
 				}
 				break;
 			case _CMD_RX_GET_VERSION://0X04,//获取版本
@@ -174,12 +172,6 @@ void  UsartCmdProcess (void)
 				if(iPara==2)	{
 					pUsart->tx_idx = 0;
 					if(temp==0)	{//查询结果
-//						if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run || SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
-//							data_buf[pUsart->tx_idx++] = ActionState_Doing;
-//						}
-//						else	{
-//							data_buf[pUsart->tx_idx++] = ActionState_OK;
-//						}
 						data_buf[pUsart->tx_idx++] = Sys.DevAction;
 					}else if(temp==1)	{//执行复位
 						if(SysMotor.ALLMotorState.ubyte == 0)	{//没有电机运行
@@ -191,7 +183,7 @@ void  UsartCmdProcess (void)
 						}
 						else {
 							data_buf[pUsart->tx_idx++] = ActionState_Busy;
-						}							
+						}
 					}
 					pUsart->tx_cmd = _CMD_TX_CLR_RESULT;
 				}
@@ -203,50 +195,45 @@ void  UsartCmdProcess (void)
 				//SysMotor.MotorIDRunning = iPara - 3;
 				iPara -= 3;
 				if(iPara>=MOTOR_X_ID && iPara <= MOTOR_QuHuoMen_ID)	{//检测测试电机类型是否符合要求
+					//
 				}else {
 					break;
 				}	
-				iPara += 3;				
+				SysMotor.MotorIDRunning = iPara;
+				iPara += 3;		
 				if(temp==1)	{//执行测试					
-					/*if(DevState.bits.SubState == 1)	{//有电机运行 忙碌中 拒绝执行新的测试请求
-						pUsart->tx_idx = 0;				
-						data_buf[pUsart->tx_idx++] = iPara;
-						data_buf[pUsart->tx_idx++] = ActionState_Busy;//
-						return;
-					}	*/
-					SysMotor.MotorIDRunning = iPara - 3;					
 					DevState.bits.State = DEV_STATE_TEST;//设备状态 独立部件运行
 					if(iPara==3)	{
 						SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 						SysMotor.motor[MOTOR_X_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-						XMotorStart();
+						XMotorStart();						
 					}
 					else if(iPara==4)	{
 						SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 						SysMotor.motor[MOTOR_Y_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 						YMotorStart();
 					}
-					else if(iPara==5)	{
+					else if(iPara==5)	{//履带电机
 						SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
 						SysMotor.motor[MOTOR_Z_ID].Param = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 						ZMotorStart();
 					}
-					else if(iPara==6)	{
+					else if(iPara==6)	{//推杆电机
 						SysMotor.ALLMotorState.bits.TMotor = DEF_Run;
 						SysMotor.motor[MOTOR_T_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 						TMotorStart();
 					}
-					else if(iPara==7)	{
+					else if(iPara==7)	{//门电机
 						SysMotor.ALLMotorState.bits.DMotor = DEF_Run;
 						SysMotor.motor[MOTOR_D_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 						DMotorStart();
 					}
-					else if(iPara==8)	{
+					else if(iPara==8)	{//取货履带电机
 						SysMotor.ALLMotorState.bits.LMotor = DEF_Run;
 						SysMotor.motor[MOTOR_L_ID].Param = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 						LMotorStart();
 					}
-					else if(iPara==9)	{
+					else if(iPara==9)	{//取货口电机
 						SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 						QuHuoMenMotorStart();
@@ -260,7 +247,7 @@ void  UsartCmdProcess (void)
 				else if(temp==0)	{//查询测试情况
 					pUsart->tx_idx = 0;				
 					data_buf[pUsart->tx_idx++] = iPara;
-					data_buf[pUsart->tx_idx++] = SysMotor.motor[SysMotor.MotorIDRunning].status.action;										
+					data_buf[pUsart->tx_idx++] = Sys.DevAction;//SysMotor.motor[SysMotor.MotorIDRunning].status.action;										
 				}
 				break;
 			case _CMD_RX_SHIP_OK:	{//0X08,//通知出货完成

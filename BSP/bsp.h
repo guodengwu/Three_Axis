@@ -11,17 +11,19 @@
 #define     Y_MOTOR_MaxLimit_IN    			P65
 #define     Y_MOTOR_MinLimit_IN    			P31
 
-#define     ChuHuoKouOpenLimit_IN    				P37 //出货口开门到位
-#define     ChuHuoKouCloseLimit_IN    				P41 //出货口关门到位
-#define     CeMenOpenLimit_IN	    			P70	//侧门开门到位
-#define     CeMenCloseLimit_IN	    			P06	//侧门关门到位
-#define     CeMenMaxLimit_IN    			P30	//侧门上限位
-#define     CeMenMinLimit_IN    			P05 //侧门下限位
+#define     QuHuoKouOpenLimit_IN    				P37 //出货口开门到位
+#define     QuHuoKouCloseLimit_IN    				P41 //出货口关门到位
+//#define     CeMenOpenLimit_IN	    			P70	//侧门开门到位
+//#define     CeMenCloseLimit_IN	    			P06	//侧门关门到位
+#define     HuoWuNearSwitch_IN				P30//货物接近开关
+#define     CeMenMaxLimit_IN    			P53	//侧门上限位
+#define     CeMenMinLimit_IN    			P06 //侧门下限位
 #define		X_MotorDuZhuan_IN				P32
 #define		Y_MotorDuZhuan_IN				P33
 
 #define		X_ENCODER_IN					P34
 #define		Y_ENCODER_IN					P35
+#define		ALLMOTOR_STUCK_IN					P36
 //////////////////////////////////
 #define     X_MOTOR_PWM1    				P24
 #define     X_MOTOR_PWM2    				P25
