@@ -6,7 +6,7 @@
 #include "includes.h"
 
 /////////////////////////////////
-#define     X_MOTOR_LeftLimit_IN    			P17
+#define     X_MOTOR_LeftLimit_IN    			P42
 #define     X_MOTOR_RightLimit_IN    			P07
 #define     Y_MOTOR_MaxLimit_IN    			P65
 #define     Y_MOTOR_MinLimit_IN    			P31

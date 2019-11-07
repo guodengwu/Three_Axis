@@ -53,18 +53,18 @@ void CalcXYMotorUpDownPos(u8 id)
 	if(id == MOTOR_X_ID)	{
 		len = SysMotor.motor[MOTOR_X_ID].ObjPos - SysMotor.motor[MOTOR_X_ID].CurPos;
 		totalLen = abs(len);
-		if(totalLen<=MOTOR_LEN_RANG)	{
+		if(totalLen<=MOTOR_LEN_RANG)	{//移动距离在运行控制精度内 不启动电机
 			XAccDecPos.DecPos = -1;
 			return;
 		}
-		else if(totalLen <= XMOTOR_AccDec_LEN)	{
+		else if(totalLen <= (XMOTOR_AccDec_LEN+MOTOR_CONSTANT_LEN))	{//移动距离在加减速距离内 匀速运行
 			//XAccDecPos.AccPos = 0;
 			XAccDecPos.DecPos = 0;
 			return;
 		}
-		else if(totalLen <= XMOTOR_AccDec_LEN*2)	{
-			temp = totalLen/3;
-		}
+		/*else if(totalLen <= XMOTOR_AccDec_LEN*2)	{//计算提前减速距离
+			temp = totalLen/2;
+		}*/
 		else	{
 			temp = XMOTOR_AccDec_LEN + MOTOR_CONSTANT_LEN;
 		}
@@ -352,13 +352,11 @@ void XMotorStart(void)
 			return;
 		}		
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
-			//X_MOTOR_PWM1 = 1;
-			StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 			X_MOTOR_PWM2 = 0;
+			StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);			
 		}
 		else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX)	{
 			X_MOTOR_PWM1 = 0;
-			//X_MOTOR_PWM2 = 1;
 			StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
 		SYS_PRINTF("x motor start.\r\n");
@@ -369,7 +367,7 @@ void XMotorStart(void)
 
 void YMotorStart(void)
 {
-	if(SysMotor.motor[MOTOR_Y_ID].status.action==ActionState_Doing)	
+	/*if(SysMotor.motor[MOTOR_Y_ID].status.action==ActionState_Doing)	
 		return;
 	YMotorSetDir();
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//测试y电机
@@ -387,7 +385,7 @@ void YMotorStart(void)
 		Y_VelCurve.index = 0;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;
 		Sys.DevAction = ActionState_Doing;
-	}
+	}*/
 }
 
 void ZMotorStart(void)
@@ -588,15 +586,15 @@ void MotorTest(void)
 
 void StopXMotor(void)
 {
-	StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 1);
-	StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 1);
+	StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 0);
+	StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 0);
 	SysMotor.ALLMotorState.bits.XMotor = DEF_Stop;
 }
 
 void StopYMotor(void)
 {
-	StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 1);
-	StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 1);
+	StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 0);
+	StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 0);
 	SysMotor.ALLMotorState.bits.YMotor = DEF_Stop;
 }
 

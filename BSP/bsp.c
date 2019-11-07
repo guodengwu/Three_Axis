@@ -17,7 +17,7 @@ static void	GPIO_config(void)
 		GPIO_InitStructure.Pin  = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
 	//GPIO_InitStructure.Mode = GPIO_HighZ;
 	GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);	
-		GPIO_InitStructure.Pin  = GPIO_Pin_1;
+		GPIO_InitStructure.Pin  = GPIO_Pin_1|GPIO_Pin_2;
 	//GPIO_InitStructure.Mode = GPIO_HighZ;
 	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
 			GPIO_InitStructure.Pin  = GPIO_Pin_3;
@@ -70,10 +70,10 @@ static void	GPIO_config(void)
 
 	LIGHT_CTRL1_OUT = 0;
 	LIGHT_CTRL2_OUT = 0;
-	IO_PWM2 = 1;
-	IO_PWM3 = 1;
-	IO_PWM4 = 1;
-	IO_PWM5 = 1;
+	IO_PWM2 = 0;
+	IO_PWM3 = 0;
+	IO_PWM4 = 0;
+	IO_PWM5 = 0;
 //	X_MOTOR_ENABLE1 = 0;
 //	X_MOTOR_ENABLE2 = 0;
 //	Y_MOTOR_ENABLE1 = 0;

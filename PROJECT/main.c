@@ -24,9 +24,9 @@ void timer_event(void)
 	}
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;
-		CheckIOState();		
+		//CheckIOState();		
 		CheckMaPan();
-		MotorStuck();		
+		//MotorStuck();		
 	}
 	if(_50ms_EVENT)	{
 		_50ms_EVENT = 0;
@@ -57,7 +57,7 @@ void main(void)
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
 	MotorReset(MOTOR_X_ID);//X Yµç»ú¸´Î»
-	MotorReset(MOTOR_Y_ID);
+	//MotorReset(MOTOR_Y_ID);
 	
 	while(1)
 	{

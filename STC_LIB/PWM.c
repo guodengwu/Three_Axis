@@ -23,9 +23,9 @@ void StartPWM(u8 pwm, u16 freq, u8 duty)
 	u32 dat;
 	u32 duty_dat;
 	    
-	//duty_dat = 100 - duty;
-	duty_dat = duty;
-	//PWMCR &= ~0x80;//关闭PWM模块
+	duty_dat = 100 - duty;
+	//duty_dat = duty;
+	PWMCR &= ~0x80;//关闭PWM模块
 	P_SW2 |= 0x80;
 	PWMCFG = 0x00;  //PWM 与 ADC 不关联
 	PWMCKS = 0x0F;  // PWM时钟=系统时钟/(PS[3:0]+1) = 27M/16 = 1.6875M
