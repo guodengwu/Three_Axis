@@ -24,7 +24,7 @@ void timer_event(void)
 	}
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;
-		//CheckIOState();		
+		CheckIOState();		
 		CheckMaPan();
 		//MotorStuck();		
 	}
