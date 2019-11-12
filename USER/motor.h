@@ -12,9 +12,9 @@
 #define XMOTOR_LEN_MAX			600//mm
 #define YMOTOR_LEN_MAX			1435//mm
 
-#define XMOTOR_AccDec_LEN			150//mm
-#define YMOTOR_AccDec_LEN			150//mm
-#define MOTOR_CONSTANT_LEN			50//mm
+#define XMOTOR_AccDec_LEN			200//mm
+#define YMOTOR_AccDec_LEN			200//mm
+#define MOTOR_CONSTANT_LEN			100//mm
 
 #define MOTOR_LEN_RANG			10//mm
 
@@ -22,7 +22,7 @@
 #define XMOTOR_MAX_PWM				DEF_PWM5
 #define YMOTOR_MIN_PWM				DEF_PWM2
 #define YMOTOR_MAX_PWM				DEF_PWM3
-#define MOTOR_PWM_FREQ				100
+#define MOTOR_PWM_FREQ				200
 
 typedef enum {
     MOTOR_X_ID      = 0,

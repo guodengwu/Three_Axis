@@ -57,7 +57,7 @@ void main(void)
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
 	MotorReset(MOTOR_X_ID);//X Yµç»ú¸´Î»
-	//MotorReset(MOTOR_Y_ID);
+	MotorReset(MOTOR_Y_ID);
 	
 	while(1)
 	{

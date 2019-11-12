@@ -122,7 +122,6 @@ void MotorReset(u8 id)
 		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		Y_VelCurve.index = 0;
 		if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{
-			//Y_MOTOR_PWM1 = 1;
 			Y_MOTOR_PWM2 = 0;
 			StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);		
 		}
@@ -260,7 +259,14 @@ void XMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
 		if(XAccDecPos.DecPos == 0)	{
-			StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[2]);
+			if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{//加速
+				X_MOTOR_PWM2 = 0;
+				StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[2]);
+			}
+			else if(SysMotor.motor[MOTOR_X_ID].CurPos<=XAccDecPos.DecPos)	{//减速
+				X_MOTOR_PWM1 = 0;
+				StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[2]);
+			}
 			return;
 		}
 		else	{
@@ -301,7 +307,14 @@ void YMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
 		if(YAccDecPos.DecPos == 0)	{
-			StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[2]);
+			if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{//加速
+				Y_MOTOR_PWM2 = 0;
+				StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[2]);
+			}
+			else if(SysMotor.motor[MOTOR_Y_ID].CurPos<=YAccDecPos.DecPos)	{//减速
+				Y_MOTOR_PWM1 = 0;
+				StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[2]);
+			}
 			return;
 		}
 		else	{
@@ -352,11 +365,11 @@ void XMotorStart(void)
 			return;
 		}		
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
-			X_MOTOR_PWM2 = 0;
+			X_MOTOR_PWM2 = 0;//P25
 			StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);			
 		}
 		else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX)	{
-			X_MOTOR_PWM1 = 0;
+			X_MOTOR_PWM1 = 0;//P24
 			StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
 		SYS_PRINTF("x motor start.\r\n");
@@ -367,25 +380,28 @@ void XMotorStart(void)
 
 void YMotorStart(void)
 {
-	/*if(SysMotor.motor[MOTOR_Y_ID].status.action==ActionState_Doing)	
+	if(SysMotor.motor[MOTOR_Y_ID].status.action==ActionState_Doing)	
 		return;
 	YMotorSetDir();
+	CalcXYMotorUpDownPos(MOTOR_Y_ID);
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//测试y电机
+		Y_VelCurve.index = 0;
+		if(YAccDecPos.DecPos == -1)	{
+			StopYMotor();
+			Sys.DevAction = ActionState_Fail;
+			return;
+		}	
 		if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{
-			//Y_MOTOR_PWM1 = 1;
 			Y_MOTOR_PWM2 = 0;
-			StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 50);
+			StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);	
 		}
 		else if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX)	{
 			Y_MOTOR_PWM1 = 0;
-			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 50);
+			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);
 		}
-//		Y_MOTOR_ENABLE1 = 0;
-//		Y_MOTOR_ENABLE2 = 1;
-		Y_VelCurve.index = 0;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;
 		Sys.DevAction = ActionState_Doing;
-	}*/
+	}
 }
 
 void ZMotorStart(void)
