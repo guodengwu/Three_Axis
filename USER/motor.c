@@ -134,7 +134,7 @@ void MotorReset(u8 id)
 	Sys.DevAction = ActionState_Doing;
 	DevState.bits.State = DEV_STATE_RESET;//复位中
 	DevState.bits.SubState = 0x04;//表示三轴板电机正在复位
-	SoftTimerStart(&Timer2Soft, 1000);//电机复位超时控制
+	SoftTimerStart(&Timer2Soft, 5000);//电机复位超时控制
 }
 
 void XMotorResetCheck()
@@ -355,12 +355,19 @@ void XMotorStart(void)
 {
 	if(SysMotor.motor[MOTOR_X_ID].status.action==ActionState_Doing)	
 		return;
+	if(SysMotor.motor[MOTOR_X_ID].ObjPos>XMOTOR_LEN_MAX)	{
+		StopXMotor();
+		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Idle;
+		Sys.DevAction = ActionState_Idle;
+		return;
+	}
 	XMotorSetDir();
 	CalcXYMotorUpDownPos(MOTOR_X_ID);
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//测试x电机
 		X_VelCurve.index = 0;
 		if(XAccDecPos.DecPos == -1)	{
 			StopXMotor();
+			SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
 			Sys.DevAction = ActionState_Fail;
 			return;
 		}		
@@ -382,12 +389,19 @@ void YMotorStart(void)
 {
 	if(SysMotor.motor[MOTOR_Y_ID].status.action==ActionState_Doing)	
 		return;
+	if(SysMotor.motor[MOTOR_Y_ID].ObjPos>YMOTOR_LEN_MAX)	{
+		StopYMotor();
+		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Idle;
+		Sys.DevAction = ActionState_Idle;
+		return;
+	}
 	YMotorSetDir();
 	CalcXYMotorUpDownPos(MOTOR_Y_ID);
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//测试y电机
 		Y_VelCurve.index = 0;
 		if(YAccDecPos.DecPos == -1)	{
 			StopYMotor();
+			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
 			Sys.DevAction = ActionState_Fail;
 			return;
 		}	
@@ -415,7 +429,7 @@ void ZMotorStart(void)
 		Z_MOTOR_ENABLE = 1;
 		//motor_timeout = 3000;
 		SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_Doing;
-		SoftTimerStart(&Timer2Soft, 3000);//电机超时控制
+		SoftTimerStart(&Timer2Soft, SysMotor.motor[MOTOR_Z_ID].Param);//电机超时控制
 	}
 }
 void TMotorStart(void)
@@ -434,7 +448,7 @@ void TMotorStart(void)
 		T_MOTOR_ENABLE = 1;
 		//motor_timeout = 1000;//10s
 		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_Doing;
-		SoftTimerStart(&Timer2Soft, 2000);//电机超时控制
+		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
 	}
 }
 void DMotorStart(void)
@@ -453,7 +467,7 @@ void DMotorStart(void)
 		D_MOTOR_ENABLE = 1;
 		//motor_timeout = 1000;
 		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_Doing;
-		SoftTimerStart(&Timer2Soft, 1000);//电机超时控制
+		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
 	}
 }
 void LMotorStart(void)
@@ -467,7 +481,7 @@ void LMotorStart(void)
 		//motor_timeout = 3000;
 		//SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_L_ID].Param*10);//运行时间
 		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_Doing;
-		SoftTimerStart(&Timer2Soft, 3000);//电机超时控制
+		SoftTimerStart(&Timer2Soft, SysMotor.motor[MOTOR_L_ID].Param);//电机超时控制
 	}
 }
 void QuHuoMenMotorStart(void)
@@ -486,7 +500,7 @@ void QuHuoMenMotorStart(void)
 		QuHuoMen_MOTOR_ENABLE = 1;
 		//motor_timeout = 1000;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
-		SoftTimerStart(&Timer2Soft, 1000);//电机超时控制
+		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
 	}	
 }
 void MotorStopTypeSet(u8 id, u8 stop_type)

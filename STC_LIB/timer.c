@@ -75,8 +75,8 @@ void SystickInit_Tmer(void)
 void Timer4Init(void)		//10毫秒@27.000MHz
 {
 	T4T3M &= 0xDF;		//定时器时钟12T模式
-	T4L = 0x1C;		//设置定时初值
-	T4H = 0xA8;		//设置定时初值
+	T4L = 0x36;		//设置定时初值
+	T4H = 0xf7;		//设置定时初值
 	T4T3M |= 0x80;		//定时器4开始计时
 	IE2 |= ET4;          //使能定时器中断
 }
