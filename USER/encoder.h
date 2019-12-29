@@ -4,11 +4,12 @@
 #include "includes.h"
 #include "motor.h"
 
-#define	MaPanSubdivide				20//码盘细分
+#define	XMaPanSubdivide				25//码盘细分
+#define	YMaPanSubdivide				50//码盘细分
 #define XMaPan_NumPerRound			100//x电机一圈100mm
 #define YMaPan_NumPerRound			200//y电机一圈200mm
-#define XMaPan_NumPerStep 		(XMaPan_NumPerRound/MaPanSubdivide)//5 mm/step
-#define YMaPan_NumPerStep 		(YMaPan_NumPerRound/MaPanSubdivide)//10 mm/step
+#define XMaPan_NumPerStep 		(XMaPan_NumPerRound/XMaPanSubdivide)//5 mm/step
+#define YMaPan_NumPerStep 		(YMaPan_NumPerRound/YMaPanSubdivide)//10 mm/step
 
 
 enum EncoderNUM{

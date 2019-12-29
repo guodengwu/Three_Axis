@@ -28,15 +28,18 @@ void CheckIOState(void)
 {
 	IOState.state1.bits.b0 = !X_MOTOR_RightLimit_IN;	
 	IOState.state1.bits.b1 = !X_MOTOR_LeftLimit_IN;
-	if(X_MOTOR_RightLimit_IN==0 || X_MOTOR_LeftLimit_IN==0)	{//x碰到上限/下限 强制停止电机
-		StopXMotor();
-		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
-		Sys.DevAction = ActionState_Fail;
-		if(X_MOTOR_RightLimit_IN==0)	{
-			SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-			XMotorResetCheck();
-		}else if(X_MOTOR_LeftLimit_IN==0)	{
-			SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
+		if((X_MOTOR_LeftLimit_IN==0&&SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN) || \
+		   (X_MOTOR_RightLimit_IN==0&&SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX))	{//x碰到上限/下限 强制停止电机
+			StopXMotor();
+			SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
+			Sys.DevAction = ActionState_Fail;
+			if(X_MOTOR_LeftLimit_IN==0)	{
+				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Min_LimitOpt;
+				XMotorResetCheck();
+			}else if(X_MOTOR_RightLimit_IN==0)	{
+				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+			}
 		}
 	}
 //	IOState.state1.bits.b2 = !CeMenCloseLimit_IN;
@@ -77,15 +80,18 @@ void CheckIOState(void)
 	
 	IOState.state2.bits.b0 = !Y_MOTOR_MinLimit_IN;
 	IOState.state2.bits.b1 = !Y_MOTOR_MaxLimit_IN;
-	if(Y_MOTOR_MinLimit_IN==0 || Y_MOTOR_MaxLimit_IN==0)	{//y碰到上限/下限 强制停止电机
-		StopYMotor();
-		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
-		Sys.DevAction = ActionState_Fail;
-		if(Y_MOTOR_MinLimit_IN==0)	{
-			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-			YMotorResetCheck();
-		}else if(Y_MOTOR_MaxLimit_IN==0)	{
-			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
+		if((Y_MOTOR_MinLimit_IN==0&&SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN) || \
+			(Y_MOTOR_MaxLimit_IN==0&&SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX))	{//y碰到上限/下限 强制停止电机
+			StopYMotor();
+			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
+			Sys.DevAction = ActionState_Fail;
+			if(Y_MOTOR_MinLimit_IN==0)	{
+				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Min_LimitOpt;
+				YMotorResetCheck();
+			}else if(Y_MOTOR_MaxLimit_IN==0)	{
+				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+			}
 		}
 	}
 	if(HuoWuNearSwitch_IN==0)	{//货物接近出口，启动推杆电机
@@ -93,11 +99,11 @@ void CheckIOState(void)
 		TMotorStart();
 	}
 	if(ALLMOTOR_STUCK_IN == 1)	{//有电机堵转，所有电机堵转信号共用
-		MotorStop(DEF_Fail);
-		if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//推杆电机根据该信号停止
-			SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
-			Sys.DevAction = ActionState_OK;
-		}
+//		MotorStop(DEF_Fail);
+//		if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//推杆电机根据该信号停止
+//			SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
+//			Sys.DevAction = ActionState_OK;
+//		}
 	}
 }
 

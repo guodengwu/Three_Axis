@@ -14,7 +14,7 @@
 
 #define XMOTOR_AccDec_LEN			200//mm
 #define YMOTOR_AccDec_LEN			200//mm
-#define MOTOR_CONSTANT_LEN			100//mm
+#define MOTOR_CONSTANT_LEN			50//mm
 
 #define MOTOR_LEN_RANG			10//mm
 

@@ -240,7 +240,7 @@ void  UsartCmdProcess (void)
 					}
 					MotorTest();
 					pUsart->tx_idx = 0;				
-					data_buf[pUsart->tx_idx++] = iPara;
+//					data_buf[pUsart->tx_idx++] = iPara;
 					data_buf[pUsart->tx_idx++] = ActionState_Doing;
 					Sys.DevAction = ActionState_Doing;
 				}
