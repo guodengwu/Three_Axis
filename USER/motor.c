@@ -499,11 +499,11 @@ void QuHuoMenMotorStart(void)
 	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{//测试取货门电机
 		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==0)	{//0关门 ， 1开门
 			QuHuoMen_MOTOR_PWM1 = 1;
-			QuHuoMen_MOTOR_PWM1 = 0;
+			QuHuoMen_MOTOR_PWM2 = 0;
 		}
 		else if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==1)	{
 			QuHuoMen_MOTOR_PWM1 = 0;
-			QuHuoMen_MOTOR_PWM1= 1;
+			QuHuoMen_MOTOR_PWM2 = 1;
 		}
 		QuHuoMen_MOTOR_ENABLE = 1;
 		//motor_timeout = 1000;

@@ -6,6 +6,7 @@ _sys_io_state_t IOState;
 _dev_state_t DevState;
 _sys_error_t SysHDError;
 _sys_logic_error_t SysLogicErr;
+static u8 MotorStuckMonitor(void);
 
 void SysDataInit(void)
 {
@@ -98,16 +99,31 @@ void CheckIOState(void)
 		SysMotor.motor[MOTOR_T_ID].Param = 1;//前推
 		TMotorStart();
 	}
-	if(ALLMOTOR_STUCK_IN == 1)	{//有电机堵转，所有电机堵转信号共用
-//		MotorStop(DEF_Fail);
-//		if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//推杆电机根据该信号停止
-//			SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
-//			Sys.DevAction = ActionState_OK;
-//		}
+	if(MotorStuckMonitor())	{
+		MotorStop(DEF_Fail);
+		if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//推杆电机根据该信号停止
+			SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
+			Sys.DevAction = ActionState_OK;
+		}
 	}
 }
 
-
+static u8 MotorStuckMonitor(void)
+{
+	static u8 MotorStuckMonitorCnt = 0;
+	
+	if(ALLMOTOR_STUCK_IN == 1)	{//有电机堵转，所有电机堵转信号共用
+		MotorStuckMonitorCnt++;
+		if(MotorStuckMonitorCnt>=11)	{//连续120ms堵转信号有效
+//			MotorStuckMonitorCnt = 0;
+			return 1;
+		}
+	}
+	else {
+		MotorStuckMonitorCnt = 0;
+	}
+	return 0;
+}
 /*void CheckDevAction(void)
 {
 	u8 runing_id;

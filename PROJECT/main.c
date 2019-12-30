@@ -24,7 +24,7 @@ void timer_event(void)
 	}
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;
-//		CheckIOState();		
+		CheckIOState();		
 		CheckMaPan();
 		//MotorStuck();		
 	}
@@ -65,6 +65,6 @@ void main(void)
 		UsartCmdProcess();//串口指令处理函数
 		UsartCmdReply();//串口指令回复	
 		XYMotorArrived();
-		CheckIOState();			
+//		CheckIOState();			
 	}
 } 
