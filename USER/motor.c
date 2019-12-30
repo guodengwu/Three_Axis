@@ -62,17 +62,21 @@ void CalcXYMotorUpDownPos(u8 id)
 			XAccDecPos.DecPos = 0;
 			return;
 		}
-		else if(totalLen <= (XMOTOR_AccDec_LEN+MOTOR_CONSTANT_LEN))	{//计算提前减速距离
-			temp = totalLen/2+MOTOR_CONSTANT_LEN;
+//		else if(totalLen <= (MOTOR_CONSTANT_LEN))	{//计算提前减速距离
+//			temp = totalLen/2+MOTOR_CONSTANT_LEN;
+//		}
+		else	{
+			temp = MOTOR_CONSTANT_LEN;
+		}
+		if(len>=0)	{
+			XAccDecPos.DecPos = SysMotor.motor[MOTOR_X_ID].ObjPos - temp;
+			SYS_PRINTF("MAX ");
 		}
 		else	{
-			temp = XMOTOR_AccDec_LEN;
-		}
-		if(len>=0)
-			XAccDecPos.DecPos = SysMotor.motor[MOTOR_X_ID].ObjPos - temp;
-		else
 			XAccDecPos.DecPos = SysMotor.motor[MOTOR_X_ID].ObjPos + temp;
-		SYS_PRINTF("c:%ld o:%ld d:%d\r\n",SysMotor.motor[MOTOR_X_ID].CurPos,SysMotor.motor[MOTOR_X_ID].ObjPos,XAccDecPos.DecPos);
+			SYS_PRINTF("MIN ");
+		}
+		SYS_PRINTF("C:%ld O:%ld D:%d\r\n",SysMotor.motor[MOTOR_X_ID].CurPos,SysMotor.motor[MOTOR_X_ID].ObjPos,XAccDecPos.DecPos);
 	}
 	if(id == MOTOR_Y_ID)	{
 		len = SysMotor.motor[MOTOR_Y_ID].ObjPos - SysMotor.motor[MOTOR_Y_ID].CurPos;
@@ -86,17 +90,17 @@ void CalcXYMotorUpDownPos(u8 id)
 			YAccDecPos.DecPos = 0;
 			return;
 		}
-		else if(totalLen <= (YMOTOR_AccDec_LEN+MOTOR_CONSTANT_LEN))	{
-			temp = totalLen/2+MOTOR_CONSTANT_LEN;
-		}
+//		else if(totalLen <= (YMOTOR_AccDec_LEN+MOTOR_CONSTANT_LEN))	{
+//			temp = totalLen/2+MOTOR_CONSTANT_LEN;
+//		}
 		else	{
-			temp = MOTOR_CONSTANT_LEN+2;
+			temp = MOTOR_CONSTANT_LEN;
 		}
 		if(len>=0)
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos - temp;
 		else
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos + temp;
-		SYS_PRINTF("c:%ld o:%ld d:%d\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos,SysMotor.motor[MOTOR_Y_ID].ObjPos,YAccDecPos.DecPos);
+		SYS_PRINTF("C:%ld O:%ld D:%d\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos,SysMotor.motor[MOTOR_Y_ID].ObjPos,YAccDecPos.DecPos);
 	}
 }
 
@@ -258,7 +262,7 @@ void XYMotorArrived(void)
 		//arriveflag = 0;
 	}
 }
-
+#define XMotorMAXSpeedIdx	15//x电机最大速度PWM占空比80%
 void XMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
@@ -276,37 +280,37 @@ void XMotorAccDec(void)
 		else	{
 			if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
 				if(SysMotor.motor[MOTOR_X_ID].CurPos>XAccDecPos.DecPos)	{//加速
-					if(X_VelCurve.index < CURVE_BUF_MAX)	{
+					if(X_VelCurve.index < XMotorMAXSpeedIdx)	{
 						StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);						
-						SYS_PRINTF("MIN %d\r\n",X_VelCurve.Curve[X_VelCurve.index]);
+						SYS_PRINTF("%d ",X_VelCurve.Curve[X_VelCurve.index]);
 						X_VelCurve.index++;	
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos<=XAccDecPos.DecPos)	{//减速
 					if(X_VelCurve.index > 0)	{
 						X_VelCurve.index--;
 						StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
-						SYS_PRINTF("MIN %d\r\n",X_VelCurve.Curve[X_VelCurve.index]);				
+						SYS_PRINTF("%d ",X_VelCurve.Curve[X_VelCurve.index]);				
 					}
 				}
 			}else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX){
 				if(SysMotor.motor[MOTOR_X_ID].CurPos<XAccDecPos.DecPos)	{//加速
-					if(X_VelCurve.index < CURVE_BUF_MAX)	{
+					if(X_VelCurve.index < XMotorMAXSpeedIdx)	{
 						StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);						
-						SYS_PRINTF("MAX %d\r\n",X_VelCurve.Curve[X_VelCurve.index]);
+						SYS_PRINTF("%d ",X_VelCurve.Curve[X_VelCurve.index]);
 						X_VelCurve.index++;	
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos>=XAccDecPos.DecPos)	{//减速
 					if(X_VelCurve.index > 0)	{
 						X_VelCurve.index--;
 						StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
-						SYS_PRINTF("MAX %d\r\n",X_VelCurve.Curve[X_VelCurve.index]);				
+						SYS_PRINTF("%d ",X_VelCurve.Curve[X_VelCurve.index]);				
 					}
 				}
 			}
 		}
 	}
 }
-
+#define YMotorMAXSpeedIdx	2//y电机下降最大速度PWM占空比15%
 void YMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
@@ -323,31 +327,31 @@ void YMotorAccDec(void)
 		}
 		else	{
 			if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{
-				if(SysMotor.motor[MOTOR_Y_ID].CurPos>YAccDecPos.DecPos)	{//加速
-					if(Y_VelCurve.index < CURVE_BUF_MAX)	{
+				if(SysMotor.motor[MOTOR_Y_ID].CurPos>YAccDecPos.DecPos)	{//加速 y电机下降过程最大速度控制在10
+					if(Y_VelCurve.index < YMotorMAXSpeedIdx)	{
 						StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);						
-						SYS_PRINTF("MIN %d\r\n",Y_VelCurve.Curve[Y_VelCurve.index]);
+						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);
 						Y_VelCurve.index++;	
 					}
 				}else if(SysMotor.motor[MOTOR_Y_ID].CurPos<=YAccDecPos.DecPos)	{//减速
 					if(Y_VelCurve.index > 0)	{
 						Y_VelCurve.index--;
 						StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
-						SYS_PRINTF("MIN %d\r\n",Y_VelCurve.Curve[Y_VelCurve.index]);				
+						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);				
 					}
 				}
 			}else if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX){
 				if(SysMotor.motor[MOTOR_Y_ID].CurPos<XAccDecPos.DecPos)	{//加速
 					if(Y_VelCurve.index < CURVE_BUF_MAX)	{
 						StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);						
-						SYS_PRINTF("MAX %d\r\n",Y_VelCurve.Curve[Y_VelCurve.index]);
+						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);
 						Y_VelCurve.index++;	
 					}
 				}else if(SysMotor.motor[MOTOR_Y_ID].CurPos>=YAccDecPos.DecPos)	{//减速
 					if(Y_VelCurve.index > 0)	{
 						Y_VelCurve.index--;
 						StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
-						SYS_PRINTF("MAX %d\r\n",Y_VelCurve.Curve[Y_VelCurve.index]);				
+						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);				
 					}
 				}
 			}
@@ -377,7 +381,7 @@ void XMotorStart(void)
 		}		
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
 			X_MOTOR_PWM2 = 0;//P25
-			StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);			
+			StartPWM(XMOTOR_MIN_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);		
 		}
 		else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX)	{
 			X_MOTOR_PWM1 = 0;//P24

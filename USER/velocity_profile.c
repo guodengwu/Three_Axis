@@ -21,8 +21,8 @@ void CalculateTModelCurve(void)
 //	for(i=0;i<CURVE_BUF_MAX;i++)	{
 //		curve->VelCurveBuf[i] = curve->freq_min + divide*i;
 //	}
-	curve->Curve[0] = 10;
-	for(i=1;i<CURVE_BUF_MAX;i++)	{
+//	curve->Curve[0] = 10;
+	for(i=0;i<CURVE_BUF_MAX;i++)	{
 		curve->Curve[i] = 5*i+10;
 	}
 	curve->index = 0;
@@ -31,8 +31,8 @@ void CalculateTModelCurve(void)
 //	for(i=0;i<CURVE_BUF_MAX;i++)	{
 //		curve->VelCurveBuf[i] = curve->freq_min + divide*i;
 //	}
-	curve->Curve[0] = 10;
-	for(i=1;i<CURVE_BUF_MAX;i++)	{
+//	curve->Curve[0] = 10;
+	for(i=0;i<CURVE_BUF_MAX;i++)	{
 		curve->Curve[i] = 5*i+10;
 	}
 	curve->index = 0;

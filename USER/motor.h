@@ -12,9 +12,9 @@
 #define XMOTOR_LEN_MAX			600//mm
 #define YMOTOR_LEN_MAX			1435//mm
 
-#define XMOTOR_AccDec_LEN			200//mm
-#define YMOTOR_AccDec_LEN			200//mm
-#define MOTOR_CONSTANT_LEN			50//mm
+#define XMOTOR_AccDec_LEN			100//mm
+#define YMOTOR_AccDec_LEN			100//mm
+#define MOTOR_CONSTANT_LEN			80//mm
 
 #define MOTOR_LEN_RANG			10//mm
 

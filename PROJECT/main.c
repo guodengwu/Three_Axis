@@ -14,7 +14,7 @@
  - 返回说明：无
  - 备注说明：使用51单片机，外部晶体频率:22.1184MHZ-1T模式
  ******************************************************************/
-u8 xdata printfbuf[100];
+//u8 xdata printfbuf[100];
 void timer_event(void)
 {
 	if(_3ms_EVENT)	{
@@ -35,10 +35,10 @@ void timer_event(void)
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;
-		sprintf(printfbuf,"%d %ld",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
-		SYS_PRINTF("x pos:%s\r\n",printfbuf);
-		sprintf(printfbuf,"%d %ld",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
-		SYS_PRINTF("y pos:%s\r\n",printfbuf);
+//		sprintf(printfbuf,"%d %ld",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
+//		SYS_PRINTF("x pos:%s\r\n",printfbuf);
+//		sprintf(printfbuf,"%d %ld",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
+//		SYS_PRINTF("y pos:%s\r\n",printfbuf);
 		soft_reset();
 	}
 }
