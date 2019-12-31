@@ -52,6 +52,10 @@
 #define     QuHuoMen_MOTOR_PWM1    				P54
 #define     QuHuoMen_MOTOR_PWM2    				P55
 #define     QuHuoMen_MOTOR_ENABLE    			P61
+
+#define     BK_MOTOR_PWM1    				P44
+#define     BK_MOTOR_PWM2    				P63
+#define     BK_MOTOR_ENABLE    			P60
 ///////////////////////////////////
 #define     LIGHT_CTRL1_OUT    			P71
 #define     LIGHT_CTRL2_OUT    			P72

@@ -52,7 +52,7 @@ static void	GPIO_config(void)
 //	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 //	GPIO_Inilize(GPIO_P3,&GPIO_InitStructure);	        //初始化 P3
 //	
-	GPIO_InitStructure.Pin  = GPIO_Pin_0|/*GPIO_Pin_1|*/GPIO_Pin_2|GPIO_Pin_3/*|GPIO_Pin_4|GPIO_Pin_7*/;
+	GPIO_InitStructure.Pin  = GPIO_Pin_0|/*GPIO_Pin_1|*/GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4/*|GPIO_Pin_7*/;
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P4,&GPIO_InitStructure);
 //	
@@ -60,7 +60,7 @@ static void	GPIO_config(void)
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;
 	GPIO_Inilize(GPIO_P5,&GPIO_InitStructure);	
 
-	GPIO_InitStructure.Pin  = GPIO_Pin_4|GPIO_Pin_1|GPIO_Pin_2;    //4 5 管脚
+	GPIO_InitStructure.Pin  = GPIO_Pin_4|GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3;    //4 5 管脚
 	GPIO_InitStructure.Mode = GPIO_OUT_PP;		        //指定IO的输入或输出方式,GPIO_PullUp,GPIO_HighZ,GPIO_OUT_OD,GPIO_OUT_PP
 	GPIO_Inilize(GPIO_P6,&GPIO_InitStructure);	        //初始化 P3
 	

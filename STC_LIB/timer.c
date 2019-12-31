@@ -53,6 +53,9 @@ void TM4_Isr() interrupt 20 //using 1
 	}
 	if(Timer2Soft.state == USING)	{//电机运行超时控制
 	    Timer2Soft.cnt ++;
+		if(Timer2Soft.cnt>200)	{//电机启动200ms后 开启堵转检测
+			MotorStuckMonitorEnable(1);
+		}
 		if(Timer2Soft.cnt>=Timer2Soft.period)	{
 			Timer2Soft.cnt = 0;
 			MotorStop(DEF_Fail);		//电机运行超时

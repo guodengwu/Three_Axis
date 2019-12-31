@@ -491,7 +491,10 @@ void LMotorStart(void)
 	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{//测试履带电机
 		L_MOTOR_PWM1 = 1;
 		L_MOTOR_PWM2 = 0;
+		BK_MOTOR_PWM1 = 1;
+		BK_MOTOR_PWM2 = 0;
 		L_MOTOR_ENABLE = 1;
+		BK_MOTOR_ENABLE = 1;
 		//motor_timeout = 3000;
 		//SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_L_ID].Param*10);//运行时间
 		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_Doing;
@@ -648,6 +651,7 @@ void StopZMotor(void)
 	Z_MOTOR_PWM2 = 0;		
 	Z_MOTOR_ENABLE = 0;
 	SysMotor.ALLMotorState.bits.ZMotor = DEF_Stop;
+	MotorStuckMonitorEnable(0);
 }
 
 void StopTMotor(void)
@@ -656,6 +660,7 @@ void StopTMotor(void)
 	T_MOTOR_PWM2 = 0;
 	T_MOTOR_ENABLE = 0;	
 	SysMotor.ALLMotorState.bits.TMotor = DEF_Stop;
+	MotorStuckMonitorEnable(0);
 }
 
 void StopDMotor(void)
@@ -664,15 +669,19 @@ void StopDMotor(void)
 	D_MOTOR_PWM2 = 0;
 	D_MOTOR_ENABLE = 0;
 	SysMotor.ALLMotorState.bits.DMotor = DEF_Stop;
+	MotorStuckMonitorEnable(0);
 }
 
 void StopLMotor(void)
 {
 	L_MOTOR_ENABLE = 0;
+	BK_MOTOR_ENABLE = 0;
 	SysMotor.ALLMotorState.bits.LMotor = DEF_Stop;
+	MotorStuckMonitorEnable(0);
 }
 void StopQuHuoMenMotor(void)
 {
 	QuHuoMen_MOTOR_ENABLE = 0;
 	SysMotor.ALLMotorState.bits.QuHuoMenMotor =  DEF_Stop;
+	MotorStuckMonitorEnable(0);
 }

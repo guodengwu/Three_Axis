@@ -83,5 +83,6 @@ extern _sys_error_t SysHDError;
 void CheckIOState(void);
 void SysDataInit(void);
 void ResetMotorStuckMonitorCnt(void);
+void MotorStuckMonitorEnable(u8 flag);
 #endif
 
