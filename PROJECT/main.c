@@ -30,8 +30,12 @@ void timer_event(void)
 	}
 	if(_50ms_EVENT)	{
 		_50ms_EVENT = 0;
-		XMotorAccDec();
-		YMotorAccDec();
+		if(XMotorAccDec())	{//加速过程返回1 不检测堵转
+			ResetMotorStuckMonitorCnt();
+		}
+		if(YMotorAccDec())	{
+			ResetMotorStuckMonitorCnt();
+		}
 	}
 	if(_1s_EVENT)	{
 		_1s_EVENT = 0;

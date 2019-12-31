@@ -14,7 +14,7 @@
 
 #define XMOTOR_AccDec_LEN			100//mm
 #define YMOTOR_AccDec_LEN			100//mm
-#define MOTOR_CONSTANT_LEN			80//mm
+#define MOTOR_CONSTANT_LEN			60//mm
 
 #define MOTOR_LEN_RANG			10//mm
 
@@ -137,6 +137,6 @@ void TMotorStart(void);
 void LMotorStart(void);
 void DMotorStart(void);
 void QuHuoMenMotorStart(void);
-void XMotorAccDec(void);
-void YMotorAccDec(void);
+u8 XMotorAccDec(void);
+u8 YMotorAccDec(void);
 #endif

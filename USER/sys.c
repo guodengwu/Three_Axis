@@ -32,7 +32,7 @@ void CheckIOState(void)
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
 		if((X_MOTOR_LeftLimit_IN==0&&SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN) || \
 		   (X_MOTOR_RightLimit_IN==0&&SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX))	{//x碰到上限/下限 强制停止电机
-			StopXMotor();
+			StopXMotor();SYS_PRINTF("x stop, limit\r\n");
 			SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
 			Sys.DevAction = ActionState_Fail;
 			if(X_MOTOR_LeftLimit_IN==0)	{
@@ -84,7 +84,7 @@ void CheckIOState(void)
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
 		if((Y_MOTOR_MinLimit_IN==0&&SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN) || \
 			(Y_MOTOR_MaxLimit_IN==0&&SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX))	{//y碰到上限/下限 强制停止电机
-			StopYMotor();
+			StopYMotor();SYS_PRINTF("y stop, limit\r\n");
 			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
 			Sys.DevAction = ActionState_Fail;
 			if(Y_MOTOR_MinLimit_IN==0)	{
@@ -100,22 +100,24 @@ void CheckIOState(void)
 		TMotorStart();
 	}
 	if(MotorStuckMonitor())	{
-		MotorStop(DEF_Fail);
+		MotorStop(DEF_Fail);SYS_PRINTF("MotorStuck\r\n");
 		if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//推杆电机根据该信号停止
 			SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
 			Sys.DevAction = ActionState_OK;
 		}
 	}
 }
+u8 MotorStuckMonitorCnt = 0;
+void ResetMotorStuckMonitorCnt(void)
+{
+	MotorStuckMonitorCnt = 0;
+}
 
 static u8 MotorStuckMonitor(void)
 {
-	static u8 MotorStuckMonitorCnt = 0;
-	
 	if(ALLMOTOR_STUCK_IN == 1)	{//有电机堵转，所有电机堵转信号共用
 		MotorStuckMonitorCnt++;
 		if(MotorStuckMonitorCnt>=11)	{//连续120ms堵转信号有效
-//			MotorStuckMonitorCnt = 0;
 			return 1;
 		}
 	}

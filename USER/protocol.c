@@ -115,7 +115,7 @@ void  UsartCmdProcess (void)
 {
     uint8_t cmd,iPara,rxdat;
 	usart_t *pUsart = &usart;
-	u32 temp;
+	u16 temp;
 
 	if(RingBuffer_Pop(&uart4_rxring, (void *)&rxdat) == 0)//ÎÞÊý¾Ý
 		return;
