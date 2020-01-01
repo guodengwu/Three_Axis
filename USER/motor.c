@@ -62,9 +62,6 @@ void CalcXYMotorUpDownPos(u8 id)
 			XAccDecPos.DecPos = 0;
 			return;
 		}
-//		else if(totalLen <= (MOTOR_CONSTANT_LEN))	{//计算提前减速距离
-//			temp = totalLen/2+MOTOR_CONSTANT_LEN;
-//		}
 		else	{
 			temp = MOTOR_CONSTANT_LEN;
 		}
@@ -90,13 +87,8 @@ void CalcXYMotorUpDownPos(u8 id)
 			YAccDecPos.DecPos = 0;
 			return;
 		}
-//		else if(totalLen <= (YMOTOR_AccDec_LEN+MOTOR_CONSTANT_LEN))	{
-//			temp = totalLen/2+MOTOR_CONSTANT_LEN;
-//		}
 		else	{
 			temp = MOTOR_CONSTANT_LEN;
-			if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX)
-				temp += MOTOR_CONSTANT_LEN;
 		}
 		if(len>=0)	{
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos - temp;
@@ -318,7 +310,7 @@ u8 XMotorAccDec(void)
 	}
 	return 0;
 }
-#define YMotorMAXSpeedIdx	8//y电机下降最大速度PWM占空比15%
+#define YMotorMAXSpeedIdx	9//y电机下降最大速度PWM占空比15%
 u8 YMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
@@ -358,7 +350,10 @@ u8 YMotorAccDec(void)
 					}
 				}else if(SysMotor.motor[MOTOR_Y_ID].CurPos>=YAccDecPos.DecPos)	{//减速
 					if(Y_VelCurve.index > 0)	{
-						Y_VelCurve.index--;
+						if(Y_VelCurve.index > 8)
+							Y_VelCurve.index -= 2;
+						else
+							Y_VelCurve.index--;
 						StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
 						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
 					}
