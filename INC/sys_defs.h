@@ -123,6 +123,12 @@
 #define DEF_OUT         1u
 #endif
 
+#ifndef DEF_Close
+#define DEF_Close          0u
+#endif
+#ifndef DEF_Open
+#define DEF_Open         1u
+#endif
 /*
 ********************************************************************************
 * Pre-processor Definitions

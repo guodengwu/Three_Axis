@@ -471,11 +471,11 @@ void DMotorStart(void)
 	if(SysMotor.motor[MOTOR_D_ID].status.action==ActionState_Doing)	
 		return;
 	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{//测试侧门电机
-		if(SysMotor.motor[MOTOR_D_ID].Param==0)	{//0关门 ， 1开门
+		if(SysMotor.motor[MOTOR_D_ID].Param==DEF_Close)	{//0关门 ， 1开门
 			D_MOTOR_PWM1 = 1;
 			D_MOTOR_PWM2 = 0;
 		}
-		else if(SysMotor.motor[MOTOR_D_ID].Param==1)	{
+		else if(SysMotor.motor[MOTOR_D_ID].Param==DEF_Open)	{
 			D_MOTOR_PWM1 = 0;
 			D_MOTOR_PWM2= 1;
 		}
@@ -505,11 +505,11 @@ void QuHuoMenMotorStart(void)
 	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	
 		return;
 	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{//测试取货门电机
-		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==0)	{//0关门 ， 1开门
+		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//0关门 ， 1开门
 			QuHuoMen_MOTOR_PWM1 = 1;
 			QuHuoMen_MOTOR_PWM2 = 0;
 		}
-		else if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==1)	{
+		else if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Open)	{
 			QuHuoMen_MOTOR_PWM1 = 0;
 			QuHuoMen_MOTOR_PWM2 = 1;
 		}

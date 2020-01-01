@@ -56,29 +56,34 @@ void CheckIOState(void)
 //	}
 	IOState.state1.bits.b4 = !CeMenMaxLimit_IN;
 	IOState.state1.bits.b5 = !CeMenMinLimit_IN;
-	if(CeMenMinLimit_IN==0||CeMenMaxLimit_IN==0)	{//门电机限位 限位失效时超时20s停止
-		StopDMotor();
-		SoftTimerStop(&Timer2Soft);
-		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_OK;
-		if(CeMenMinLimit_IN==0)	{
-			SysMotor.motor[MOTOR_D_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-		}else if(CeMenMaxLimit_IN==0)	{
-			SysMotor.motor[MOTOR_D_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{
+		if(CeMenMinLimit_IN==0&&SysMotor.motor[MOTOR_D_ID].Param==DEF_Close|| \
+			CeMenMaxLimit_IN==0&&SysMotor.motor[MOTOR_D_ID].Param==DEF_Open)	{//门电机限位 限位失效时超时20s停止
+			StopDMotor();
+			SoftTimerStop(&Timer2Soft);
+			SysMotor.motor[MOTOR_D_ID].status.action = ActionState_OK;
+			if(CeMenMinLimit_IN==0)	{
+				SysMotor.motor[MOTOR_D_ID].status.abort_type = MotorAbort_Min_LimitOpt;
+			}else if(CeMenMaxLimit_IN==0)	{
+				SysMotor.motor[MOTOR_D_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+			}
 		}
 	}
 	IOState.state1.bits.b6 = !QuHuoKouOpenLimit_IN;
 	IOState.state1.bits.b7 = !QuHuoKouCloseLimit_IN;
-	if(QuHuoKouOpenLimit_IN == 0||QuHuoKouCloseLimit_IN == 0)	{//取货口电机限位  限位失效时超时10s停止
-		StopQuHuoMenMotor();
-		SoftTimerStop(&Timer2Soft);
-		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_OK;
-		if(QuHuoKouOpenLimit_IN==0)	{
-			SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-		}else if(QuHuoKouCloseLimit_IN==0)	{
-			SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{
+		if((QuHuoKouOpenLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Open) || \
+			(QuHuoKouCloseLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close))	{//取货口电机限位  限位失效时超时10s停止
+			StopQuHuoMenMotor();
+			SoftTimerStop(&Timer2Soft);
+			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_OK;
+			if(QuHuoKouOpenLimit_IN==0)	{
+				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;//SYS_PRINTF("QuHuoKouOpenLimit_IN\r\n");
+			}else if(QuHuoKouCloseLimit_IN==0)	{
+				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Max_LimitOpt;//SYS_PRINTF("QuHuoKouCloseLimit_IN\r\n");
+			}
 		}
 	}
-	
 	IOState.state2.bits.b0 = !Y_MOTOR_MinLimit_IN;
 	IOState.state2.bits.b1 = !Y_MOTOR_MaxLimit_IN;
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
@@ -108,19 +113,6 @@ void CheckIOState(void)
 	}
 }
 u8 MotorStuckMonitorCnt = 0;
-/*u8 MotorStuckMoniEnableFlag = 0;
-void MotorStuckMonitorEnable(u8 flag)
-{
-	if(flag)	
-		MotorStuckMoniEnableFlag = 1;
-	else
-		MotorStuckMoniEnableFlag = 0;
-}
-void ResetMotorStuckMonitorCnt(void)
-{
-	MotorStuckMonitorCnt = 0;
-}*/
-
 static u8 MotorStuckMonitor(void)
 {
 	if(ALLMOTOR_STUCK_IN == 1)	{//有电机堵转，所有电机堵转信号共用
