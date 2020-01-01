@@ -84,6 +84,17 @@ void CheckIOState(void)
 			}
 		}
 	}
+	IOState.state1.bits.b2 = !JiaShouLimit_IN;
+	if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{
+		if(JiaShouLimit_IN==0)	{
+			StopQuHuoMenMotor();
+			SoftTimerStop(&Timer2Soft);
+			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;
+			SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
+			SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
+			QuHuoMenMotorStart();
+		}
+	}
 	IOState.state2.bits.b0 = !Y_MOTOR_MinLimit_IN;
 	IOState.state2.bits.b1 = !Y_MOTOR_MaxLimit_IN;
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{

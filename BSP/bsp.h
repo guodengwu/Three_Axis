@@ -14,7 +14,7 @@
 #define     QuHuoKouOpenLimit_IN    				P37 //出货口开门到位
 #define     QuHuoKouCloseLimit_IN    				P41 //出货口关门到位
 #define     HuoWuCheck_IN	    			P66	//货物检测开关
-//#define     CeMenCloseLimit_IN	    			P06	//侧门关门到位
+#define     JiaShouLimit_IN	    	P70	//夹手开关
 #define     HuoWuNearSwitch_IN				P30//货物接近开关
 #define     CeMenMaxLimit_IN    			P53	//侧门上限位
 #define     CeMenMinLimit_IN    			P06 //侧门下限位
