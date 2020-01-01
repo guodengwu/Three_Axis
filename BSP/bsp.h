@@ -25,19 +25,20 @@
 #define		Y_ENCODER_IN					P35
 #define		ALLMOTOR_STUCK_IN					P36
 //////////////////////////////////
-#define     X_MOTOR_PWM1    				P24
-#define     X_MOTOR_PWM2    				P25
-#define     X_MOTOR_ENABLE1    			P42
-#define     X_MOTOR_ENABLE2    			P21
+#define     X_MOTOR_PWM1    				P27//P24
+#define     X_MOTOR_PWM2    				P00//P25
+//#define     X_MOTOR_ENABLE    			P26
+//#define     X_MOTOR_ENABLE1    			//P42
+//#define     X_MOTOR_ENABLE2    			P21
 
 #define     Y_MOTOR_PWM1    			P22
 #define     Y_MOTOR_PWM2    			P23
 #define     Y_MOTOR_ENABLE1    			P73
 #define     Y_MOTOR_ENABLE2    			P20
 
-#define     Z_MOTOR_PWM1    			P27
-#define     Z_MOTOR_PWM2    			P00
-#define     Z_MOTOR_ENABLE    			P26
+#define     Z_MOTOR_PWM1    			P24//P27
+#define     Z_MOTOR_PWM2    			P25//P00
+//#define     Z_MOTOR_ENABLE    			P26
 #define     T_MOTOR_PWM1    				P77
 #define     T_MOTOR_PWM2    				P74
 #define     T_MOTOR_ENABLE    			P01

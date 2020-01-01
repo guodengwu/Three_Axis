@@ -73,12 +73,10 @@ static void	GPIO_config(void)
 	IO_PWM2 = 0;
 	IO_PWM3 = 0;
 	IO_PWM4 = 0;
-	IO_PWM5 = 0;
-//	X_MOTOR_ENABLE1 = 0;
-//	X_MOTOR_ENABLE2 = 0;
-//	Y_MOTOR_ENABLE1 = 0;
-//	Y_MOTOR_ENABLE2 = 0;
-	Z_MOTOR_ENABLE = 0;
+//	IO_PWM5 = 0;
+	IO_PWM6 = 0;
+	Z_MOTOR_PWM1 = 0;
+	Z_MOTOR_PWM2 = 0;
 	T_MOTOR_ENABLE = 0;	
 	D_MOTOR_ENABLE = 0;
 	L_MOTOR_ENABLE = 0;

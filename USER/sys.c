@@ -108,7 +108,7 @@ void CheckIOState(void)
 	}
 }
 u8 MotorStuckMonitorCnt = 0;
-u8 MotorStuckMoniEnableFlag = 0;
+/*u8 MotorStuckMoniEnableFlag = 0;
 void MotorStuckMonitorEnable(u8 flag)
 {
 	if(flag)	
@@ -119,17 +119,13 @@ void MotorStuckMonitorEnable(u8 flag)
 void ResetMotorStuckMonitorCnt(void)
 {
 	MotorStuckMonitorCnt = 0;
-}
+}*/
 
 static u8 MotorStuckMonitor(void)
 {
-	if(MotorStuckMoniEnableFlag==0)	{
-		MotorStuckMonitorCnt = 0;
-		return 0;
-	}
 	if(ALLMOTOR_STUCK_IN == 1)	{//有电机堵转，所有电机堵转信号共用
 		MotorStuckMonitorCnt++;
-		if(MotorStuckMonitorCnt>=11)	{//连续120ms堵转信号有效
+		if(MotorStuckMonitorCnt>=20)	{//连续200ms堵转信号有效
 			return 1;
 		}
 	}

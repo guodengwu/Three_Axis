@@ -18,8 +18,9 @@
 
 #define MOTOR_LEN_RANG			10//mm
 
-#define XMOTOR_MIN_PWM				DEF_PWM4
-#define XMOTOR_MAX_PWM				DEF_PWM5
+//#define XMOTOR_MIN_PWM				DEF_PWM4
+//#define XMOTOR_MAX_PWM				DEF_PWM5
+#define XMOTOR_PWM				DEF_PWM6
 #define YMOTOR_MIN_PWM				DEF_PWM2
 #define YMOTOR_MAX_PWM				DEF_PWM3
 #define MOTOR_PWM_FREQ				200
