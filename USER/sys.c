@@ -100,6 +100,15 @@ void CheckIOState(void)
 			}
 		}
 	}
+	IOState.state1.bits.b2 = HuoWuCheck_IN;
+	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{
+		if(HuoWuCheck_IN==1)	{
+			StopLMotor();SYS_PRINTF("HuoWuCheck_IN\r\n");
+			SoftTimerStop(&Timer2Soft);
+			SysMotor.motor[MOTOR_L_ID].status.action = ActionState_OK;
+			Sys.DevAction = ActionState_OK;
+		}
+	}
 	if(HuoWuNearSwitch_IN==0)	{//货物接近出口，启动推杆电机
 		SysMotor.motor[MOTOR_T_ID].Param = 1;//前推
 		TMotorStart();

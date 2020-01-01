@@ -233,7 +233,7 @@ void  UsartCmdProcess (void)
 						SysMotor.motor[MOTOR_L_ID].Param = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
 						LMotorStart();
 					}
-					else if(iPara==9)	{//取货口电机
+					else if(iPara==9)	{//取货口门电机
 						SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 						QuHuoMenMotorStart();

@@ -497,7 +497,7 @@ void LMotorStart(void)
 		L_MOTOR_ENABLE = 1;
 		BK_MOTOR_ENABLE = 1;
 		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_Doing;
-		SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_L_ID].Param);//电机运行时间控制
+		SoftTimerStart(&Timer2Soft, SysMotor.motor[MOTOR_L_ID].Param);//电机运行时间控制
 	}
 }
 void QuHuoMenMotorStart(void)
