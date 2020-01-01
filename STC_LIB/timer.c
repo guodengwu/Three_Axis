@@ -2,7 +2,7 @@
 #include	"timer.h"
 #include "motor.h"
 
-u8 _3ms_EVENT,_10ms_EVENT,_50ms_EVENT;
+u8 _3ms_EVENT,_10ms_EVENT,_30ms_EVENT;
 u8 _1s_EVENT;
 struct SYS_TIM  SysTim;
 _softtimer_t Timer1Soft;
@@ -32,8 +32,8 @@ void TM3_Isr() interrupt 19
 	if((SysTim.SumMs%10)==0)	{//1s
 		_10ms_EVENT = 1;
 	}
-	if((SysTim.SumMs%50)==0)	{//1s
-		_50ms_EVENT = 1;
+	if((SysTim.SumMs%30)==0)	{//1s
+		_30ms_EVENT = 1;
 	}
 	if((SysTim.SumMs%3)==0)	{//1s
 		_3ms_EVENT = 1;

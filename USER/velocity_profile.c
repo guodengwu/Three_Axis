@@ -23,7 +23,7 @@ void CalculateTModelCurve(void)
 //	}
 //	curve->Curve[0] = 10;
 	for(i=0;i<CURVE_BUF_MAX;i++)	{
-		curve->Curve[i] = 5*i+10;
+		curve->Curve[i] = 5*i+20;
 	}
 	curve->index = 0;
 	curve = &Y_VelCurve;	
@@ -33,7 +33,7 @@ void CalculateTModelCurve(void)
 //	}
 //	curve->Curve[0] = 10;
 	for(i=0;i<CURVE_BUF_MAX;i++)	{
-		curve->Curve[i] = 5*i+10;
+		curve->Curve[i] = 5*i+20;
 	}
 	curve->index = 0;
 }

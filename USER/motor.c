@@ -95,6 +95,8 @@ void CalcXYMotorUpDownPos(u8 id)
 //		}
 		else	{
 			temp = MOTOR_CONSTANT_LEN;
+			if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX)
+				temp += MOTOR_CONSTANT_LEN;
 		}
 		if(len>=0)	{
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos - temp;
@@ -266,7 +268,7 @@ void XYMotorArrived(void)
 		//arriveflag = 0;
 	}
 }
-#define XMotorMAXSpeedIdx	14//x电机最大速度PWM占空比80%
+#define XMotorMAXSpeedIdx	11//x电机最大速度PWM占空比80%
 u8 XMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
@@ -316,7 +318,7 @@ u8 XMotorAccDec(void)
 	}
 	return 0;
 }
-#define YMotorMAXSpeedIdx	2//y电机下降最大速度PWM占空比15%
+#define YMotorMAXSpeedIdx	8//y电机下降最大速度PWM占空比15%
 u8 YMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
@@ -327,7 +329,7 @@ u8 YMotorAccDec(void)
 			}
 			else /*if(SysMotor.motor[MOTOR_Y_ID].CurPos<=YAccDecPos.DecPos)*/	{//前进
 				Y_MOTOR_PWM1 = 0;
-				StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[3]);
+				StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[2]);
 			}
 		}
 		else	{
@@ -347,7 +349,7 @@ u8 YMotorAccDec(void)
 					}
 				}
 			}else if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX){
-				if(SysMotor.motor[MOTOR_Y_ID].CurPos<XAccDecPos.DecPos)	{//加速
+				if(SysMotor.motor[MOTOR_Y_ID].CurPos<YAccDecPos.DecPos)	{//加速
 					if(Y_VelCurve.index < CURVE_BUF_MAX)	{
 						StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);						
 						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);

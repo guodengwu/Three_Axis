@@ -28,8 +28,8 @@ void timer_event(void)
 		CheckMaPan();
 		//MotorStuck();		
 	}
-	if(_50ms_EVENT)	{
-		_50ms_EVENT = 0;
+	if(_30ms_EVENT)	{
+		_30ms_EVENT = 0;
 		if(XMotorAccDec())	{//加速过程返回1 不检测堵转
 			MotorStuckMonitorEnable(1);
 		}

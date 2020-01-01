@@ -34,7 +34,7 @@ typedef enum {
 extern struct SYS_TIM  SysTim;
 extern _softtimer_t Timer1Soft;
 extern _softtimer_t Timer2Soft;
-extern u8 _10ms_EVENT,_50ms_EVENT;
+extern u8 _10ms_EVENT,_30ms_EVENT;
 extern u8 _1s_EVENT;
 extern u8 _3ms_EVENT;
 

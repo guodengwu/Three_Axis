@@ -6,7 +6,7 @@
 #define DEF_VEL_MAX             32000//(float)(0.04)//默认最大速度 mm/s
 #define DEF_VEL_MIN             1000//(float)(0.00125)//默认最小速度 mm/s
 
-#define CURVE_BUF_MAX          19//加速点300个  加速间隔100ms
+#define CURVE_BUF_MAX          17//加速点300个  加速间隔100ms
 
 typedef struct {
     //INT8U   flexible;
