@@ -38,26 +38,32 @@ typedef struct _sys_logic_error	{
 	u32 logic;
 }_sys_logic_error_t;
 
+//typedef struct _ship	{
+//	u32 state;
+//}_ship_t;
+
 enum dev_state {
 	DEV_STATE_IDLE = 0,//空闲
 	DEV_STATE_BUSY,//忙碌
 	DEV_STATE_SHIPING,//出货中
 	DEV_STATE_TEST,//测试中
 	DEV_STATE_RESET,//复位中
+	DEV_STATE_SHIP_Failed,
 };
 
 enum dev_ship_state {//出货状态
-	DEV_ShipStateIDLE = 0,//
-	DEV_ShipStateMotorUp,//升降机上升
-	DEV_ShipStateReqShip,//请求出货中
-	DEV_ShipStateCeMenOpening,//侧门打开中
-	DEV_ShipState_TuiGanMove,////推杆动作
-	DEV_ShipState_CeMenClosing,//侧门关闭
-	DEV_ShipState_QuHuoKouOpening,//取货口开门中
-	DEV_ShipState_PleaseTakeoutCargo,//请求取货
-	DEV_ShipState_QuHuoKouCloseReady,
-	DEV_ShipState_QuHuoKouClosing,
-	DEV_ShipState_QuHuoKouClosed,
+	DEV_ShipSubStateIDLE = 0,//
+	DEV_ShipSubStateMotorUp,//升降机上升
+	DEV_ShipSubStateStartZmotor,//z电机动作中
+	DEV_ShipSubStateReqShip,//请求出货中
+	DEV_ShipSubStateCeMenOpening,//侧门打开中
+	DEV_ShipSubState_TuiGanMove,////推杆动作
+	DEV_ShipSubState_CeMenClosing,//侧门关闭
+	DEV_ShipSubState_QuHuoKouOpening,//取货口开门中
+	DEV_ShipSubState_QuHuoKouCloseing,//请求取货
+//	DEV_ShipState_Failed,
+//	DEV_ShipState_QuHuoKouClosing,
+//	DEV_ShipState_QuHuoKouClosed,
 };
 
 enum dev_logic_err {
@@ -73,7 +79,7 @@ enum dev_logic_err {
 	LE_QuHuoKouWai = 85,
 };
 
-
+//extern _ship_t Ship_t;
 extern _sys_logic_error_t SysLogicErr;
 extern _sys_io_state_t IOState;
 extern _dev_state_t DevState;

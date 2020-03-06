@@ -26,7 +26,7 @@ void timer_event(void)
 		_10ms_EVENT = 0;
 		CheckIOState();		
 		CheckMaPan();
-		//MotorStuck();		
+		//MotorStuck();
 	}
 	if(_30ms_EVENT)	{
 		_30ms_EVENT = 0;
@@ -40,6 +40,7 @@ void timer_event(void)
 //		sprintf(printfbuf,"%d %ld",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
 //		SYS_PRINTF("y pos:%s\r\n",printfbuf);
 		soft_reset();
+		ShipProcess();
 	}
 }
 

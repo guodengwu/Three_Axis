@@ -74,7 +74,7 @@ typedef union _allmotor_state {
 }allmotor_state_t;
 
 typedef struct _SysMotor  {
-	u8 MotorIDRunning;
+	u8 RunningID;
 	allmotor_state_t ALLMotorState;//所有电机状态 0-空闲 1-运行中
 	TMotor motor[MOTOR_NUMS];
 }SysMotor_t;

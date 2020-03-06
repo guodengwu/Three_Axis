@@ -24,7 +24,7 @@ void MotorInit(void)
 	}
 	XAccDecPos.DecPos = 0;
 	YAccDecPos.DecPos = 0;
-	SysMotor.MotorIDRunning = 0xff;
+	SysMotor.RunningID = 0xff;
 	SysMotor.ALLMotorState.ubyte = 0;
 }
 
@@ -255,12 +255,11 @@ void XYMotorArrived(void)
 			SYS_PRINTF("MAX y motor arrived.%ld\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos);
 		}
 	}
-	if(SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
-		if(DevState.bits.State == DEV_STATE_SHIPING)	{
-			DevState.bits.SubState = DEV_ShipStateReqShip;
-		}
-		//arriveflag = 0;
-	}
+//	if(SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
+//		if(DevState.bits.State == DEV_STATE_SHIPING && DevState.bits.SubState == DEV_ShipSubStateIDLE)	{
+//			DevState.bits.SubState = DEV_ShipSubStateStartZmotor;//出货流程 x y到位后 启动z
+//		}
+//	}
 }
 #define XMotorMAXSpeedIdx	11//x电机最大速度PWM占空比80%
 u8 XMotorAccDec(void)
@@ -378,7 +377,7 @@ void XMotorStart(void)
 	}
 	XMotorSetDir();
 	CalcXYMotorUpDownPos(MOTOR_X_ID);
-	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//测试x电机
+	if(SysMotor.ALLMotorState.bits.XMotor != DEF_Run)	{//测试x电机
 		X_VelCurve.index = 0;
 		if(XAccDecPos.DecPos == -1)	{
 			StopXMotor();
@@ -397,6 +396,8 @@ void XMotorStart(void)
 			StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
 		SYS_PRINTF("x motor start.\r\n");
+		SysMotor.RunningID = MOTOR_X_ID;
+		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
 		Sys.DevAction = ActionState_Doing;
 //		ResetMotorStuckMonitorCnt();
@@ -413,7 +414,7 @@ void YMotorStart(void)
 	}
 	YMotorSetDir();
 	CalcXYMotorUpDownPos(MOTOR_Y_ID);
-	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//测试y电机
+	if(SysMotor.ALLMotorState.bits.YMotor != DEF_Run)	{//测试y电机
 		Y_VelCurve.index = 0;
 		if(YAccDecPos.DecPos == -1)	{
 			StopYMotor();
@@ -429,6 +430,8 @@ void YMotorStart(void)
 			Y_MOTOR_PWM1 = 0;
 			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);
 		}
+		SysMotor.RunningID = MOTOR_Y_ID;
+		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;
 		Sys.DevAction = ActionState_Doing;
 //		ResetMotorStuckMonitorCnt();
@@ -439,9 +442,11 @@ void ZMotorStart(void)
 {
 	if(SysMotor.motor[MOTOR_Z_ID].status.action==ActionState_Doing)	
 		return;
-	if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{//测试z电机
+	if(SysMotor.ALLMotorState.bits.ZMotor != DEF_Run)	{//测试z电机
 		Z_MOTOR_PWM1 = 1;
 		Z_MOTOR_PWM2 = 0;
+		SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
+		SysMotor.RunningID = MOTOR_Z_ID;
 		SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_Doing;
 		SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_Z_ID].Param);//电机运行时间控制
 		SYS_PRINTF("z motor T:%ld\r\n",SysMotor.motor[MOTOR_Z_ID].Param);
@@ -451,7 +456,7 @@ void TMotorStart(void)
 {
 	if(SysMotor.motor[MOTOR_T_ID].status.action==ActionState_Doing)	
 		return;
-	if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//测试推杆电机
+	if(SysMotor.ALLMotorState.bits.TMotor != DEF_Run)	{//测试推杆电机
 		if(SysMotor.motor[MOTOR_T_ID].Param==0)	{//0收缩 ， 1延伸
 			T_MOTOR_PWM1 = 1;
 			T_MOTOR_PWM2 = 0;			
@@ -461,7 +466,8 @@ void TMotorStart(void)
 			T_MOTOR_PWM2 = 1;
 		}
 		T_MOTOR_ENABLE = 1;
-		//motor_timeout = 1000;//10s
+		SysMotor.RunningID = MOTOR_T_ID;
+		SysMotor.ALLMotorState.bits.TMotor = DEF_Run;
 		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_Doing;
 		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
 	}
@@ -470,7 +476,7 @@ void DMotorStart(void)
 {
 	if(SysMotor.motor[MOTOR_D_ID].status.action==ActionState_Doing)	
 		return;
-	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{//测试侧门电机
+	if(SysMotor.ALLMotorState.bits.DMotor != DEF_Run)	{//测试侧门电机
 		if(SysMotor.motor[MOTOR_D_ID].Param==DEF_Close)	{//0关门 ， 1开门
 			D_MOTOR_PWM1 = 1;
 			D_MOTOR_PWM2 = 0;
@@ -480,7 +486,8 @@ void DMotorStart(void)
 			D_MOTOR_PWM2= 1;
 		}
 		D_MOTOR_ENABLE = 1;
-		//motor_timeout = 1000;
+		SysMotor.RunningID = MOTOR_D_ID;
+		SysMotor.ALLMotorState.bits.DMotor = DEF_Run;
 		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_Doing;
 		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
 	}
@@ -489,13 +496,15 @@ void LMotorStart(void)
 {
 	if(SysMotor.motor[MOTOR_L_ID].status.action==ActionState_Doing)	
 		return;
-	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{//测试履带电机
+	if(SysMotor.ALLMotorState.bits.LMotor != DEF_Run)	{//测试履带电机
 		L_MOTOR_PWM1 = 1;
 		L_MOTOR_PWM2 = 0;
 		BK_MOTOR_PWM1 = 1;
 		BK_MOTOR_PWM2 = 0;
 		L_MOTOR_ENABLE = 1;
 		BK_MOTOR_ENABLE = 1;
+		SysMotor.RunningID = MOTOR_L_ID;
+		SysMotor.ALLMotorState.bits.LMotor = DEF_Run;
 		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_Doing;
 		SoftTimerStart(&Timer2Soft, SysMotor.motor[MOTOR_L_ID].Param);//电机运行时间控制
 	}
@@ -504,7 +513,7 @@ void QuHuoMenMotorStart(void)
 {
 	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	
 		return;
-	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{//测试取货门电机
+	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor != DEF_Run)	{//测试取货门电机
 		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//0关门 ， 1开门
 			QuHuoMen_MOTOR_PWM1 = 1;
 			QuHuoMen_MOTOR_PWM2 = 0;
@@ -514,7 +523,8 @@ void QuHuoMenMotorStart(void)
 			QuHuoMen_MOTOR_PWM2 = 1;
 		}
 		QuHuoMen_MOTOR_ENABLE = 1;
-		//motor_timeout = 1000;
+		SysMotor.RunningID = MOTOR_QuHuoMen_ID;
+		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
 		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
 	}	
