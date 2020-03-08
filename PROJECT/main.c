@@ -72,8 +72,6 @@ void main(void)
     EA = 1;	
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
-	SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
-	DMotorStart();
 	SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
 	QuHuoMenMotorStart();
 	MotorReset(MOTOR_X_ID);//X 电机先复位

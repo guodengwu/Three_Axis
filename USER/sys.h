@@ -48,7 +48,7 @@ enum dev_state {
 	DEV_STATE_SHIPING,//出货中
 	DEV_STATE_TEST,//测试中
 	DEV_STATE_RESET,//复位中
-	DEV_STATE_SHIP_Failed,
+//	DEV_STATE_SHIP_Failed,
 };
 
 enum dev_ship_state {//出货状态

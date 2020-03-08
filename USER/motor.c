@@ -14,7 +14,7 @@ AccDecPos YAccDecPos;
 void MotorInit(void)
 {
 	u8 i;
-	for(i=MOTOR_X_ID;i<MOTOR_QuHuoMen_ID;i++)	{
+	for(i=MOTOR_X_ID;i<=MOTOR_QuHuoMen_ID;i++)	{
 		SysMotor.motor[i].id = i;
 		SysMotor.motor[i].status.is_run = MotorState_Stop;
 		SysMotor.motor[i].status.action = ActionState_Idle;
@@ -139,7 +139,7 @@ void MotorReset(u8 id)
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;	
 		SYS_PRINTF("y motor reset.\r\n");
 	}
-	Sys.DevAction = ActionState_Doing;
+//	Sys.DevAction = ActionState_Doing;
 	DevState.bits.State = DEV_STATE_RESET;//复位中
 	DevState.bits.SubState = 0x04;//表示三轴板电机正在复位
 	SoftTimerStart(&Timer2Soft, 30000);//电机复位超时控制
@@ -155,6 +155,8 @@ void XMotorResetCheck()
 			SysMotor.motor[MOTOR_X_ID].CurPos = 0;
 			SYS_PRINTF("x motor reset ok.\r\n");
 			MotorReset(MOTOR_Y_ID);
+			SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
+			DMotorStart();
 		}
 	}
 }
@@ -196,7 +198,7 @@ void CheckMaPan(void)
 				StopXMotor();
 				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_MaPanError;
 				SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
-				Sys.DevAction = ActionState_Fail;
+//				Sys.DevAction = ActionState_Fail;
 			}
 		}
 		else	{
@@ -214,7 +216,7 @@ void CheckMaPan(void)
 				StopYMotor();
 				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_MaPanError;
 				SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
-				Sys.DevAction = ActionState_Fail;
+//				Sys.DevAction = ActionState_Fail;
 			}
 		}
 		else	{
@@ -264,7 +266,7 @@ void XYMotorArrived(void)
 //		}
 //	}
 }
-#define XMotorMAXSpeedIdx	11//x电机最大速度PWM占空比80%
+#define XMotorMAXSpeedIdx	10//x电机最大速度PWM占空比80%
 u8 XMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
@@ -388,7 +390,7 @@ void XMotorStart(void)
 		if(XAccDecPos.DecPos == -1)	{//运行距离在控制精度内
 			StopXMotor();
 			SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK;
-			Sys.DevAction = ActionState_OK;
+//			Sys.DevAction = ActionState_OK;
 			return;
 		}		
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
@@ -405,7 +407,7 @@ void XMotorStart(void)
 		SysMotor.RunningID = MOTOR_X_ID;
 		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
-		Sys.DevAction = ActionState_Doing;
+//		Sys.DevAction = ActionState_Doing;
 //		ResetMotorStuckMonitorCnt();
 	}
 }
@@ -428,7 +430,7 @@ void YMotorStart(void)
 		if(YAccDecPos.DecPos == -1)	{//运行距离在控制精度内
 			StopYMotor();
 			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
-			Sys.DevAction = ActionState_OK;
+//			Sys.DevAction = ActionState_OK;
 			return;
 		}	
 		if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{
@@ -442,7 +444,7 @@ void YMotorStart(void)
 		SysMotor.RunningID = MOTOR_Y_ID;
 		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;
-		Sys.DevAction = ActionState_Doing;
+//		Sys.DevAction = ActionState_Doing;
 //		ResetMotorStuckMonitorCnt();
 	}
 }
@@ -522,7 +524,7 @@ void LMotorStart(void)
 void QuHuoMenMotorStart(void)
 {
 	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	{
-		SYS_PRINTF("quhuo motor runnig");
+//		SYS_PRINTF("quhuo motor runnig");
 		return;
 	}
 	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor != DEF_Run)	{//测试取货门电机
@@ -539,6 +541,7 @@ void QuHuoMenMotorStart(void)
 		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
 		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
+//		SYS_PRINTF("quhuo motor start");
 	}	
 }
 void MotorStopTypeSet(u8 id, u8 stop_type)
@@ -590,11 +593,11 @@ void MotorStop(u8 stop_type)
 		StopQuHuoMenMotor();
 		MotorStopTypeSet(MOTOR_QuHuoMen_ID, stop_type);
 	}
-	if(stop_type==DEF_Success)	{
-		Sys.DevAction = ActionState_OK;
-	}else if(stop_type==DEF_Fail)	{
-		Sys.DevAction = ActionState_Fail;
-	}
+//	if(stop_type==DEF_Success)	{
+//		Sys.DevAction = ActionState_OK;
+//	}else if(stop_type==DEF_Fail)	{
+//		Sys.DevAction = ActionState_Fail;
+//	}
 }
 
 void MotorStuck(void)
