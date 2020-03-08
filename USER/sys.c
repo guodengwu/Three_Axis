@@ -47,7 +47,7 @@ void QuHuoKouProcess(void)
 			StopQuHuoMenMotor();
 			SoftTimerStop(&Timer2Soft);
 			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_OK;
-			if(QuHuoKouOpenLimit_IN==0)	{//开门成功
+			if(QuHuoKouOpenLimit_IN==0)	{//开门到位
 				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;
 				if(JiaShouFlag)	{//有夹手情况 重新关门
 					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
@@ -60,12 +60,15 @@ void QuHuoKouProcess(void)
 			}
 		}
 		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//在关门过程有夹手信号
-			if(JiaShouLimit_IN==0)	{//有夹手信号		
+			if(JiaShouLimit_IN==0)	{//有夹手信号	
+			if(JiaShouLimit_IN==0)	{
 	//			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;
 				JiaShouCnt ++;
 				if(JiaShouCnt>3)	{//大于3次继续关门
 					JiaShouFlag = 0;
 					JiaShouCnt = 0;
+					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
+					QuHuoMenMotorStart();
 				}
 				else	{//停止关门
 					StopQuHuoMenMotor();
@@ -75,7 +78,13 @@ void QuHuoKouProcess(void)
 					JiaShouFlag = 1;
 				}
 			}
+			}
 		}
+	}
+	if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close&&SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_Fail)
+	{//关门失败
+		JiaShouFlag = 0;
+		JiaShouCnt = 0;
 	}
 }
 	

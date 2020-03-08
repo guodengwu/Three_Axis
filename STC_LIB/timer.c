@@ -64,8 +64,9 @@ void TM4_Isr() interrupt 20 //using 1
 	}
 	if(Timer3Soft.state == USING)	{
 		Timer3Soft.cnt ++;
-		if(Timer3Soft.cnt>=Timer2Soft.period)	{
+		if(Timer3Soft.cnt>=Timer3Soft.period)	{
 			Timer3Soft.cnt = 0;
+			SoftTimerStop(&Timer3Soft);
 			if(Timer3Soft.pCallBack!=NULL)	{
 				(*Timer3Soft.pCallBack)();
 			}

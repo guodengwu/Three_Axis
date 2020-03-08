@@ -521,8 +521,10 @@ void LMotorStart(void)
 }
 void QuHuoMenMotorStart(void)
 {
-	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	
+	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	{
+		SYS_PRINTF("quhuo motor runnig");
 		return;
+	}
 	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor != DEF_Run)	{//测试取货门电机
 		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//0关门 ， 1开门
 			QuHuoMen_MOTOR_PWM1 = 1;
