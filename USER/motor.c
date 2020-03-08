@@ -54,11 +54,12 @@ void CalcXYMotorUpDownPos(u8 id)
 		len = SysMotor.motor[MOTOR_X_ID].ObjPos - SysMotor.motor[MOTOR_X_ID].CurPos;
 		totalLen = abs(len);
 		if(totalLen<=MOTOR_LEN_RANG)	{//移动距离在运行控制精度内 不启动电机
+			SYS_PRINTF("X not need run ");
 			XAccDecPos.DecPos = -1;
 			return;
 		}
 		else if(totalLen <= MOTOR_CONSTANT_LEN)	{//移动距离在加减速距离内 匀速运行
-			//XAccDecPos.AccPos = 0;
+			SYS_PRINTF("X constant run ");
 			XAccDecPos.DecPos = 0;
 			return;
 		}
@@ -67,11 +68,11 @@ void CalcXYMotorUpDownPos(u8 id)
 		}
 		if(len>=0)	{
 			XAccDecPos.DecPos = SysMotor.motor[MOTOR_X_ID].ObjPos - temp;
-			SYS_PRINTF("MAX ");
+			SYS_PRINTF("X MAX ");
 		}
 		else	{
 			XAccDecPos.DecPos = SysMotor.motor[MOTOR_X_ID].ObjPos + temp;
-			SYS_PRINTF("MIN ");
+			SYS_PRINTF("X MIN ");
 		}
 		SYS_PRINTF("C:%ld O:%ld D:%d\r\n",SysMotor.motor[MOTOR_X_ID].CurPos,SysMotor.motor[MOTOR_X_ID].ObjPos,XAccDecPos.DecPos);
 	}
@@ -79,11 +80,12 @@ void CalcXYMotorUpDownPos(u8 id)
 		len = SysMotor.motor[MOTOR_Y_ID].ObjPos - SysMotor.motor[MOTOR_Y_ID].CurPos;
 		totalLen = abs(len);
 		if(totalLen<=MOTOR_LEN_RANG)	{
+			SYS_PRINTF("Y not need run ");
 			YAccDecPos.DecPos = -1;
 			return;
 		}
 		else if(totalLen <= MOTOR_CONSTANT_LEN)	{
-			//XAccDecPos.AccPos = 0;
+			SYS_PRINTF("Y constant run ");
 			YAccDecPos.DecPos = 0;
 			return;
 		}
@@ -92,11 +94,11 @@ void CalcXYMotorUpDownPos(u8 id)
 		}
 		if(len>=0)	{
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos - temp;
-			SYS_PRINTF("MAX ");
+			SYS_PRINTF("Y MAX ");
 		}
 		else	{
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos + temp;
-			SYS_PRINTF("MIN ");
+			SYS_PRINTF("Y MIN ");
 		}
 		SYS_PRINTF("C:%ld O:%ld D:%d\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos,SysMotor.motor[MOTOR_Y_ID].ObjPos,YAccDecPos.DecPos);
 	}
@@ -107,7 +109,6 @@ void MotorReset(u8 id)
 	if(id == MOTOR_X_ID)	{
 		Sys.state |= SYSSTATE_XMOTORRESET;
 		SysMotor.motor[MOTOR_X_ID].dir = MOTOR_TO_MIN;
-		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 		X_VelCurve.index = 0;
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
 			X_MOTOR_PWM2 = 0;
@@ -119,12 +120,12 @@ void MotorReset(u8 id)
 			X_MOTOR_PWM2 = 1;
 			StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
+		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
 		SYS_PRINTF("x motor reset.\r\n");
 	}else 	if(id == MOTOR_Y_ID)	{
 		Sys.state |= SYSSTATE_YMOTORRESET;
 		SysMotor.motor[MOTOR_Y_ID].dir = MOTOR_TO_MIN;
-		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		Y_VelCurve.index = 0;
 		if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{
 			Y_MOTOR_PWM2 = 0;
@@ -134,13 +135,14 @@ void MotorReset(u8 id)
 			Y_MOTOR_PWM1 = 0;
 			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);
 		}
+		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;	
 		SYS_PRINTF("y motor reset.\r\n");
 	}
 	Sys.DevAction = ActionState_Doing;
 	DevState.bits.State = DEV_STATE_RESET;//复位中
 	DevState.bits.SubState = 0x04;//表示三轴板电机正在复位
-	SoftTimerStart(&Timer2Soft, 5000);//电机复位超时控制
+	SoftTimerStart(&Timer2Soft, 30000);//电机复位超时控制
 }
 
 void XMotorResetCheck()
@@ -152,6 +154,7 @@ void XMotorResetCheck()
 			encoder[EncoderX_ID].pluse = 0;
 			SysMotor.motor[MOTOR_X_ID].CurPos = 0;
 			SYS_PRINTF("x motor reset ok.\r\n");
+			MotorReset(MOTOR_Y_ID);
 		}
 	}
 }
@@ -369,20 +372,23 @@ u8 YMotorAccDec(void)
 
 void XMotorStart(void)
 {
-	if(SysMotor.motor[MOTOR_X_ID].status.action==ActionState_Doing)	
+	if(SysMotor.motor[MOTOR_X_ID].status.action==ActionState_Doing||SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
+		SYS_PRINTF("x running.\r\n");
 		return;
-	if(SysMotor.motor[MOTOR_X_ID].ObjPos>XMOTOR_LEN_MAX)	{
-		SysMotor.motor[MOTOR_X_ID].ObjPos = XMOTOR_LEN_MAX;
+	}
+	if(SysMotor.motor[MOTOR_X_ID].ObjPos>X_QuHuoKouPos)	{
+		SysMotor.motor[MOTOR_X_ID].ObjPos = X_QuHuoKouPos;
 //		return;
 	}
 	XMotorSetDir();
 	CalcXYMotorUpDownPos(MOTOR_X_ID);
-	if(SysMotor.ALLMotorState.bits.XMotor != DEF_Run)	{//测试x电机
+//	if(SysMotor.ALLMotorState.bits.XMotor != DEF_Run)	
+	{
 		X_VelCurve.index = 0;
-		if(XAccDecPos.DecPos == -1)	{
+		if(XAccDecPos.DecPos == -1)	{//运行距离在控制精度内
 			StopXMotor();
-			SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
-			Sys.DevAction = ActionState_Fail;
+			SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK;
+			Sys.DevAction = ActionState_OK;
 			return;
 		}		
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{
@@ -406,20 +412,23 @@ void XMotorStart(void)
 
 void YMotorStart(void)
 {
-	if(SysMotor.motor[MOTOR_Y_ID].status.action==ActionState_Doing)	
+	if(SysMotor.motor[MOTOR_Y_ID].status.action==ActionState_Doing||SysMotor.ALLMotorState.bits.YMotor == DEF_Run)		{
+		SYS_PRINTF("y running.\r\n");
 		return;
+	}
 	if(SysMotor.motor[MOTOR_Y_ID].ObjPos>YMOTOR_LEN_MAX)	{
 		SysMotor.motor[MOTOR_Y_ID].ObjPos = YMOTOR_LEN_MAX;
 //		return;
 	}
 	YMotorSetDir();
 	CalcXYMotorUpDownPos(MOTOR_Y_ID);
-	if(SysMotor.ALLMotorState.bits.YMotor != DEF_Run)	{//测试y电机
+//	if(SysMotor.ALLMotorState.bits.YMotor != DEF_Run)	
+	{//测试y电机
 		Y_VelCurve.index = 0;
-		if(YAccDecPos.DecPos == -1)	{
+		if(YAccDecPos.DecPos == -1)	{//运行距离在控制精度内
 			StopYMotor();
-			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
-			Sys.DevAction = ActionState_Fail;
+			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
+			Sys.DevAction = ActionState_OK;
 			return;
 		}	
 		if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{
@@ -490,6 +499,7 @@ void DMotorStart(void)
 		SysMotor.ALLMotorState.bits.DMotor = DEF_Run;
 		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_Doing;
 		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
+		SYS_PRINTF("d motor start");
 	}
 }
 void LMotorStart(void)
@@ -562,9 +572,9 @@ void MotorStop(u8 stop_type)
 		StopZMotor();
 		MotorStopTypeSet(MOTOR_Z_ID, stop_type);
 	}
-	if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//停止推杆电机
+	if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//停止推杆电机 使用卡死信号停止
 		StopTMotor();
-		MotorStopTypeSet(MOTOR_T_ID, stop_type);
+		MotorStopTypeSet(MOTOR_T_ID, DEF_Success);
 	}
 	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{//停止侧门电机
 		StopDMotor();

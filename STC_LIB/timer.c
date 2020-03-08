@@ -7,6 +7,7 @@ u8 _1s_EVENT;
 struct SYS_TIM  SysTim;
 _softtimer_t Timer1Soft;
 _softtimer_t Timer2Soft;
+_softtimer_t Timer3Soft;
 
 static void SysTimDataInit(void)
 {
@@ -19,6 +20,8 @@ static void SysTimDataInit(void)
 	Timer1Soft.state = STOP;
 	Timer2Soft.TIM = Timer2;
 	Timer2Soft.state = STOP;
+	Timer3Soft.TIM = Timer3;
+	Timer3Soft.state = STOP;
 }
 /********************* Timer中断函数************************/
 void TM3_Isr() interrupt 19
@@ -57,6 +60,15 @@ void TM4_Isr() interrupt 20 //using 1
 			Timer2Soft.cnt = 0;
 			MotorStop(DEF_Fail);		//电机运行超时
 			SoftTimerStop(&Timer2Soft);
+		}
+	}
+	if(Timer3Soft.state == USING)	{
+		Timer3Soft.cnt ++;
+		if(Timer3Soft.cnt>=Timer2Soft.period)	{
+			Timer3Soft.cnt = 0;
+			if(Timer3Soft.pCallBack!=NULL)	{
+				(*Timer3Soft.pCallBack)();
+			}
 		}
 	}
 }

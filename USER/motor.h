@@ -9,8 +9,11 @@
 
 #define	MOTOR_RUN_TIMEOUT		600000 //6s
 
-#define XMOTOR_LEN_MAX			600//mm
+#define XMOTOR_LEN_MAX			540//mm
 #define YMOTOR_LEN_MAX			1435//mm
+
+#define X_QuHuoKouPos			650//mm
+#define Y_QuHuoKouPos			450//380//mm
 
 #define XMOTOR_AccDec_LEN			100//mm
 #define YMOTOR_AccDec_LEN			100//mm
@@ -93,7 +96,7 @@ enum eActionState {
     ActionState_Doing       ,    // Action State:Doing
     ActionState_OK          ,    // Action State:OK
     ActionState_Fail        ,     // Action State:Fail
-	//ActionState_DoReady		,
+//	ActionState_Retry		,
 };
 
 enum eMotorAbort {

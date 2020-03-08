@@ -27,6 +27,7 @@ void timer_event(void)
 		CheckIOState();		
 		CheckMaPan();
 		//MotorStuck();
+//		JiaShouProcess();
 	}
 	if(_30ms_EVENT)	{
 		_30ms_EVENT = 0;
@@ -44,6 +45,20 @@ void timer_event(void)
 	}
 }
 
+//void CheckDevAction(void)
+//{
+//	u8 i,id;
+//	
+//	for(i=0;i<;i++)	{
+//		if(SysMotor.motor[i].status.action == ActionState_Doing)	{
+//			Sys.DevAction = ActionState_Doing;
+//			return;
+//		}
+//	}
+////	id = SysMotor.RunningID;
+////	Sys.DevAction = SysMotor.motor[id].status.action;
+//} 
+
 void main(void)
 {
 	delay_us(2000);
@@ -57,8 +72,17 @@ void main(void)
     EA = 1;	
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
-	MotorReset(MOTOR_X_ID);//X Y电机复位
-	MotorReset(MOTOR_Y_ID);
+	SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
+	DMotorStart();
+	SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
+	QuHuoMenMotorStart();
+	MotorReset(MOTOR_X_ID);//X 电机先复位
+//	for(;;)	{
+//		if(!(Sys.state & SYSSTATE_XMOTORRESET))	{//x 复位成功后才能动y
+//			MotorReset(MOTOR_Y_ID);
+//			break;
+//		}
+//	}
 	
 	while(1)
 	{

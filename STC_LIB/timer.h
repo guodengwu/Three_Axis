@@ -23,6 +23,7 @@ typedef struct _softtimer
 	u32 cnt;
 	u32 period;
   	u8 state;
+	void (*pCallBack)();
 }_softtimer_t;
 
 typedef enum {
@@ -34,6 +35,7 @@ typedef enum {
 extern struct SYS_TIM  SysTim;
 extern _softtimer_t Timer1Soft;
 extern _softtimer_t Timer2Soft;
+extern _softtimer_t Timer3Soft;
 extern u8 _10ms_EVENT,_30ms_EVENT;
 extern u8 _1s_EVENT;
 extern u8 _3ms_EVENT;

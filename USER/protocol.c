@@ -133,17 +133,18 @@ void  UsartCmdProcess (void)
 			case _CMD_RX_SHIP:	//0X02,//出货指令			
 				pUsart->tx_cmd = _CMD_TX_SHIP;
 				pUsart->tx_idx = 0;
-				temp = pUsart->rx_idx+6;
+				pUsart->rx_idx+=8;
 				if(Sys.DevAction == ActionState_Doing)	{
 					data_buf[pUsart->tx_idx++] = 0;
 				}else	{
 					data_buf[pUsart->tx_idx++] = 1;				
-					SysMotor.motor[MOTOR_X_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&temp);
-					SysMotor.motor[MOTOR_Y_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&temp);
+					SysMotor.motor[MOTOR_X_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+					SysMotor.motor[MOTOR_Y_ID].ObjPos = (INT32S)UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+					if(SysMotor.motor[MOTOR_X_ID].ObjPos>XMOTOR_LEN_MAX)	{
+						SysMotor.motor[MOTOR_X_ID].ObjPos = XMOTOR_LEN_MAX;
+					}
 					DevState.bits.State = DEV_STATE_SHIPING;
 					DevState.bits.SubState = DEV_ShipSubStateMotorUp;//升降机上升
-//					SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
-//					SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 					Sys.DevAction = ActionState_Doing;
 					XMotorStart();
 					YMotorStart();
@@ -255,6 +256,7 @@ void  UsartCmdProcess (void)
 //				DevState.bits.State = DEV_STATE_IDLE;
 				DevState.bits.SubState = DEV_ShipSubStateCeMenOpening;
 				pUsart->tx_cmd = _CMD_TX_SHIP_OK;
+				SYS_PRINTF("Ship compelet. ");
 				break;
 			}
 			default:
