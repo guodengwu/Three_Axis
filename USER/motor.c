@@ -169,6 +169,8 @@ void YMotorResetCheck()
 			encoder[EncoderY_ID].pluse = 0;
 			SysMotor.motor[MOTOR_Y_ID].CurPos = 0;
 			SYS_PRINTF("y motor reset ok.\r\n");
+			DevState.bits.State = DEV_STATE_IDLE;//
+			DevState.bits.SubState = DEV_ShipSubStateIDLE;
 		}
 	}
 }
@@ -233,6 +235,8 @@ void XYMotorArrived(void)
 	//s32 max_limit,min_limit;
 	
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
+		if(Sys.state & SYSSTATE_XMOTORRESET)
+			return;
 		if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN&&SysMotor.motor[MOTOR_X_ID].CurPos <= SysMotor.motor[MOTOR_X_ID].ObjPos)	{
 			StopXMotor();
 			SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Normal;
@@ -247,6 +251,8 @@ void XYMotorArrived(void)
 		}
 	}
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
+		if(Sys.state & SYSSTATE_YMOTORRESET)
+			return;
 		if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN&&SysMotor.motor[MOTOR_Y_ID].CurPos <= SysMotor.motor[MOTOR_Y_ID].ObjPos)	{
 			StopYMotor();
 			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Normal;

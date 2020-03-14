@@ -133,7 +133,7 @@ void CheckIOState(void)
 	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{
 		if(CeMenMinLimit_IN==0)	{
 			CeMenMinCnt ++;
-			if(CeMenMinCnt>2)	{
+			if(CeMenMinCnt>=2)	{
 				if(SysMotor.motor[MOTOR_D_ID].Param==DEF_Close)	{
 					StopDMotor();
 					SoftTimerStop(&Timer2Soft);
@@ -145,7 +145,7 @@ void CheckIOState(void)
 				CeMenMinCnt = 0;
 		if(CeMenMaxLimit_IN==0)	{
 			CeMenMaxCnt ++;
-			if(CeMenMaxCnt>2)	{
+			if(CeMenMaxCnt>=2)	{
 				if(SysMotor.motor[MOTOR_D_ID].Param==DEF_Open)	{
 					StopDMotor();
 					SoftTimerStop(&Timer2Soft);
@@ -161,7 +161,7 @@ void CheckIOState(void)
 		CeMenMaxCnt = 0;
 	}
 //	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{
-//		if(CeMenMinLimit_IN==0&&SysMotor.motor[MOTOR_D_ID].Param==DEF_Close|| \
+//		if(CeMenMinLimit_IN==0&&SysMotor.motor[MOTOR_D_ID].Param==DEF_Close|| 
 //			CeMenMaxLimit_IN==0&&SysMotor.motor[MOTOR_D_ID].Param==DEF_Open)	{//门电机限位 限位失效时超时20s停止
 //			StopDMotor();
 //			SoftTimerStop(&Timer2Soft);
@@ -197,7 +197,7 @@ void CheckIOState(void)
 	if(HuoWuCheck_IN==1)	{
 		NoHuoWuTimeCnt = 0;
 		GetHuoWuTimeCnt ++;
-		if(GetHuoWuTimeCnt>5)	{
+		if(GetHuoWuTimeCnt>=5)	{
 			if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{
 				StopLMotor();SYS_PRINTF("HuoWuCheck_IN\r\n");
 				SoftTimerStop(&Timer2Soft);
@@ -210,7 +210,7 @@ void CheckIOState(void)
 	else if(HuoWuCheck_IN==0)	{
 		GetHuoWuTimeCnt = 0;
 		NoHuoWuTimeCnt ++;
-		if(NoHuoWuTimeCnt>5)	{
+		if(NoHuoWuTimeCnt>=5)	{
 			HuoWuDetectFlag = 0;
 		}
 	}

@@ -172,7 +172,7 @@ void bsp(void)
 void soft_reset(void)
 {
 	if(Sys.state&SYSSTATE_RESET)	{
-		delay_us(3000);
+		delay_us(1000);
 		IAP_CONTR = 0x60;
 	}
 }

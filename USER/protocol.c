@@ -159,8 +159,9 @@ void  UsartCmdProcess (void)
 					pUsart->tx_idx = 0;
 					if(Sys.DevAction == ActionState_Doing)	{
 						data_buf[pUsart->tx_idx++] = 0;
-					}else	{//1：开始重启
-						data_buf[pUsart->tx_idx++] = 1;				
+					}else	{//1：准备重启
+						data_buf[pUsart->tx_idx++] = 1;
+						Sys.state |= SYSSTATE_RESET_TB;					
 					}
 				}
 				break;
@@ -183,8 +184,8 @@ void  UsartCmdProcess (void)
 //							Sys.DevAction = ActionState_Idle;
 							ShipResult(ActionState_Idle);
 							MotorReset(MOTOR_X_ID);//X Y电机复位
-							SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
-							DMotorStart();//门复位
+//							SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
+//							DMotorStart();//门复位
 							SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
 							QuHuoMenMotorStart();
 							data_buf[pUsart->tx_idx++] = ActionState_Doing;
@@ -214,12 +215,15 @@ void  UsartCmdProcess (void)
 					if(iPara==3)	{
 //						SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 						SysMotor.motor[MOTOR_X_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+						if(SysMotor.motor[MOTOR_X_ID].ObjPos>XMOTOR_LEN_MAX)	{
+							SysMotor.motor[MOTOR_X_ID].ObjPos = XMOTOR_LEN_MAX;
+						}
 						XMotorStart();						
 					}
 					else if(iPara==4)	{
 //						SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 						SysMotor.motor[MOTOR_Y_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
-						SYS_PRINTF("y %ld \r\n",SysMotor.motor[MOTOR_Y_ID].ObjPos);
+//						SYS_PRINTF("y %ld \r\n",SysMotor.motor[MOTOR_Y_ID].ObjPos);
 						YMotorStart();
 					}
 					else if(iPara==5)	{//履带电机
@@ -377,10 +381,8 @@ static void uart_message_tx_handler(usart_t *pUsart)
 		UART4_SendByte(tx_dat);
 		pUsart->tx_idx++;
 	}else {
-		if(pUsart->tx_cmd == _CMD_TX_RESET)	{//指令发送完成后 再复位
-			if(Sys.DevAction != ActionState_Doing)	{
-				Sys.state |= SYSSTATE_RESET;
-			}
+		if(Sys.state & SYSSTATE_RESET_TB)	{//指令发送完成后 再复位
+			Sys.state |= SYSSTATE_RESET;
 		}
 		pUsart->tx_cmd = _CMD_TX_NONE;
 		pUsart->tx_flag = DEF_Idle;//发送完成
