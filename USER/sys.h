@@ -55,7 +55,7 @@ enum dev_state {
 enum dev_ship_state {//出货状态
 	DEV_ShipSubStateIDLE = 0,//
 	DEV_ShipSubStateMotorUp,//升降机上升
-	DEV_ShipSubStateStartZmotor,//z电机动作中
+//	DEV_ShipSubStateStartZmotor,//z电机动作中
 	DEV_ShipSubStateReqShip,//请求出货中
 	DEV_ShipSubStateCeMenOpening,//侧门打开中
 	DEV_ShipSubState_TuiGanMove,////推杆动作

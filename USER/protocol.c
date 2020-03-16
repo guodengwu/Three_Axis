@@ -112,6 +112,7 @@ void UsartCmdReply(void)
 }
 extern RINGBUFF_T uart4_rxring;
 extern void ShipResult(u8 result);
+extern u8 ShipStateFlag;
 //串口指令处理函数
 void  UsartCmdProcess (void)
 {
@@ -148,8 +149,10 @@ void  UsartCmdProcess (void)
 					DevState.bits.State = DEV_STATE_SHIPING;
 					DevState.bits.SubState = DEV_ShipSubStateMotorUp;//升降机上升
 					Sys.DevAction = ActionState_Doing;//开始出货
-					XMotorStart();
-					YMotorStart();
+					ShipStateFlag = 0;
+					MotorReset(MOTOR_X_ID);//先复位
+//					XMotorStart();
+//					YMotorStart();
 				}
 				break;
 			case _CMD_RX_RESET://0X03,//重启

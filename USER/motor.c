@@ -107,6 +107,8 @@ void CalcXYMotorUpDownPos(u8 id)
 void MotorReset(u8 id)
 {
 	if(id == MOTOR_X_ID)	{
+		if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)
+			return;
 		Sys.state |= SYSSTATE_XMOTORRESET;
 		SysMotor.motor[MOTOR_X_ID].dir = MOTOR_TO_MIN;
 		X_VelCurve.index = 0;
@@ -124,6 +126,8 @@ void MotorReset(u8 id)
 		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
 		SYS_PRINTF("x motor reset.\r\n");
 	}else 	if(id == MOTOR_Y_ID)	{
+		if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)
+			return;
 		Sys.state |= SYSSTATE_YMOTORRESET;
 		SysMotor.motor[MOTOR_Y_ID].dir = MOTOR_TO_MIN;
 		Y_VelCurve.index = 0;
@@ -139,9 +143,10 @@ void MotorReset(u8 id)
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;	
 		SYS_PRINTF("y motor reset.\r\n");
 	}
-//	Sys.DevAction = ActionState_Doing;
-	DevState.bits.State = DEV_STATE_RESET;//复位中
-	DevState.bits.SubState = 0x04;//表示三轴板电机正在复位
+	if(Sys.DevAction != ActionState_Doing)	{//非出货期间的复位
+		DevState.bits.State = DEV_STATE_RESET;//复位中
+		DevState.bits.SubState = 0x04;//表示三轴板电机正在复位
+	}
 	SoftTimerStart(&Timer2Soft, 30000);//电机复位超时控制
 }
 
@@ -169,8 +174,10 @@ void YMotorResetCheck()
 			encoder[EncoderY_ID].pluse = 0;
 			SysMotor.motor[MOTOR_Y_ID].CurPos = 0;
 			SYS_PRINTF("y motor reset ok.\r\n");
-			DevState.bits.State = DEV_STATE_IDLE;//
-			DevState.bits.SubState = DEV_ShipSubStateIDLE;
+			if(Sys.DevAction != ActionState_Doing)	{//非出货期间的复位
+				DevState.bits.State = DEV_STATE_IDLE;//
+				DevState.bits.SubState = DEV_ShipSubStateIDLE;
+			}
 		}
 	}
 }
@@ -495,6 +502,13 @@ void DMotorStart(void)
 		return;
 	if(SysMotor.ALLMotorState.bits.DMotor != DEF_Run)	{//测试侧门电机
 		if(SysMotor.motor[MOTOR_D_ID].Param==DEF_Close)	{//0关门 ， 1开门
+			if(CeMenMinLimit_IN==0)	{
+				if(CeMenMinLimit_IN==0)	{//已经关门到位
+					SysMotor.motor[MOTOR_D_ID].status.action = ActionState_OK;
+					SysMotor.motor[MOTOR_D_ID].status.abort_type = MotorAbort_Min_LimitOpt;
+					return;
+				}
+			}
 			D_MOTOR_PWM1 = 1;
 			D_MOTOR_PWM2 = 0;
 		}
@@ -663,7 +677,7 @@ void MotorTest(void)
 
 void StopXMotor(void)
 {
-	X_MOTOR_PWM2 = 1;
+	X_MOTOR_PWM1 = 0;
 	X_MOTOR_PWM2 = 0;
 	StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, 0);
 //	StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 0);
