@@ -110,9 +110,12 @@ void UsartCmdReply(void)
 			break;
 	}
 }
+extern u32 GetSysTick(void);
 extern RINGBUFF_T uart4_rxring;
 extern void ShipResult(u8 result);
 extern u8 ShipStateFlag;
+u32 pro_last_t = 0,pro_cur_t = 0;
+s32 time_diff;
 //串口指令处理函数
 void  UsartCmdProcess (void)
 {
@@ -122,6 +125,14 @@ void  UsartCmdProcess (void)
 
 	if(RingBuffer_Pop(&uart4_rxring, (void *)&rxdat) == 0)//无数据
 		return;
+	pro_cur_t = GetSysTick();
+	time_diff = pro_cur_t - pro_last_t;
+	if(time_diff<0)	{
+		time_diff += 0xffffffff;
+	}
+	if(time_diff>100)//接收数据间隔大于50ms 判断超时	
+		usart.rx_state = PRO_RX_STATE_SD0;
+	pro_last_t = GetSysTick();
 	uart_message_rx_handler(&usart, rxdat);
 	if(pUsart->rx_flag==DEF_No)	{//无数据接收 返回
 		return;

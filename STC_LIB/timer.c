@@ -27,8 +27,8 @@ static void SysTimDataInit(void)
 void TM3_Isr() interrupt 19
 {
     SysTim.SumMs++;
-	if(SysTim.SumMs>=1000)	{//1s
-		SysTim.SumMs = 0;
+	if((SysTim.SumMs%1000)==0)	{//1s
+//		SysTim.SumMs = 0;
 		SysTim.SumSec ++;
 		_1s_EVENT = 1;
 	}
@@ -83,6 +83,11 @@ void SystickInit_Tmer(void)
 	T4T3M |= 0x08;		//定时器3开始计时
 	IE2 |= ET3;          //使能定时器中断
 	SysTimDataInit();
+}
+
+u32 GetSysTick(void)
+{
+	return SysTim.SumMs;
 }
 
 void Timer4Init(void)		//10毫秒@27.000MHz
