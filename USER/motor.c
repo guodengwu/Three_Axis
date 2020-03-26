@@ -24,7 +24,7 @@ void MotorInit(void)
 	}
 	XAccDecPos.DecPos = 0;
 	YAccDecPos.DecPos = 0;
-	SysMotor.RunningID = 0xff;
+	SysMotor.RunningID = 0;
 	SysMotor.ALLMotorState.ubyte = 0;
 }
 
@@ -122,6 +122,7 @@ void MotorReset(u8 id)
 			X_MOTOR_PWM2 = 1;
 			StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
+		SysMotor.RunningID = MOTOR_X_ID;
 		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
 		SYS_PRINTF("x motor reset.\r\n");
@@ -139,6 +140,7 @@ void MotorReset(u8 id)
 			Y_MOTOR_PWM1 = 0;
 			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);
 		}
+		SysMotor.RunningID = MOTOR_Y_ID;
 		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;	
 		SYS_PRINTF("y motor reset.\r\n");
@@ -146,7 +148,7 @@ void MotorReset(u8 id)
 	if(Sys.DevAction != ActionState_Doing)	{//非出货期间的复位
 		DevState.bits.State = DEV_STATE_RESET;//复位中
 		DevState.bits.SubState = 0x04;//表示三轴板电机正在复位
-	}
+	}	
 	SoftTimerStart(&Timer2Soft, 30000);//电机复位超时控制
 }
 
@@ -205,6 +207,7 @@ void CheckMaPan(void)
 			if(XPosChangeCnt>10)	{
 				SysHDError.E2.bits.b2 = 1;//X 码盘异常
 				StopXMotor();
+				SYS_PRINTF("x mapan error\r\n");
 				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_MaPanError;
 				SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
 //				Sys.DevAction = ActionState_Fail;
@@ -223,6 +226,7 @@ void CheckMaPan(void)
 			if(YPosChangeCnt>10)	{
 				SysHDError.E2.bits.b3 = 1;//Y 码盘异常
 				StopYMotor();
+				SYS_PRINTF("y mapan error\r\n");
 				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_MaPanError;
 				SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
 //				Sys.DevAction = ActionState_Fail;
@@ -300,7 +304,7 @@ u8 XMotorAccDec(void)
 				if(SysMotor.motor[MOTOR_X_ID].CurPos>XAccDecPos.DecPos)	{//加速
 					if(X_VelCurve.index < XMotorMAXSpeedIdx)	{
 						StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);						
-						SYS_PRINTF("%d ",X_VelCurve.Curve[X_VelCurve.index]);
+//						SYS_PRINTF("%d ",X_VelCurve.Curve[X_VelCurve.index]);
 						X_VelCurve.index++;	
 						return 1;
 					}
@@ -315,7 +319,7 @@ u8 XMotorAccDec(void)
 				if(SysMotor.motor[MOTOR_X_ID].CurPos<XAccDecPos.DecPos)	{//加速
 					if(X_VelCurve.index < XMotorMAXSpeedIdx)	{
 						StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);						
-						SYS_PRINTF("%d ",X_VelCurve.Curve[X_VelCurve.index]);
+//						SYS_PRINTF("%d ",X_VelCurve.Curve[X_VelCurve.index]);
 						X_VelCurve.index++;	
 						return 1;
 					}
@@ -350,7 +354,7 @@ u8 YMotorAccDec(void)
 				if(SysMotor.motor[MOTOR_Y_ID].CurPos>YAccDecPos.DecPos)	{//加速 y电机下降过程最大速度控制在10
 					if(Y_VelCurve.index < YMotorMAXSpeedIdx)	{
 						StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);						
-						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);
+//						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);
 						Y_VelCurve.index++;	
 						return 1;
 					}
@@ -365,7 +369,7 @@ u8 YMotorAccDec(void)
 				if(SysMotor.motor[MOTOR_Y_ID].CurPos<YAccDecPos.DecPos)	{//加速
 					if(Y_VelCurve.index < CURVE_BUF_MAX)	{
 						StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);						
-						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);
+//						SYS_PRINTF("%d ",Y_VelCurve.Curve[Y_VelCurve.index]);
 						Y_VelCurve.index++;	
 						return 1;
 					}
@@ -454,6 +458,7 @@ void YMotorStart(void)
 			Y_MOTOR_PWM1 = 0;
 			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);
 		}
+		SYS_PRINTF("y motor start.\r\n");
 		SysMotor.RunningID = MOTOR_Y_ID;
 		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;
@@ -721,7 +726,7 @@ void StopDMotor(void)
 void StopLMotor(void)
 {
 	L_MOTOR_ENABLE = 0;
-	BK_MOTOR_ENABLE = 0;
+	BK_MOTOR_ENABLE = 0;//P6.0
 	SysMotor.ALLMotorState.bits.LMotor = DEF_Stop;
 	//MotorStuckMonitorEnable(0);
 }

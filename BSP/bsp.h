@@ -33,8 +33,8 @@
 
 #define     Y_MOTOR_PWM1    			P22
 #define     Y_MOTOR_PWM2    			P23
-#define     Y_MOTOR_ENABLE1    			P73
-#define     Y_MOTOR_ENABLE2    			P20
+//#define     Y_MOTOR_ENABLE1    			P73
+//#define     Y_MOTOR_ENABLE2    			P20
 
 #define     Z_MOTOR_PWM1    			P24//P27
 #define     Z_MOTOR_PWM2    			P25//P00
@@ -45,7 +45,7 @@
 
 #define     D_MOTOR_PWM1    				P76
 #define     D_MOTOR_PWM2    				P75
-#define     D_MOTOR_ENABLE    			P10
+#define     D_MOTOR_ENABLE    			P20//P10
 #define     L_MOTOR_PWM1    				P64
 #define     L_MOTOR_PWM2    				P40
 #define     L_MOTOR_ENABLE    			P62

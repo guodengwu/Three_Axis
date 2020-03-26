@@ -261,13 +261,20 @@ void ShipProcess(void)
 		if(DevState.bits.SubState == DEV_ShipSubStateMotorUp)	{//等待x y移动到位
 			if(ShipStateFlag==0)	{//等待复位结束
 				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK && \
-					SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{
-					XMotorStart();
-					YMotorStart();
+					SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{			
 					ShipStateFlag = 1;
+					timecnt = 0;
 				}
 			}
-			else if(ShipStateFlag==1)
+			else if(ShipStateFlag==1)	{
+				timecnt++;
+				if(timecnt>1)	{
+					ShipStateFlag = 2;
+					XMotorStart();
+					YMotorStart();
+				}
+			}
+			else if(ShipStateFlag==2)	{
 				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
 	//				DevState.bits.SubState = DEV_ShipSubStateStartZmotor;
 					SysMotor.motor[MOTOR_Z_ID].Param = 15000;//启动z电机
@@ -276,6 +283,7 @@ void ShipProcess(void)
 					timecnt = 0;
 					ReqShipTimeCnt = 0;
 				}
+			}
 		}
 //		else if(DevState.bits.SubState == DEV_ShipSubStateStartZmotor)	{//请求出货 等待08指令
 //			SysMotor.motor[MOTOR_Z_ID].Param = 15000;
@@ -379,7 +387,7 @@ void ShipProcess(void)
 				DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpening;
 				timecnt = 0;
 			}
-			if(timecnt>10)	{//5s 超时货物检测失败
+			if(timecnt>15)	{//5s 超时货物检测失败
 				ShipResult(ActionState_Fail);
 			}
 			else
