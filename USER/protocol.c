@@ -157,6 +157,7 @@ void  UsartCmdProcess (void)
 					if(SysMotor.motor[MOTOR_X_ID].ObjPos>XMOTOR_LEN_MAX)	{
 						SysMotor.motor[MOTOR_X_ID].ObjPos = XMOTOR_LEN_MAX;
 					}
+					SYS_PRINTF("Ship Start %ld,%ld \r\n", SysMotor.motor[MOTOR_X_ID].ObjPos, SysMotor.motor[MOTOR_Y_ID].ObjPos);
 					DevState.bits.State = DEV_STATE_SHIPING;
 					DevState.bits.SubState = DEV_ShipSubStateMotorUp;//升降机上升
 					Sys.DevAction = ActionState_Doing;//开始出货
@@ -281,7 +282,7 @@ void  UsartCmdProcess (void)
 //				DevState.bits.State = DEV_STATE_IDLE;
 				DevState.bits.SubState = DEV_ShipSubStateCeMenOpening;
 				pUsart->tx_cmd = _CMD_TX_SHIP_OK;
-				SYS_PRINTF("Ship compelet. ");
+//				SYS_PRINTF("Ship compelet. ");
 				break;
 			}
 			default:

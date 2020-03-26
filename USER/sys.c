@@ -342,36 +342,30 @@ void ShipProcess(void)
 			}
 			else if(ShipStateFlag == 1)	{
 				if(SysMotor.motor[MOTOR_T_ID].status.action == ActionState_OK)	{//推杆后退到位
-					SysMotor.motor[MOTOR_X_ID].ObjPos = 0;//x 先复位
-					XMotorStart();
+//					SysMotor.motor[MOTOR_X_ID].ObjPos = 0;//x 先复位
+//					XMotorStart();
+					MotorReset(MOTOR_X_ID);
 					ShipStateFlag = 2;
 				}
 			}
 //			else if(ShipStateFlag == 2)	{
 //				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK)	{//x 复位ok
-//					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;				
-//					YMotorStart();
 //					SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
 //					DMotorStart();//关闭侧门	
-//					ShipStateFlag = 3;
+//					ShipStateFlag = 3;					
 //				}
 //			}
+//			else if(ShipStateFlag == 3)	{	
+//				if(SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{
+//					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;				
+//					YMotorStart();
+//					ShipStateFlag = 4;	
+//				}
+//			}				
 			else if(ShipStateFlag == 2)	{
-				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK)	{//x 复位ok
-					SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
-					DMotorStart();//关闭侧门	
-					ShipStateFlag = 3;					
-				}
-			}
-			else if(ShipStateFlag == 3)	{	
-				if(SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{
-					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;				
-					YMotorStart();
-					ShipStateFlag = 4;	
-				}
-			}				
-			else if(ShipStateFlag == 4)	{
-				if(SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
+//				if(SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
+				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK && \
+					SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{	
 					DevState.bits.SubState = DEV_ShipSubState_CeMenClosing;
 					SysMotor.motor[MOTOR_L_ID].Param = 10000;//10s
 					LMotorStart();

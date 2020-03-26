@@ -125,7 +125,7 @@ void MotorReset(u8 id)
 		SysMotor.RunningID = MOTOR_X_ID;
 		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
-		SYS_PRINTF("x motor reset.\r\n");
+//		SYS_PRINTF("x motor reset.\r\n");
 	}else 	if(id == MOTOR_Y_ID)	{
 		if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)
 			return;
@@ -143,7 +143,7 @@ void MotorReset(u8 id)
 		SysMotor.RunningID = MOTOR_Y_ID;
 		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;	
-		SYS_PRINTF("y motor reset.\r\n");
+//		SYS_PRINTF("y motor reset.\r\n");
 	}
 	if(Sys.DevAction != ActionState_Doing)	{//非出货期间的复位
 		DevState.bits.State = DEV_STATE_RESET;//复位中
@@ -195,16 +195,16 @@ void CalcXYMotorPos(void)
 	SysMotor.motor[MOTOR_X_ID].CurPos = encoder[EncoderX_ID].pluse*XMaPan_NumPerStep;	
 	SysMotor.motor[MOTOR_Y_ID].CurPos = encoder[EncoderY_ID].pluse*YMaPan_NumPerStep;	
 }
-//码盘异常检测 在运动状态下 持续10s码盘读数无变化
+//码盘异常检测 在运动状态下 持续3s位置无变化
 void CheckMaPan(void)
 {
-	static XCurPos=0,YCurPos=0;
-	static XPosChangeCnt=0,YPosChangeCnt=0;
+	static s32 XCurPos=0,YCurPos=0;
+	static u16 XPosChangeCnt=0,YPosChangeCnt=0;
 	
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
 		if(XCurPos==SysMotor.motor[MOTOR_X_ID].CurPos)	{
 			XPosChangeCnt++;
-			if(XPosChangeCnt>10)	{
+			if(XPosChangeCnt>100)	{
 				SysHDError.E2.bits.b2 = 1;//X 码盘异常
 				StopXMotor();
 				SYS_PRINTF("x mapan error\r\n");
@@ -214,6 +214,7 @@ void CheckMaPan(void)
 			}
 		}
 		else	{
+			XCurPos = SysMotor.motor[MOTOR_X_ID].CurPos;
 			XPosChangeCnt = 0;
 			SysHDError.E2.bits.b2 = 0;
 		}
@@ -223,7 +224,7 @@ void CheckMaPan(void)
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
 		if(YCurPos==SysMotor.motor[MOTOR_Y_ID].CurPos)	{
 			YPosChangeCnt++;
-			if(YPosChangeCnt>10)	{
+			if(YPosChangeCnt>100)	{
 				SysHDError.E2.bits.b3 = 1;//Y 码盘异常
 				StopYMotor();
 				SYS_PRINTF("y mapan error\r\n");
@@ -233,6 +234,7 @@ void CheckMaPan(void)
 			}
 		}
 		else	{
+			YCurPos = SysMotor.motor[MOTOR_Y_ID].CurPos;
 			YPosChangeCnt = 0;
 			SysHDError.E2.bits.b3 = 0;
 		}
