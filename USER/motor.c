@@ -311,7 +311,7 @@ u8 XMotorAccDec(void)
 						return 1;
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos<=XAccDecPos.DecPos)	{//¼õËÙ
-					if(X_VelCurve.index > 2)	{
+					if(X_VelCurve.index > 1)	{
 						X_VelCurve.index--;
 						StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
 						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				
@@ -326,7 +326,7 @@ u8 XMotorAccDec(void)
 						return 1;
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos>=XAccDecPos.DecPos)	{//¼õËÙ
-					if(X_VelCurve.index > 2)	{
+					if(X_VelCurve.index > 1)	{
 						X_VelCurve.index--;
 						StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
 						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				

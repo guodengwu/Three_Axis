@@ -224,7 +224,7 @@ void CheckIOState(void)
 	if(MotorStuckMonitor())	{		
 		if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//推杆电机根据该信号停止
 			SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
-//			Sys.DevAction = ActionState_OK;
+			SoftTimerStop(&Timer2Soft);
 		}
 		MotorStop(DEF_Fail);SYS_PRINTF("MotorStuck\r\n");
 	}
