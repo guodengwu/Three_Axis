@@ -122,6 +122,7 @@ void MotorReset(u8 id)
 			X_MOTOR_PWM2 = 1;
 			StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index++]);
 		}
+		XAccDecPos.DecPos = 0;
 		SysMotor.RunningID = MOTOR_X_ID;
 		SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 		SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Doing;	
@@ -140,6 +141,7 @@ void MotorReset(u8 id)
 			Y_MOTOR_PWM1 = 0;
 			StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index++]);
 		}
+		YAccDecPos.DecPos = 0;
 		SysMotor.RunningID = MOTOR_Y_ID;
 		SysMotor.ALLMotorState.bits.YMotor = DEF_Run;
 		SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Doing;	
@@ -285,11 +287,11 @@ void XYMotorArrived(void)
 //		}
 //	}
 }
-#define XMotorMAXSpeedIdx	10//x电机最大速度PWM占空比80%
+#define XMotorMAXSpeedIdx	9//x电机最大速度PWM占空比80%
 u8 XMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
-		if(XAccDecPos.DecPos == 0)	{
+		if(XAccDecPos.DecPos == 0)	{//匀速
 			if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{//后退
 				X_MOTOR_PWM2 = 0;
 				X_MOTOR_PWM1 = 1;
@@ -311,7 +313,7 @@ u8 XMotorAccDec(void)
 						return 1;
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos<=XAccDecPos.DecPos)	{//减速
-					if(X_VelCurve.index > 1)	{
+					if(X_VelCurve.index > 2)	{
 						X_VelCurve.index--;
 						StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
 						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				
@@ -326,7 +328,7 @@ u8 XMotorAccDec(void)
 						return 1;
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos>=XAccDecPos.DecPos)	{//减速
-					if(X_VelCurve.index > 1)	{
+					if(X_VelCurve.index > 2)	{
 						X_VelCurve.index--;
 						StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
 						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				
@@ -341,7 +343,7 @@ u8 XMotorAccDec(void)
 u8 YMotorAccDec(void)
 {
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
-		if(YAccDecPos.DecPos == 0)	{
+		if(YAccDecPos.DecPos == 0)	{//匀速
 			if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN)	{//后退
 				Y_MOTOR_PWM2 = 0;
 				StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[1]);
@@ -705,6 +707,7 @@ void StopZMotor(void)
 //	Z_MOTOR_ENABLE = 0;
 	SysMotor.ALLMotorState.bits.ZMotor = DEF_Stop;
 	//MotorStuckMonitorEnable(0);
+	SoftTimerStop(&Timer1Soft);
 }
 
 void StopTMotor(void)

@@ -136,7 +136,7 @@ void CheckIOState(void)
 			if(CeMenMinCnt>=2)	{
 				if(SysMotor.motor[MOTOR_D_ID].Param==DEF_Close)	{
 					StopDMotor();
-					SoftTimerStop(&Timer2Soft);
+					SoftTimerStop(&Timer2Soft);SYS_PRINTF("d stop, limit\r\n");
 					SysMotor.motor[MOTOR_D_ID].status.action = ActionState_OK;
 					SysMotor.motor[MOTOR_D_ID].status.abort_type = MotorAbort_Min_LimitOpt;
 				}
@@ -180,16 +180,22 @@ void CheckIOState(void)
 	IOState.state2.bits.b0 = !Y_MOTOR_MinLimit_IN;
 	IOState.state2.bits.b1 = !Y_MOTOR_MaxLimit_IN;
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
-		if((Y_MOTOR_MinLimit_IN==0&&SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN) || \
-			(Y_MOTOR_MaxLimit_IN==0&&SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX))	{//y碰到上限/下限 强制停止电机
-			StopYMotor();SYS_PRINTF("y stop, limit\r\n");
-			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
-//			Sys.DevAction = ActionState_OK;
-			if(Y_MOTOR_MinLimit_IN==0)	{
-				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-				YMotorResetCheck();
-			}else if(Y_MOTOR_MaxLimit_IN==0)	{
-				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+		if(Y_MOTOR_MinLimit_IN==0||Y_MOTOR_MaxLimit_IN==0)	{
+			_nop_();_nop_();_nop_();_nop_();
+			if(Y_MOTOR_MinLimit_IN==0||Y_MOTOR_MaxLimit_IN==0)
+			if((Y_MOTOR_MinLimit_IN==0&&SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MIN) || \
+				(Y_MOTOR_MaxLimit_IN==0&&SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX))	{//y碰到上限/下限 强制停止电机
+				StopYMotor();
+				SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
+	//			Sys.DevAction = ActionState_OK;
+				if(Y_MOTOR_MinLimit_IN==0)	{
+					SYS_PRINTF("y stop, min limit\r\n");
+					SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Min_LimitOpt;
+					YMotorResetCheck();
+				}else if(Y_MOTOR_MaxLimit_IN==0)	{
+					SYS_PRINTF("y stop, max limit\r\n");
+					SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+				}
 			}
 		}
 	}
@@ -199,7 +205,7 @@ void CheckIOState(void)
 		GetHuoWuTimeCnt ++;
 		if(GetHuoWuTimeCnt>=5)	{
 			if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{
-				StopLMotor();SYS_PRINTF("HuoWuCheck_IN\r\n");
+				StopLMotor();//SYS_PRINTF("HuoWuCheck_IN\r\n");
 				SoftTimerStop(&Timer2Soft);
 				SysMotor.motor[MOTOR_L_ID].status.action = ActionState_OK;
 //				Sys.DevAction = ActionState_OK;
@@ -249,6 +255,8 @@ void ShipResult(u8 result)
 	DevState.bits.SubState = DEV_ShipSubStateIDLE;
 	Sys.DevAction = result;//出货结果
 	SYS_PRINTF("ship result %ld.\r\n", Sys.DevAction);
+	SoftTimerStop(&Timer1Soft);
+	SoftTimerStop(&Timer2Soft);
 }
 u8 ShipStateFlag;
 void ShipProcess(void)
@@ -298,7 +306,7 @@ void ShipProcess(void)
 				ReqShipTimeCnt = 0;
 				ShipResult(ActionState_Fail);
 			}
-			HuoWuNearDetectFlag = 0;//清货物接近检测标志
+//			HuoWuNearDetectFlag = 0;//清货物接近检测标志
 		}
 		else if(DevState.bits.SubState == DEV_ShipSubStateCeMenOpening)	{
 			ReqShipTimeCnt = 0;					
@@ -312,12 +320,13 @@ void ShipProcess(void)
 				SysMotor.motor[MOTOR_D_ID].Param = DEF_Open;
 				DMotorStart();//打开侧门	
 				timecnt	++;		
+				HuoWuNearDetectFlag = 0;
 			}
 			else if(timecnt<2)	{
 				timecnt ++;	
 				return;
 			}
-			if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{				
+			else if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{				
 				if(HuoWuNearDetectFlag == 0)	{
 					SysMotor.motor[MOTOR_X_ID].ObjPos = X_QuHuoKouPos;
 					XMotorStart();
@@ -326,7 +335,7 @@ void ShipProcess(void)
 				else if((HuoWuNearDetectFlag == 1)&&(SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK))	{//x y电机到位 & 检测到货物 & 侧门开到位					
 					SysMotor.motor[MOTOR_T_ID].Param = 1;
 					TMotorStart();//启动推杆 前推
-//					HuoWuNearDetectFlag = 0;//清货物接近检测标志
+					HuoWuNearDetectFlag = 0;//清货物接近检测标志
 					DevState.bits.SubState = DEV_ShipSubState_TuiGanMove;
 					ShipStateFlag = 0;
 				}
@@ -342,30 +351,30 @@ void ShipProcess(void)
 			}
 			else if(ShipStateFlag == 1)	{
 				if(SysMotor.motor[MOTOR_T_ID].status.action == ActionState_OK)	{//推杆后退到位
-//					SysMotor.motor[MOTOR_X_ID].ObjPos = 0;//x 先复位
-//					XMotorStart();
-					MotorReset(MOTOR_X_ID);
+					SysMotor.motor[MOTOR_X_ID].ObjPos = 0;//x 先复位
+					XMotorStart();
+//					MotorReset(MOTOR_X_ID);
 					ShipStateFlag = 2;
 				}
 			}
-//			else if(ShipStateFlag == 2)	{
-//				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK)	{//x 复位ok
-//					SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
-//					DMotorStart();//关闭侧门	
-//					ShipStateFlag = 3;					
-//				}
-//			}
-//			else if(ShipStateFlag == 3)	{	
-//				if(SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{
-//					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;				
-//					YMotorStart();
-//					ShipStateFlag = 4;	
-//				}
-//			}				
 			else if(ShipStateFlag == 2)	{
-//				if(SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
-				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK && \
-					SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{	
+				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK)	{//x 复位ok
+					SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
+					DMotorStart();//关闭侧门	
+					ShipStateFlag = 3;					
+				}
+			}
+			else if(ShipStateFlag == 3)	{	
+				if(SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{
+					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;				
+					YMotorStart();
+					ShipStateFlag = 4;	
+				}
+			}
+			else if(ShipStateFlag == 4)	{
+				if(SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
+//				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK && 
+//					SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{	
 					DevState.bits.SubState = DEV_ShipSubState_CeMenClosing;
 					SysMotor.motor[MOTOR_L_ID].Param = 10000;//10s
 					LMotorStart();
