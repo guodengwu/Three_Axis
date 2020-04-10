@@ -95,7 +95,7 @@ void QuHuoKouProcess(void)
 //		JiaShouCnt = 0;
 //	}
 }
-	
+#include "encoder.h"
 u8 GetHuoWuTimeCnt = 0;
 u8 NoHuoWuTimeCnt = 0;
 u8 CeMenMinCnt=0,CeMenMaxCnt=0;
@@ -111,6 +111,7 @@ void CheckIOState(void)
 //			Sys.DevAction = ActionState_OK;
 			if(X_MOTOR_LeftLimit_IN==0)	{
 				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Min_LimitOpt;
+				encoder[MOTOR_X_ID].pluse = 0;
 				XMotorResetCheck();
 			}else if(X_MOTOR_RightLimit_IN==0)	{
 				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Max_LimitOpt;
@@ -189,7 +190,9 @@ void CheckIOState(void)
 				SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
 	//			Sys.DevAction = ActionState_OK;
 				if(Y_MOTOR_MinLimit_IN==0)	{
-					SYS_PRINTF("y stop, min limit\r\n");
+					SYS_PRINTF("y stop, min limit  \r\n");
+					SYS_PRINTF("arrived.%ld,%ld\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos, encoder[MOTOR_Y_ID].pluse);
+					encoder[MOTOR_Y_ID].pluse = 0;
 					SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Min_LimitOpt;
 					YMotorResetCheck();
 				}else if(Y_MOTOR_MaxLimit_IN==0)	{
@@ -322,7 +325,7 @@ void ShipProcess(void)
 				timecnt	++;		
 				HuoWuNearDetectFlag = 0;
 			}
-			else if(timecnt<2)	{
+			else if(timecnt<2)	{//收到08指令 z继续转2s
 				timecnt ++;	
 				return;
 			}

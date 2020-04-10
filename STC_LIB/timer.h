@@ -39,6 +39,7 @@ extern _softtimer_t Timer3Soft;
 extern u8 _10ms_EVENT,_30ms_EVENT;
 extern u8 _1s_EVENT;
 extern u8 _3ms_EVENT;
+extern u8 _1ms_EVENT;
 
 void	SystickInit_Tmer(void);
 void Timer4Init(void);

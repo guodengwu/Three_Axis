@@ -188,11 +188,8 @@ void YMotorResetCheck()
 
 void CalcXYMotorPos(void)
 {
-	/*if((SysMotor.ALLMotorState.bits.XMotor != DEF_Run) || (SysMotor.ALLMotorState.bits.YMotor != DEF_Run))	{
-		return;
-	}*/
-	ReadEncoder(&SysMotor.motor[MOTOR_X_ID]);	
-	ReadEncoder(&SysMotor.motor[MOTOR_Y_ID]);
+//	ReadEncoder(&SysMotor.motor[MOTOR_X_ID]);	
+//	ReadEncoder(&SysMotor.motor[MOTOR_Y_ID]);
 
 	SysMotor.motor[MOTOR_X_ID].CurPos = encoder[EncoderX_ID].pluse*XMaPan_NumPerStep;	
 	SysMotor.motor[MOTOR_Y_ID].CurPos = encoder[EncoderY_ID].pluse*YMaPan_NumPerStep;	
@@ -272,13 +269,13 @@ void XYMotorArrived(void)
 			StopYMotor();
 			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Normal;
 			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
-			SYS_PRINTF("MIN y motor arrived.%ld\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos);
+			SYS_PRINTF("y motor arrived.%ld,%ld\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos, encoder[EncoderY_ID].pluse);
 		}
 		else if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX&&SysMotor.motor[MOTOR_Y_ID].CurPos >= SysMotor.motor[MOTOR_Y_ID].ObjPos)	{
 			StopYMotor();
 			SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Normal;
 			SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
-			SYS_PRINTF("MAX y motor arrived.%ld\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos);
+			SYS_PRINTF("y motor arrived.%ld,%ld\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos, encoder[EncoderY_ID].pluse);
 		}
 	}
 //	if(SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK && SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	{
@@ -313,10 +310,13 @@ u8 XMotorAccDec(void)
 						return 1;
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos<=XAccDecPos.DecPos)	{//¼õËÙ
-					if(X_VelCurve.index > 2)	{
-						X_VelCurve.index--;
+					if(X_VelCurve.index > 0)	{
+						if(X_VelCurve.index > 4)
+							X_VelCurve.index -= 2;
+						else
+							X_VelCurve.index--;
 						StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
-						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				
+//						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				
 					}
 				}
 			}else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX){
@@ -328,10 +328,13 @@ u8 XMotorAccDec(void)
 						return 1;
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos>=XAccDecPos.DecPos)	{//¼õËÙ
-					if(X_VelCurve.index > 2)	{
-						X_VelCurve.index--;
+					if(X_VelCurve.index > 0)	{
+						if(X_VelCurve.index > 5)
+							X_VelCurve.index -= 2;
+						else
+							X_VelCurve.index--;
 						StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
-						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				
+//						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				
 					}
 				}
 			}
@@ -364,9 +367,12 @@ u8 YMotorAccDec(void)
 					}
 				}else if(SysMotor.motor[MOTOR_Y_ID].CurPos<=YAccDecPos.DecPos)	{//¼õËÙ
 					if(Y_VelCurve.index > 0)	{
-						Y_VelCurve.index--;
+						if(Y_VelCurve.index > 5)
+							Y_VelCurve.index -= 2;
+						else
+							Y_VelCurve.index--;
 						StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
-						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
+//						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
 					}
 				}
 			}else if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX){
@@ -384,7 +390,7 @@ u8 YMotorAccDec(void)
 						else
 							Y_VelCurve.index--;
 						StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
-						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
+//						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
 					}
 				}
 			}

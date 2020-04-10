@@ -280,7 +280,8 @@ void  UsartCmdProcess (void)
 				break;
 			case _CMD_RX_SHIP_OK:	{//0X08,//通知出货完成
 //				DevState.bits.State = DEV_STATE_IDLE;
-				DevState.bits.SubState = DEV_ShipSubStateCeMenOpening;
+				if(DevState.bits.State == DEV_STATE_SHIPING&&DevState.bits.SubState == DEV_ShipSubStateReqShip)
+					DevState.bits.SubState = DEV_ShipSubStateCeMenOpening;
 				pUsart->tx_cmd = _CMD_TX_SHIP_OK;
 //				SYS_PRINTF("Ship compelet. ");
 				break;

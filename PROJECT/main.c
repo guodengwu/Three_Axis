@@ -17,10 +17,14 @@
 //u8 xdata printfbuf[100];
 void timer_event(void)
 {
+	if(_1ms_EVENT)	{
+		_1ms_EVENT = 0;
+		CalcXYMotorPos();
+	}
 	if(_3ms_EVENT)	{
 		_3ms_EVENT = 0;
-		RS485TxToRx();
-		CalcXYMotorPos();
+		RS485TxToRx();	
+//		CalcXYMotorPos();		
 	}
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;

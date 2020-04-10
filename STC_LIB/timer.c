@@ -2,7 +2,7 @@
 #include	"timer.h"
 #include "motor.h"
 
-u8 _3ms_EVENT,_10ms_EVENT,_30ms_EVENT;
+u8 _1ms_EVENT,_3ms_EVENT,_10ms_EVENT,_30ms_EVENT;
 u8 _1s_EVENT;
 struct SYS_TIM  SysTim;
 _softtimer_t Timer1Soft;
@@ -41,6 +41,7 @@ void TM3_Isr() interrupt 19
 	if((SysTim.SumMs%3)==0)	{//1s
 		_3ms_EVENT = 1;
 	}
+	_1ms_EVENT = 1;
 }
 //timer4作为电机运行时间控制 基准时间10ms
 void TM4_Isr() interrupt 20 //using 1
