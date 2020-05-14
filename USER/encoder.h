@@ -31,6 +31,7 @@ extern Encoder_t encoder[ENCODER_NUMS];
 void ReadEncoder(TMotor *pMotor);
 void EncoderDataInit(void);
 void EncoderReset(u8 id);
-
+void CalXEncode(void);
+void CalYEncode(void);
 #endif
 

@@ -1,6 +1,7 @@
 #include "encoder.h"
 
-
+u16 y_encoderintflag,x_encoderintflag;
+u16 y_encodercnt,x_encodercnt;
 Encoder_t encoder[ENCODER_NUMS];
 static void XEncoderInit(void);
 static void YEncoderInit(void);
@@ -11,6 +12,10 @@ void EncoderDataInit(void)
 	EncoderReset(EncoderY_ID);
 	XEncoderInit();
 	YEncoderInit();
+	y_encoderintflag=0;
+	y_encodercnt=0;
+	x_encoderintflag=0;
+	x_encodercnt=0;
 }
 
 void EncoderReset(u8 id)
@@ -41,27 +46,70 @@ static void YEncoderInit(void)
 void TM0_Isr() interrupt 1
 {
 	if(X_ENCODER_IN==0)	{
-		if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MIN)	{
-			encoder[EncoderX_ID].pluse --;
-		}
-		else if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MAX)		{
-			encoder[EncoderX_ID].pluse ++;
-		}	
+		x_encoderintflag=1;
+		x_encodercnt=0;		
+//		if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MIN)	{
+//			encoder[EncoderX_ID].pluse --;
+//		}
+//		else if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MAX)		{
+//			encoder[EncoderX_ID].pluse ++;
+//		}	
 	}
 }
 
 void TM1_Isr() interrupt 3
 {
-	if(Y_ENCODER_IN==0)	{
-		if(SysMotor.motor[MOTOR_Y_ID].dir==MOTOR_TO_MIN)	{
-			encoder[EncoderY_ID].pluse --;
-		}
-		else if(SysMotor.motor[MOTOR_Y_ID].dir==MOTOR_TO_MAX)		{
-			encoder[EncoderY_ID].pluse ++;
-		}
+	if(Y_ENCODER_IN==0/*&&y_encoderintflag==0*/)	{
+		y_encoderintflag=1;
+		y_encodercnt=0;
+//		if(SysMotor.motor[MOTOR_Y_ID].dir==MOTOR_TO_MIN)	{
+//			encoder[EncoderY_ID].pluse --;
+//		}
+//		else if(SysMotor.motor[MOTOR_Y_ID].dir==MOTOR_TO_MAX)		{
+//			encoder[EncoderY_ID].pluse ++;
+//		}
 	}
 }
 
+void CalXEncode(void)
+{
+	if(x_encoderintflag)	{
+		if(X_ENCODER_IN==0)	{
+			x_encodercnt++;
+			if(x_encodercnt>1)	{
+				x_encoderintflag=0;
+				if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MIN)	{
+					encoder[EncoderX_ID].pluse --;
+				}
+				else if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MAX)		{
+					encoder[EncoderX_ID].pluse ++;
+				}				
+			}
+		}
+		else
+			x_encoderintflag = 0;
+	}
+}
+
+void CalYEncode(void)
+{
+	if(y_encoderintflag)	{
+		if(Y_ENCODER_IN==0)	{
+			y_encodercnt++;
+			if(y_encodercnt>1)	{
+				y_encoderintflag=0;
+				if(SysMotor.motor[MOTOR_Y_ID].dir==MOTOR_TO_MIN)	{
+					encoder[EncoderY_ID].pluse --;
+				}
+				else if(SysMotor.motor[MOTOR_Y_ID].dir==MOTOR_TO_MAX)		{
+					encoder[EncoderY_ID].pluse ++;
+				}				
+			}
+		}
+		else
+			y_encoderintflag = 0;
+	}
+}
 //static u16 Time0RegBk=0xffff, Time1RegBk=0xffff;
 //void ReadEncoder(TMotor *pMotor)
 //{
