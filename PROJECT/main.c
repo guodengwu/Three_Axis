@@ -35,7 +35,7 @@ void timer_event(void)
 	}
 	if(_30ms_EVENT)	{
 		_30ms_EVENT = 0;
-		XMotorAccDec();//加速过程返回1 不检测堵转
+//		XMotorAccDec();//加速过程返回1 不检测堵转
 		YMotorAccDec();
 	}
 	if(_1s_EVENT)	{

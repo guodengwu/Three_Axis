@@ -13,7 +13,7 @@
 #define YMOTOR_LEN_MAX			1435//mm
 
 #define X_QuHuoKouPos			650//mm
-#define Y_QuHuoKouPos			450//380//mm
+#define Y_QuHuoKouPos			290//450//380//mm
 
 #define XMOTOR_AccDec_LEN			100//mm
 #define YMOTOR_AccDec_LEN			100//mm
