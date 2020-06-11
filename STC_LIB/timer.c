@@ -42,7 +42,7 @@ void TM3_Isr() interrupt 19
 		_3ms_EVENT = 1;
 	}
 	_1ms_EVENT = 1;
-	CalXEncode();
+//	CalXEncode();
 	CalYEncode();
 }
 //timer4作为电机运行时间控制 基准时间10ms

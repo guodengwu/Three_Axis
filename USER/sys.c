@@ -83,7 +83,7 @@ void QuHuoKouProcess(void)
 					SoftTimerStop(&Timer2Soft);		
 					SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
 					Timer3Soft.pCallBack = &JiaShouProcess;
-					SoftTimerStart(&Timer3Soft, 1500);//有夹手事件，等待2s开门
+					SoftTimerStart(&Timer3Soft, 500);//有夹手事件，等待2s开门
 					JiaShouFlag = 1;
 				}
 			}
@@ -279,8 +279,9 @@ void ShipProcess(void)
 				}
 			}
 			else if(ShipStateFlag==1)	{
-				timecnt++;
-				if(timecnt>1)	{
+//				timecnt++;
+//				if(timecnt>1)	
+				{
 					ShipStateFlag = 2;
 					XMotorStart();
 					YMotorStart();
@@ -392,6 +393,8 @@ void ShipProcess(void)
 		}
 		else if(DevState.bits.SubState == DEV_ShipSubState_CeMenClosing)	{//等待货物检测完成
 			if(HuoWuDetectFlag == 1)	{//货物检测ok
+				StopLMotor();
+				SoftTimerStop(&Timer1Soft);//关闭履带电机
 				SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
 				DMotorStart();//关闭侧门	
 				SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;

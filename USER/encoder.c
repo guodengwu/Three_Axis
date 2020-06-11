@@ -45,16 +45,17 @@ static void YEncoderInit(void)
 
 void TM0_Isr() interrupt 1
 {
-	if(X_ENCODER_IN==0)	{
-		x_encoderintflag=1;
-		x_encodercnt=0;		
-//		if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MIN)	{
-//			encoder[EncoderX_ID].pluse --;
-//		}
-//		else if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MAX)		{
-//			encoder[EncoderX_ID].pluse ++;
-//		}	
-	}
+//	if(X_ENCODER_IN==0)	
+//	{
+//		x_encoderintflag=1;
+//		x_encodercnt=0;		
+		if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MIN)	{
+			encoder[EncoderX_ID].pluse --;
+		}
+		else if(SysMotor.motor[MOTOR_X_ID].dir==MOTOR_TO_MAX)		{
+			encoder[EncoderX_ID].pluse ++;
+		}	
+//	}
 }
 
 void TM1_Isr() interrupt 3

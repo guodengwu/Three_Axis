@@ -64,8 +64,11 @@ void CalcXYMotorUpDownPos(u8 id)
 			XAccDecPos.DecPos = 0;
 			return;
 		}
-		else	{
-			temp = MOTOR_CONSTANT_LEN;
+		else if(totalLen > XMOTOR_AccDec_LEN*2)	{
+			temp = XMOTOR_AccDec_LEN;
+		}
+		else {
+			temp = totalLen/3;
 		}
 		if(len>=0)	{
 			XAccDecPos.DecPos = SysMotor.motor[MOTOR_X_ID].ObjPos - temp;
@@ -90,14 +93,23 @@ void CalcXYMotorUpDownPos(u8 id)
 			YAccDecPos.DecPos = 0;
 			return;
 		}
-		else	{
-			temp = MOTOR_CONSTANT_LEN;
-		}
-		if(len>=0)	{
+		if(len>=0)	{//上行
+			if(totalLen > YMOTOR_AccDec_UpLen*2)	{
+				temp = YMOTOR_AccDec_UpLen;
+			}
+			else {
+				temp = totalLen/2;
+			}
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos - temp;
 			SYS_PRINTF("Y MAX ");
 		}
-		else	{
+		else	{//下行
+			if(totalLen > YMOTOR_AccDec_DnLen*2)	{
+				temp = YMOTOR_AccDec_DnLen;
+			}
+			else {
+				temp = totalLen/2;
+			}
 			YAccDecPos.DecPos = SysMotor.motor[MOTOR_Y_ID].ObjPos + temp;
 			SYS_PRINTF("Y MIN ");
 		}
@@ -202,7 +214,8 @@ void CalcXYMotorPos(void)
 //	ReadEncoder(&SysMotor.motor[MOTOR_X_ID]);	
 //	ReadEncoder(&SysMotor.motor[MOTOR_Y_ID]);
 
-	SysMotor.motor[MOTOR_X_ID].CurPos = encoder[EncoderX_ID].pluse*XMaPan_NumPerStep;	
+//	SysMotor.motor[MOTOR_X_ID].CurPos = (encoder[EncoderX_ID].pluse*53)/10;	
+	SysMotor.motor[MOTOR_X_ID].CurPos = encoder[EncoderX_ID].pluse*XMaPan_NumPerStep;
 	SysMotor.motor[MOTOR_Y_ID].CurPos = encoder[EncoderY_ID].pluse*YMaPan_NumPerStep;	
 }
 //码盘异常检测 在运动状态下 持续3s位置无变化
@@ -303,12 +316,12 @@ u8 XMotorAccDec(void)
 			if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN)	{//后退
 				X_MOTOR_PWM2 = 0;
 				X_MOTOR_PWM1 = 1;
-				StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[3]);
+				StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[1]);
 			}
 			else /*if(SysMotor.motor[MOTOR_X_ID].CurPos<=XAccDecPos.DecPos)*/	{//前进
 				X_MOTOR_PWM1 = 0;
 				X_MOTOR_PWM2 = 1;
-				StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[3]);
+				StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[1]);
 			}
 		}
 		else	{
@@ -324,16 +337,13 @@ u8 XMotorAccDec(void)
 					if(X_VelCurve.index < 0)
 						X_VelCurve.index = 0;
 					else if(X_VelCurve.index > 0)	{
-						/*if(X_VelCurve.index > 6)
-							X_VelCurve.index -= 3;
-						else*/ if(X_VelCurve.index > 3)
+						if(X_VelCurve.index > 3)
 							X_VelCurve.index -= 3;
 						else
 							X_VelCurve.index--;
 					}
 					StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
-//						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);				
-					
+						SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);					
 				}
 			}else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX){
 				if(SysMotor.motor[MOTOR_X_ID].CurPos<XAccDecPos.DecPos)	{//加速
@@ -347,11 +357,6 @@ u8 XMotorAccDec(void)
 					if(X_VelCurve.index < 0)
 						X_VelCurve.index = 0;
 					else if(X_VelCurve.index > 0)	{
-						/*if(X_VelCurve.index > 6)
-							X_VelCurve.index -= 3;
-						else*/ if(X_VelCurve.index > 3)
-							X_VelCurve.index -= 3;
-						else
 							X_VelCurve.index--;
 					}
 					StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
@@ -388,16 +393,14 @@ u8 YMotorAccDec(void)
 				}else if(SysMotor.motor[MOTOR_Y_ID].CurPos<=YAccDecPos.DecPos)	{//减速
 					if(Y_VelCurve.index < 0)
 						Y_VelCurve.index = 0;
-					else if(X_VelCurve.index > 0)		{
-						if(Y_VelCurve.index > 8)
-							Y_VelCurve.index -= 3;
-						else if(Y_VelCurve.index > 3)
+					else if(Y_VelCurve.index > 0)		{
+						if(Y_VelCurve.index > 4)
 							Y_VelCurve.index -= 2;
 						else
 							Y_VelCurve.index--;
 					}
 					StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
-//						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
+						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
 				}
 			}else if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX){
 				if(SysMotor.motor[MOTOR_Y_ID].CurPos<YAccDecPos.DecPos)	{//加速
@@ -410,16 +413,14 @@ u8 YMotorAccDec(void)
 				}else if(SysMotor.motor[MOTOR_Y_ID].CurPos>=YAccDecPos.DecPos)	{//减速
 					if(Y_VelCurve.index < 0)
 						Y_VelCurve.index = 0;
-					else if(X_VelCurve.index > 0)		{
-						if(Y_VelCurve.index > 8)
-							Y_VelCurve.index -= 3;
-						else if(Y_VelCurve.index > 3)
+					else if(Y_VelCurve.index > 0)		{
+						if(Y_VelCurve.index > 5)
 							Y_VelCurve.index -= 2;
 						else
 							Y_VelCurve.index--;
 					}
 					StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
-//						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);					
+						SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);					
 				}
 			}
 		}
@@ -536,7 +537,8 @@ void TMotorStart(void)
 		SysMotor.RunningID = MOTOR_T_ID;
 		SysMotor.ALLMotorState.bits.TMotor = DEF_Run;
 		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_Doing;
-		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
+		SoftTimerStart(&Timer2Soft, 5000);//电机超时控制
+		SYS_PRINTF("T motor start, %d", SysMotor.motor[MOTOR_T_ID].Param);
 	}
 }
 void DMotorStart(void)
