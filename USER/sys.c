@@ -364,10 +364,11 @@ void ShipProcess(void)
 			}
 			else if(ShipStateFlag == 2)	{
 				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK)	{//x 复位ok
-//					SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
-//					DMotorStart();//关闭侧门	
-					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;	
-					YMotorStart();
+//					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;	
+//					YMotorStart();
+					SysMotor.motor[MOTOR_L_ID].Param = 4000;//10000;//10s 履带电机先正转4s
+					SysMotor.motor[MOTOR_L_ID].dir = DEF_Up;
+					LMotorStart();
 					ShipStateFlag = 3;					
 				}
 			}
@@ -379,12 +380,14 @@ void ShipProcess(void)
 //				}
 //			}
 			else if(ShipStateFlag == 3)	{
-				if(SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	
+//				if(SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	
 				{
 					DevState.bits.SubState = DEV_ShipSubState_CeMenClosing;
-					SysMotor.motor[MOTOR_L_ID].Param = 4000;//10000;//10s 履带电机先正转4s
-					SysMotor.motor[MOTOR_L_ID].dir = DEF_Up;
-					LMotorStart();
+					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;	
+					YMotorStart();
+//					SysMotor.motor[MOTOR_L_ID].Param = 4000;//10000;//10s 履带电机先正转4s
+//					SysMotor.motor[MOTOR_L_ID].dir = DEF_Up;
+//					LMotorStart();
 					HuoWuDetectFlag = 0;
 					LvDaiMotorFlag = 0;//履带电机运转标志
 				}
