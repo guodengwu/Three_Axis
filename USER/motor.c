@@ -640,14 +640,14 @@ void MotorStop(u8 stop_type)
 	if(DevState.bits.State == DEV_STATE_TEST)	{
 		DevState.bits.SubState = 0;//没有电机运行
 	}
-	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//停止x电机
-		StopXMotor();
-		MotorStopTypeSet(MOTOR_X_ID, stop_type);
-	}
-	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//停止y电机
-		StopYMotor();
-		MotorStopTypeSet(MOTOR_Y_ID, stop_type);	
-	}
+//	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//停止x电机
+//		StopXMotor();
+//		MotorStopTypeSet(MOTOR_X_ID, stop_type);
+//	}
+//	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//停止y电机
+//		StopYMotor();
+//		MotorStopTypeSet(MOTOR_Y_ID, stop_type);	
+//	}
 	if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{//停止z电机
 		StopZMotor();
 		MotorStopTypeSet(MOTOR_Z_ID, stop_type);
