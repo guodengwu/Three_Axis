@@ -259,6 +259,7 @@ void  UsartCmdProcess (void)
 					else if(iPara==8)	{//取货履带电机
 //						SysMotor.ALLMotorState.bits.LMotor = DEF_Run;
 						SysMotor.motor[MOTOR_L_ID].Param = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);
+						SysMotor.motor[MOTOR_L_ID].dir = DEF_Up;
 						LMotorStart();
 					}
 					else if(iPara==9)	{//取货口门电机

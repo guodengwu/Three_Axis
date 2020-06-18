@@ -203,8 +203,8 @@ void CheckIOState(void)
 			}
 		}
 	}
-	IOState.state1.bits.b2 = HuoWuCheck_IN;
-	if(HuoWuCheck_IN==1)	{
+	IOState.state1.bits.b3 = !HuoWuCheck_IN;
+	if(HuoWuCheck_IN==0)	{//低电平检测到货物
 		NoHuoWuTimeCnt = 0;
 		GetHuoWuTimeCnt ++;
 		if(GetHuoWuTimeCnt>=5)	{
@@ -217,7 +217,7 @@ void CheckIOState(void)
 			HuoWuDetectFlag = 1;
 		}
 	}
-	else if(HuoWuCheck_IN==0)	{
+	else if(HuoWuCheck_IN==1)	{
 		GetHuoWuTimeCnt = 0;
 		NoHuoWuTimeCnt ++;
 		if(NoHuoWuTimeCnt>=5)	{
@@ -358,36 +358,23 @@ void ShipProcess(void)
 				if(SysMotor.motor[MOTOR_T_ID].status.action == ActionState_OK)	{//推杆后退到位
 					SysMotor.motor[MOTOR_X_ID].ObjPos = 0;//x 先复位
 					XMotorStart();
-//					MotorReset(MOTOR_X_ID);
 					ShipStateFlag = 2;
 				}
 			}
 			else if(ShipStateFlag == 2)	{
 				if(SysMotor.motor[MOTOR_X_ID].status.action == ActionState_OK)	{//x 复位ok
-//					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;	
-//					YMotorStart();
 					SysMotor.motor[MOTOR_L_ID].Param = 4000;//10000;//10s 履带电机先正转4s
 					SysMotor.motor[MOTOR_L_ID].dir = DEF_Up;
 					LMotorStart();
 					ShipStateFlag = 3;					
 				}
 			}
-//			else if(ShipStateFlag == 3)	{	
-//				if(SysMotor.motor[MOTOR_D_ID].status.action == ActionState_OK)	{
-//					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;				
-//					YMotorStart();
-//					ShipStateFlag = 4;	
-//				}
-//			}
 			else if(ShipStateFlag == 3)	{
 //				if(SysMotor.motor[MOTOR_Y_ID].status.action == ActionState_OK)	
 				{
 					DevState.bits.SubState = DEV_ShipSubState_CeMenClosing;
 					SysMotor.motor[MOTOR_Y_ID].ObjPos = 0;	
 					YMotorStart();
-//					SysMotor.motor[MOTOR_L_ID].Param = 4000;//10000;//10s 履带电机先正转4s
-//					SysMotor.motor[MOTOR_L_ID].dir = DEF_Up;
-//					LMotorStart();
 					HuoWuDetectFlag = 0;
 					LvDaiMotorFlag = 0;//履带电机运转标志
 				}
