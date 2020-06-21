@@ -114,6 +114,7 @@ extern u32 GetSysTick(void);
 extern RINGBUFF_T uart4_rxring;
 extern void ShipResult(u8 result);
 extern u8 ShipStateFlag;
+extern u8 HuoWuDetectFlag;
 u32 pro_last_t = 0,pro_cur_t = 0;
 s32 time_diff;
 //串口指令处理函数
@@ -157,14 +158,20 @@ void  UsartCmdProcess (void)
 					if(SysMotor.motor[MOTOR_X_ID].ObjPos>XMOTOR_LEN_MAX)	{
 						SysMotor.motor[MOTOR_X_ID].ObjPos = XMOTOR_LEN_MAX;
 					}
-					SYS_PRINTF("Ship Start %ld,%ld \r\n", SysMotor.motor[MOTOR_X_ID].ObjPos, SysMotor.motor[MOTOR_Y_ID].ObjPos);
-					DevState.bits.State = DEV_STATE_SHIPING;
-					DevState.bits.SubState = DEV_ShipSubStateMotorUp;//升降机上升
-					Sys.DevAction = ActionState_Doing;//开始出货
-					ShipStateFlag = 0;
-					MotorReset(MOTOR_X_ID);//先复位
-//					XMotorStart();
-//					YMotorStart();
+					if(HuoWuDetectFlag == 1)	{//取货口有货 报出货失败
+						SysMotor.motor[MOTOR_L_ID].Param = 3000;//履带电机先正转
+						SysMotor.motor[MOTOR_L_ID].dir = DEF_Up;
+						LMotorStart();
+						ShipResult(ActionState_Fail);
+					}
+					else	{//取货口无货物 开始出货
+						SYS_PRINTF("Ship Start %ld,%ld \r\n", SysMotor.motor[MOTOR_X_ID].ObjPos, SysMotor.motor[MOTOR_Y_ID].ObjPos);
+						DevState.bits.State = DEV_STATE_SHIPING;
+						DevState.bits.SubState = DEV_ShipSubStateMotorUp;//升降机上升
+						Sys.DevAction = ActionState_Doing;//开始出货
+						ShipStateFlag = 0;
+						MotorReset(MOTOR_X_ID);//先复位
+					}
 				}
 				break;
 			case _CMD_RX_RESET://0X03,//重启
@@ -266,6 +273,8 @@ void  UsartCmdProcess (void)
 //						SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 						QuHuoMenMotorStart();
+						if(DevState.bits.SubState == DEV_ShipSubState_CeMenClosing)
+							DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpening;	
 					}
 					MotorTest();
 					pUsart->tx_idx = 0;				
@@ -280,7 +289,6 @@ void  UsartCmdProcess (void)
 				}
 				break;
 			case _CMD_RX_SHIP_OK:	{//0X08,//通知出货完成
-//				DevState.bits.State = DEV_STATE_IDLE;
 				if(DevState.bits.State == DEV_STATE_SHIPING&&DevState.bits.SubState == DEV_ShipSubStateReqShip)
 					DevState.bits.SubState = DEV_ShipSubStateCeMenOpening;
 				pUsart->tx_cmd = _CMD_TX_SHIP_OK;
