@@ -33,8 +33,9 @@ typedef enum {
 } TimerState;
 
 extern struct SYS_TIM  SysTim;
-extern _softtimer_t Timer1Soft;
-extern _softtimer_t Timer2Soft;
+//extern _softtimer_t Timer1Soft;
+//extern _softtimer_t Timer2Soft;
+extern _softtimer_t TimerSoft[7];
 extern _softtimer_t Timer3Soft;
 extern u8 _10ms_EVENT,_30ms_EVENT;
 extern u8 _1s_EVENT;

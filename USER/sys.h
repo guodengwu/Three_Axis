@@ -60,8 +60,12 @@ enum dev_ship_state {//出货状态
 	DEV_ShipSubStateCeMenOpening,//侧门打开中
 	DEV_ShipSubState_TuiGanMove,////推杆动作
 	DEV_ShipSubState_CeMenClosing,//侧门关闭
-	DEV_ShipSubState_QuHuoKouOpening,//取货口开门中
-	DEV_ShipSubState_QuHuoKouCloseing,//请求取货
+	DEV_ShipSubState_QuHuoKouOpening=11,//取货口开门中
+	DEV_ShipSubState_QuHuoKouOpenOk=12,//请求取货
+	DEV_ShipSubState_QuHuoKouOpenFailed=13,
+	DEV_ShipSubState_QuHuoKouCloseing=16,
+	DEV_ShipSubState_QuHuoKouCloseOk=17,
+	DEV_ShipSubState_QuHuoKouCloseFailed=18,
 //	DEV_ShipState_Failed,
 //	DEV_ShipState_QuHuoKouClosing,
 //	DEV_ShipState_QuHuoKouClosed,

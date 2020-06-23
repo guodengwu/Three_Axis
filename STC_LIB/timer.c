@@ -5,21 +5,26 @@
 u8 _1ms_EVENT,_3ms_EVENT,_10ms_EVENT,_30ms_EVENT;
 u8 _1s_EVENT;
 struct SYS_TIM  SysTim;
-_softtimer_t Timer1Soft;
-_softtimer_t Timer2Soft;
+_softtimer_t TimerSoft[7];
+//_softtimer_t Timer2Soft;
 _softtimer_t Timer3Soft;
 
 static void SysTimDataInit(void)
 {
+	u8 i;
 	SysTim.SumMs = 0;
 	SysTim.SumSec = 0;
 	SysTim.SumMinute = 0;
 	_10ms_EVENT = 0;
 	_1s_EVENT = 0;
-	Timer1Soft.TIM = Timer1;
-	Timer1Soft.state = STOP;
-	Timer2Soft.TIM = Timer2;
-	Timer2Soft.state = STOP;
+	for(i=0;i<7;i++)	{
+		TimerSoft[i].TIM = Timer1;
+		TimerSoft[i].state = STOP;
+	}
+//	Timer1Soft.TIM = Timer1;
+//	Timer1Soft.state = STOP;
+//	Timer2Soft.TIM = Timer2;
+//	Timer2Soft.state = STOP;
 	Timer3Soft.TIM = Timer3;
 	Timer3Soft.state = STOP;
 }
@@ -48,23 +53,28 @@ void TM3_Isr() interrupt 19
 //timer4作为电机运行时间控制 基准时间10ms
 void TM4_Isr() interrupt 20 //using 1
 {
-	if(Timer1Soft.state == USING)	{//电机运行时间控制
-		Timer1Soft.cnt ++;
-		if(Timer1Soft.cnt>=Timer1Soft.period)	{
-			Timer1Soft.cnt = 0;
-			MotorStop(DEF_Success);
-			SoftTimerStop(&Timer1Soft);
-			SoftTimerStop(&Timer2Soft);
+	u8 i;
+	for(i=0;i<7;i++)	{
+		if(TimerSoft[i].state == USING)	{//电机运行时间控制
+			TimerSoft[i].cnt ++;
+			if(TimerSoft[i].cnt>=TimerSoft[i].period)	{
+				TimerSoft[i].cnt = 0;
+				SoftTimerStop(&TimerSoft[i]);
+				SysMotor.motor[i].status.abort_type = MotorAbort_Timeout;	
+				if(TimerSoft[i].pCallBack!=NULL)	{
+					(*TimerSoft[i].pCallBack)();
+				}							
+			}
 		}
 	}
-	if(Timer2Soft.state == USING)	{//电机运行超时控制
-	    Timer2Soft.cnt ++;
-		if(Timer2Soft.cnt>=Timer2Soft.period)	{
-			Timer2Soft.cnt = 0;
-			MotorStop(DEF_Fail);		//电机运行超时
-			SoftTimerStop(&Timer2Soft);
-		}
-	}
+//	if(Timer2Soft.state == USING)	{//电机运行超时控制
+//	    Timer2Soft.cnt ++;
+//		if(Timer2Soft.cnt>=Timer2Soft.period)	{
+//			Timer2Soft.cnt = 0;
+//			MotorStop(DEF_Fail);		//电机运行超时
+//			SoftTimerStop(&Timer2Soft);
+//		}
+//	}
 	if(Timer3Soft.state == USING)	{
 		Timer3Soft.cnt ++;
 		if(Timer3Soft.cnt>=Timer3Soft.period)	{

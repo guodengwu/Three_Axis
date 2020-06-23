@@ -3,6 +3,7 @@
 
 #include "includes.h"
 #include "PWM.h"
+#include	"timer.h"
 
 #define MOTOR_TO_MAX         DEF_True        // To Max
 #define MOTOR_TO_MIN         DEF_False       // To Min
@@ -12,7 +13,7 @@
 #define XMOTOR_LEN_MAX			550//mm
 #define YMOTOR_LEN_MAX			1435//mm
 
-#define X_QuHuoKouPos			665//mm
+#define X_QuHuoKouPos			675//665//650mm
 #define Y_QuHuoKouPos			270//450//380//mm
 
 #define XMOTOR_AccDec_LEN			100//mm
@@ -20,7 +21,7 @@
 #define YMOTOR_AccDec_DnLen			80//mm
 #define MOTOR_CONSTANT_LEN			60//mm
 
-#define MOTOR_LEN_RANG			10//mm
+#define MOTOR_LEN_RANG			8//mm
 
 //#define XMOTOR_MIN_PWM				DEF_PWM4
 //#define XMOTOR_MAX_PWM				DEF_PWM5
@@ -81,6 +82,7 @@ typedef struct _SysMotor  {
 	u8 RunningID;
 	allmotor_state_t ALLMotorState;//所有电机状态 0-空闲 1-运行中
 	TMotor motor[MOTOR_NUMS];
+	_softtimer_t *pTimer[MOTOR_NUMS];
 }SysMotor_t;
 
 enum eMotorState {
