@@ -61,7 +61,7 @@ void QuHuoKouProcess(void)
 					JiaShouFlag = 0;
 					SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;					
 				}
-			}else if(QuHuoKouCloseLimit_IN==0)	{//关门成功
+			}else if(QuHuoKouCloseLimit_IN==0)	{//关门到位
 				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Max_LimitOpt;
 				JiaShouFlag = 0;
 				JiaShouCnt = 0;
@@ -401,29 +401,33 @@ void ShipProcess(void)
 		}
 		else if(DevState.bits.SubState == DEV_ShipSubState_QuHuoKouOpening)	{
 			if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_OK)	{//取货门开门到位
-				timecnt ++;
 				DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpenOk;
-				if(HuoWuDetectFlag == 0)	{//货物被取走 5s后关门
-					if(timecnt>5)	{
-						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-						QuHuoMenMotorStart();
-						DevState.bits.SubState = DEV_ShipSubState_QuHuoKouCloseing;
-					}
-				}
-				if(timecnt > 30)	{//货物没被取走 30s后 关门
+			}
+			else if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_Fail)
+				DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpenFailed;
+		}
+		else if(DevState.bits.SubState == DEV_ShipSubState_QuHuoKouOpenOk)	{
+			timecnt ++;				
+			if(HuoWuDetectFlag == 0)	{//货物被取走 5s后关门
+				if(timecnt>5)	{
 					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
 					QuHuoMenMotorStart();
 					DevState.bits.SubState = DEV_ShipSubState_QuHuoKouCloseing;
 				}
 			}
-			else if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_Fail)
-				DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpenFailed;
+			if(timecnt > 30)	{//货物没被取走 30s后 关门
+				SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
+				QuHuoMenMotorStart();
+				DevState.bits.SubState = DEV_ShipSubState_QuHuoKouCloseing;
+			}
 		}
 		else if(DevState.bits.SubState == DEV_ShipSubState_QuHuoKouCloseing)	{
 			if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_OK)	{//取货门关门到位
 				ShipResult(ActionState_OK);//出货完成
 				DevState.bits.SubState = DEV_ShipSubState_QuHuoKouCloseOk;
 			}
+			else if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_Fail)
+				DevState.bits.SubState = DEV_ShipSubState_QuHuoKouCloseFailed;
 		}
 		id = SysMotor.RunningID;
 		if(SysMotor.motor[id].status.action == ActionState_Fail)	{//电机动作失败

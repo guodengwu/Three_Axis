@@ -631,12 +631,14 @@ void QuHuoMenMotorStart(void)
 			QuHuoMen_MOTOR_PWM1 = 0;
 			QuHuoMen_MOTOR_PWM2 = 1;
 		}
+		else
+			return;
 		QuHuoMen_MOTOR_ENABLE = 1;
 		SysMotor.RunningID = MOTOR_QuHuoMen_ID;
 		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
 //		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
-		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 10000);
+//		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 10000);
 	}	
 }
 void MotorStopTypeSet(u8 id, u8 stop_type)
