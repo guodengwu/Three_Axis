@@ -232,8 +232,9 @@ void  UsartCmdProcess (void)
 				}
 //				SysMotor.MotorIDRunning = iPara;
 				iPara += 3;		
-				if(temp==1)	{//执行测试					
-					DevState.bits.State = DEV_STATE_TEST;//设备状态 独立部件运行
+				if(temp==1)	{//执行测试	
+					if(DevState.bits.State != DEV_STATE_SHIPING)
+						DevState.bits.State = DEV_STATE_TEST;//设备状态 独立部件运行
 					if(iPara==3)	{
 //						SysMotor.ALLMotorState.bits.XMotor = DEF_Run;
 						SysMotor.motor[MOTOR_X_ID].ObjPos = UsartRxGetINT16U(pUsart->rx_buf,&pUsart->rx_idx);

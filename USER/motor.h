@@ -16,7 +16,7 @@
 #define X_QuHuoKouPos			675//665//650mm
 #define Y_QuHuoKouPos			270//450//380//mm
 
-#define XMOTOR_AccDec_LEN			100//mm
+#define XMOTOR_AccDec_LEN			80//mm
 #define YMOTOR_AccDec_UpLen			60//mm
 #define YMOTOR_AccDec_DnLen			80//mm
 #define MOTOR_CONSTANT_LEN			60//mm

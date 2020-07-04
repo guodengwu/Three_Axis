@@ -206,7 +206,7 @@ void CheckIOState(void)
 		GetHuoWuTimeCnt ++;
 		if(GetHuoWuTimeCnt>=5)	{
 			if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{
-				StopLMotor();//SYS_PRINTF("HuoWuCheck_IN\r\n");
+				StopLMotor();SYS_PRINTF("HuoWuCheck_IN\r\n");
 				SysMotor.motor[MOTOR_L_ID].status.action = ActionState_OK;
 //				Sys.DevAction = ActionState_OK;
 			}

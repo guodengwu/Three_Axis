@@ -363,9 +363,9 @@ u8 XMotorAccDec(void)
 						return 1;
 					}
 				}else if(SysMotor.motor[MOTOR_X_ID].CurPos>=XAccDecPos.DecPos)	{//减速
-					if(X_VelCurve.index < 0)
-						X_VelCurve.index = 0;
-					else if(X_VelCurve.index > 0)	{
+					if(X_VelCurve.index < 1)
+						X_VelCurve.index = 1;
+					else if(X_VelCurve.index > 1)	{
 						X_VelCurve.index--;
 					}
 					StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
@@ -738,11 +738,11 @@ void MotorStuck(void)
 
 void MotorTest(void)
 {
-	if(DevState.bits.State != DEV_STATE_TEST)	{
-		return;
-	}
-	
-	DevState.bits.SubState = 1;//电机运行中
+//	if(DevState.bits.State != DEV_STATE_TEST)	{
+//		return;
+//	}
+//	
+//	DevState.bits.SubState = 1;//电机运行中
 	//MotorStart();
 //	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{
 //		SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_L_ID].Param);
