@@ -396,7 +396,7 @@ void ShipProcess(void)
 				SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
 				DMotorStart();//关闭侧门					
 			}
-			else if(DevState.bits.SubState == DEV_ShipSubState_QuHuoKouOpening)	{
+			if(DevState.bits.SubState == DEV_ShipSubState_QuHuoKouOpening)	{
 				if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_OK)	{//取货门开门到位
 					DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpenOk;
 					timecnt = 0;

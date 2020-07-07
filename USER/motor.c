@@ -631,8 +631,9 @@ void QuHuoMenMotorStart(void)
 			QuHuoMen_MOTOR_PWM1 = 0;
 			QuHuoMen_MOTOR_PWM2 = 1;
 		}
-		else
+		else	{
 			return;
+		}
 		QuHuoMen_MOTOR_ENABLE = 1;
 		SysMotor.RunningID = MOTOR_QuHuoMen_ID;
 		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
@@ -815,6 +816,8 @@ void StopLMotor(void)
 }
 void StopQuHuoMenMotor(void)
 {
+	QuHuoMen_MOTOR_PWM1 = 0;
+	QuHuoMen_MOTOR_PWM2 = 0;
 	QuHuoMen_MOTOR_ENABLE = 0;
 	SysMotor.ALLMotorState.bits.QuHuoMenMotor =  DEF_Stop;
 	SoftTimerStop(SysMotor.pTimer[MOTOR_QuHuoMen_ID]);
