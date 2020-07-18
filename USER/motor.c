@@ -30,7 +30,7 @@ void MotorInit(void)
 	SysMotor.pTimer[MOTOR_T_ID]->pCallBack = &StopTMotor;
 	SysMotor.pTimer[MOTOR_D_ID]->pCallBack = &StopDMotor;
 	SysMotor.pTimer[MOTOR_L_ID]->pCallBack = &StopLMotor;
-	SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &StopQuHuoMenMotor;
+	SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &QuHuoMenMotorCallback;
 	
 	XAccDecPos.DecPos = 0;
 	YAccDecPos.DecPos = 0;
@@ -634,13 +634,14 @@ void QuHuoMenMotorStart(void)
 		else	{
 			return;
 		}
-		QuHuoMen_MOTOR_ENABLE = 1;
+//		QuHuoMen_MOTOR_ENABLE = 1;
+		StartPWM(QUHUOMEN_PWM, MOTOR_PWM_FREQ, 100);//全速关门
 		SysMotor.RunningID = MOTOR_QuHuoMen_ID;
 		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
 //		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
-//		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 10000);
-	}	
+		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 1500);//1.5s后 关门速度减半 防夹手
+	}
 }
 void MotorStopTypeSet(u8 id, u8 stop_type)
 {
@@ -814,6 +815,16 @@ void StopLMotor(void)
 		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_OK;
 	}
 }
+
+void QuHuoMenMotorCallback(void)
+{
+	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{//测试取货门电机
+		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//0关门减速
+			StartPWM(QUHUOMEN_PWM, MOTOR_PWM_FREQ, 60);
+		}
+	}
+}
+
 void StopQuHuoMenMotor(void)
 {
 	QuHuoMen_MOTOR_PWM1 = 0;

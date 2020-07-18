@@ -6,6 +6,7 @@ void PWMInit(void)
 	PWMCFG = 0x00;  //PWM 与 ADC 不关联
     PWMCKS = 0x0F;  // PWM时钟=系统时钟/(PS[3:0]+1) = 27M/16 = 1.6875M
 
+	PWM1CR = 0x10;                              //PWM1_3/P6.1
 	PWM4T1 = 0x0010;
 	PWM4T2 = 0x0000;
 	PWM5T1 = 0x0010;
@@ -16,7 +17,7 @@ void PWMInit(void)
 
     PWMCR = 0x00;                               //启动PWM模块
 }
-extern u8  printfbuf[100];
+//extern u8  printfbuf[100];
 void StartPWM(u8 pwm, u16 freq, u8 duty)
 {
 	u32 cycle;
@@ -32,7 +33,25 @@ void StartPWM(u8 pwm, u16 freq, u8 duty)
 	cycle = ((MAIN_Fosc / 16) / freq);
 	PWMC = cycle;
 
-	if(pwm==DEF_PWM2)	{
+	if(pwm==DEF_PWM1)	{
+		if(duty==0)	{
+			PWM1CR =0x0;
+			IO_PWM1 = 0; 
+		}
+		else if(duty>=100)	{
+			PWM1CR =0x0;
+			IO_PWM1 = 1; 
+		}
+		else	{
+			dat = cycle*duty_dat / 100;
+			//dat *= duty_dat;    //设置PWM2第2次反转的PWM计数 占空比为(PWM2T2-PWM2T1)/PWMC
+			PWM1T1 = 0;                //设置PWM2第1次反转的PWM计数
+			PWM1T2 = dat;
+			//SYS_PRINTF("%d %d %d\r\n",cycle,duty_dat,dat);
+			PWM1CR = 0x80;	//使能PWM4输出			
+		}
+	}
+	else if(pwm==DEF_PWM2)	{
 		if(duty==0)	{
 			PWM2CR =0x0;
 			IO_PWM2 = 0; 

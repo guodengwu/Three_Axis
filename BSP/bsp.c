@@ -173,7 +173,10 @@ void bsp(void)
 void soft_reset(void)
 {
 	if(Sys.state&SYSSTATE_RESET)	{
-		delay_us(1000);
+		QuHuoMen_MOTOR_PWM1 = 0;
+		QuHuoMen_MOTOR_PWM2 = 0;
+		QuHuoMen_MOTOR_ENABLE = 0;
+		delay_us(500);
 		IAP_CONTR = 0x60;
 	}
 }

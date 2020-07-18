@@ -24,8 +24,8 @@
 #define MOTOR_LEN_RANG			8//mm
 
 //#define XMOTOR_MIN_PWM				DEF_PWM4
-//#define XMOTOR_MAX_PWM				DEF_PWM5
-#define XMOTOR_PWM				DEF_PWM6
+#define QUHUOMEN_PWM				DEF_PWM1
+#define XMOTOR_PWM					DEF_PWM6
 #define YMOTOR_MIN_PWM				DEF_PWM2
 #define YMOTOR_MAX_PWM				DEF_PWM3
 #define MOTOR_PWM_FREQ				200
@@ -127,6 +127,7 @@ void StopZMotor(void);
 void StopLMotor(void);
 void StopTMotor(void);
 void StopDMotor(void);
+void QuHuoMenMotorCallback(void);
 void StopQuHuoMenMotor(void);
 void MotorReset(u8 id);
 void CalcXYMotorPos(void);

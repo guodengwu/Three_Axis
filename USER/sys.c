@@ -375,7 +375,7 @@ void ShipProcess(void)
 					StopLMotor();
 					timecnt = 0;
 					DevState.bits.SubState = DEV_ShipSubState_CeMenClosing;
-					Sys.DevAction = ActionState_OK;//出货结果
+//					Sys.DevAction = ActionState_OK;//出货结果
 					LvDaiMotorFlag = 2;
 				}
 				else {//未检测到货物
