@@ -82,6 +82,11 @@ enum dev_logic_err {
 	LE_QuHuoMen = 70,
 	LE_HuoPanHongWai = 80,
 	LE_QuHuoKouWai = 85,
+	LE_ReqShipTimeout = 200,//请求出货超时
+	LE_HuoWuDetectTimeout = 201,//货物检测超时
+	LE_HuoWuTakeawayTimeout = 202,//货物取走超时
+	LE_MotorCurrentOver = 203,
+	LE_QuHuoMenCloseFaileByJiashou = 204,
 };
 
 //extern _ship_t Ship_t;

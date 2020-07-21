@@ -577,7 +577,7 @@ void DMotorStart(void)
 		SysMotor.ALLMotorState.bits.DMotor = DEF_Run;
 		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_Doing;
 //		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
-		SoftTimerStart(SysMotor.pTimer[MOTOR_D_ID], 10000);
+		SoftTimerStart(SysMotor.pTimer[MOTOR_D_ID], 5000);
 		SYS_PRINTF("d motor start");
 	}
 }
@@ -640,6 +640,7 @@ void QuHuoMenMotorStart(void)
 		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
 //		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
+		SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &QuHuoMenMotorCallback;
 		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 1500);//1.5s后 关门速度减半 防夹手
 	}
 }
@@ -802,6 +803,7 @@ void StopDMotor(void)
 	SoftTimerStop(SysMotor.pTimer[MOTOR_D_ID]);
 	if(SysMotor.motor[MOTOR_D_ID].status.abort_type == MotorAbort_Timeout)	{
 		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_Fail;
+		SysHDError.E1.bits.b4 = 1;
 	}
 }
 
@@ -823,16 +825,21 @@ void QuHuoMenMotorCallback(void)
 			StartPWM(QUHUOMEN_PWM, MOTOR_PWM_FREQ, 60);
 		}
 	}
+	SoftTimerStop(SysMotor.pTimer[MOTOR_QuHuoMen_ID]);
+	SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
+	SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &StopQuHuoMenMotor;
+	SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 4000);
 }
 
 void StopQuHuoMenMotor(void)
 {
 	QuHuoMen_MOTOR_PWM1 = 0;
 	QuHuoMen_MOTOR_PWM2 = 0;
-	QuHuoMen_MOTOR_ENABLE = 0;
+	StartPWM(QUHUOMEN_PWM, MOTOR_PWM_FREQ, 0);
 	SysMotor.ALLMotorState.bits.QuHuoMenMotor =  DEF_Stop;
 	SoftTimerStop(SysMotor.pTimer[MOTOR_QuHuoMen_ID]);
 	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type == MotorAbort_Timeout)	{
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;
+		SysHDError.E1.bits.b6 = 1;
 	}
 }

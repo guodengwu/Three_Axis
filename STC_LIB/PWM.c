@@ -35,11 +35,11 @@ void StartPWM(u8 pwm, u16 freq, u8 duty)
 
 	if(pwm==DEF_PWM1)	{
 		if(duty==0)	{
-			PWM1CR =0x0;
+			PWM1CR &= ~0x80;
 			IO_PWM1 = 0; 
 		}
 		else if(duty>=100)	{
-			PWM1CR =0x0;
+			PWM1CR &= ~0x80;
 			IO_PWM1 = 1; 
 		}
 		else	{
@@ -48,7 +48,7 @@ void StartPWM(u8 pwm, u16 freq, u8 duty)
 			PWM1T1 = 0;                //设置PWM2第1次反转的PWM计数
 			PWM1T2 = dat;
 			//SYS_PRINTF("%d %d %d\r\n",cycle,duty_dat,dat);
-			PWM1CR = 0x80;	//使能PWM4输出			
+			PWM1CR |= 0x80;	//使能PWM4输出			
 		}
 	}
 	else if(pwm==DEF_PWM2)	{

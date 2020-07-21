@@ -78,6 +78,8 @@ void main(void)
 	EncoderDataInit();
 	SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
 	QuHuoMenMotorStart();
+	SysMotor.motor[MOTOR_T_ID].Param = 0;//0收缩
+	TMotorStart();
 	MotorReset(MOTOR_X_ID);//X 电机先复位
 //	for(;;)	{
 //		if(!(Sys.state & SYSSTATE_XMOTORRESET))	{//x 复位成功后才能动y

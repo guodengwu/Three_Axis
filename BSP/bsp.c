@@ -80,6 +80,8 @@ static void	GPIO_config(void)
 	T_MOTOR_ENABLE = 0;	
 	D_MOTOR_ENABLE = 0;
 	L_MOTOR_ENABLE = 0;
+	QuHuoMen_MOTOR_PWM1 = 0;
+	QuHuoMen_MOTOR_PWM2 = 0;
 	QuHuoMen_MOTOR_ENABLE = 0;
 	BK_MOTOR_ENABLE = 0;
 	RS485_CTRL = 0;//默认接收模式
