@@ -639,6 +639,7 @@ void QuHuoMenMotorStart(void)
 		SysMotor.RunningID = MOTOR_QuHuoMen_ID;
 		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
+		SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
 //		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
 		SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &QuHuoMenMotorCallback;
 		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 1500);//1.5s后 关门速度减半 防夹手
