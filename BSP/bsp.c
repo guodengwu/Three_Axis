@@ -171,7 +171,9 @@ void bsp(void)
 	Timer4Init();
 	PWMInit();
 }
-
+//软件复位分2种：
+//从用户程序区软件复位并切换到用户程序 ; -- 0x20
+//从用户程序区软件复位并切换到ISP程序下载监控区  --  0x60 （会导致取货门开门）
 void soft_reset(void)
 {
 	if(Sys.state&SYSSTATE_RESET)	{
@@ -179,6 +181,6 @@ void soft_reset(void)
 		QuHuoMen_MOTOR_PWM2 = 0;
 		QuHuoMen_MOTOR_ENABLE = 0;
 		delay_us(500);
-		IAP_CONTR = 0x60;
+		IAP_CONTR = 0x20;//0x60;
 	}
 }
