@@ -34,10 +34,10 @@ u8 JiaShouCnt = 0,JiaShouFlag=0;
 
 void JiaShouProcess(void)
 {
-	if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)
-		SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
-	else 
-		SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
+//	if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)
+//		SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
+//	else 
+//		SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
 	QuHuoMenMotorStart();
 }
 
@@ -53,6 +53,7 @@ void QuHuoKouProcess(void)
 			if(QuHuoKouOpenLimit_IN==0)	{//开门到位
 				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;
 				if(JiaShouFlag==1)	{//夹手未超过3次 重新关门
+					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
 					Timer3Soft.pCallBack = &JiaShouProcess;
 					SoftTimerStart(&Timer3Soft, 1000);
 				}
@@ -74,6 +75,7 @@ void QuHuoKouProcess(void)
 			if(JiaShouLimit_IN==0)	{
 				StopQuHuoMenMotor();//停止关门		
 				SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
+				SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
 				Timer3Soft.pCallBack = &JiaShouProcess;
 				SoftTimerStart(&Timer3Soft, 1000);//电机停1s消除反向电动势后开门
 				JiaShouCnt ++;
@@ -232,9 +234,9 @@ void CheckIOState(void)
 ////			SoftTimerStop(&Timer2Soft);
 //			SoftTimerStop(SysMotor.pTimer[MOTOR_T_ID]);
 //		}
-		MotorStop(DEF_Fail);
-		SYS_PRINTF("MotorStuck\r\n");
-		SysLogicErr.logic = LE_MotorCurrentOver;
+//		MotorStop(DEF_Fail);
+//		SYS_PRINTF("MotorStuck\r\n");
+//		SysLogicErr.logic = LE_MotorCurrentOver;
 	}
 }
 u8 MotorStuckMonitorCnt = 0;
@@ -417,7 +419,8 @@ void ShipProcess(void)
 				}
 			}
 			if(DevState.bits.SubState == DEV_ShipSubState_QuHuoKouOpening)	{
-				if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_OK)	{//取货门开门到位
+//				if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_OK)	{//取货门开门到位
+				if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt)	{
 					DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpenOk;					
 				}
 				else if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_Fail)
