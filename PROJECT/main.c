@@ -14,7 +14,8 @@
  - 返回说明：无
  - 备注说明：使用51单片机，外部晶体频率:22.1184MHZ-1T模式
  ******************************************************************/
-//u8 xdata printfbuf[100];
+extern void ShipProcess(void);
+u8 ssss=0;
 void timer_event(void)
 {
 	if(_1ms_EVENT)	{
@@ -24,7 +25,7 @@ void timer_event(void)
 	if(_3ms_EVENT)	{
 		_3ms_EVENT = 0;
 		RS485TxToRx();	
-//		CalcXYMotorPos();		
+		QuHuoKouProcess();//取货门开关门处理
 	}
 	if(_10ms_EVENT)	{
 		_10ms_EVENT = 0;
@@ -43,7 +44,7 @@ void timer_event(void)
 //		sprintf(printfbuf,"%d %ld",encoder[EncoderX_ID].pluse, SysMotor.motor[MOTOR_X_ID].CurPos);
 //		SYS_PRINTF("x pos:%s\r\n",printfbuf);
 //		sprintf(printfbuf,"%d %ld",encoder[EncoderY_ID].pluse, SysMotor.motor[MOTOR_Y_ID].CurPos);
-//		SYS_PRINTF("y pos:%s\r\n",printfbuf);
+//		SYS_PRINTF("logic err: %x,%x\r\n",SysLogicErr,ssss);
 		soft_reset();
 		ShipProcess();
 	}
@@ -77,7 +78,7 @@ void main(void)
 	SYS_PRINTF("Sys Startup.\r\n");
 	EncoderDataInit();
 	SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-	QuHuoMenMotorStart();
+	QuHuoMenMotorStart(DEF_True);
 	SysMotor.motor[MOTOR_T_ID].Param = 0;//0收缩
 	TMotorStart();
 	MotorReset(MOTOR_X_ID);//X 电机先复位

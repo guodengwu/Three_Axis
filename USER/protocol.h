@@ -33,7 +33,7 @@
 
 typedef struct _usart {
     uint8_t               rx_state;
-    uint16_t              rx_idx;
+    uint8_t              rx_idx;
     uint16_t              rx_cnt;
     uint16_t              rx_len;
     uint16_t              rx_bufsize;
@@ -45,7 +45,7 @@ typedef struct _usart {
     uint8_t (*rx_indicate)(struct _usart *pUsart, uint8_t rx_dat);
 
     uint8_t               tx_cmd;
-    uint16_t              tx_idx;
+    uint8_t              tx_idx;
     uint16_t              tx_len;
     uint16_t              tx_bufsize;
     uint16_t              tx_crc;
@@ -83,15 +83,15 @@ typedef enum {
 } EMessageCmd;
 
 enum MSG_ERR {
-    MSG_ERR_NONE              =  0x0000u, // 无消息错误
-    MSG_ERR_SLAVE_NO_ACK      =  0xFFF8u, // 从板无响应
-	MSG_ERR_LENGTH      		 =  0xFFF9u, // 消息长度错误代码
-	MSG_ERR_CHECKSUM          =  0xFFFAu, // 消息校验和错误代码
-	MSG_ERR_ETX_WORD          =  0xFFFBu, // 消息结束符错误代码
-	MSG_ERR_UNDEFINITION      =  0xFFFCu, // 消息命令未定义错误代码
-	MSG_ERR_IAP_MODE          =  0xFFFDu, // 当前处于IAP模式
-	MSG_ERR_STATE             =  0xFFFEu, // 消息未定义状态
-	MSG_ERR_TIMEOUT		     =  0xFFF7u, // 消息接收超时
+    MSG_ERR_NONE              =  0x00, // 无消息错误
+    MSG_ERR_SLAVE_NO_ACK      =  0xF8, // 从板无响应
+	MSG_ERR_LENGTH      		 =  0xF9, // 消息长度错误代码
+	MSG_ERR_CHECKSUM          =  0xFA, // 消息校验和错误代码
+	MSG_ERR_ETX_WORD          =  0xFB, // 消息结束符错误代码
+	MSG_ERR_UNDEFINITION      =  0xFC, // 消息命令未定义错误代码
+	MSG_ERR_IAP_MODE          =  0xFD, // 当前处于IAP模式
+	MSG_ERR_STATE             =  0xFE, // 消息未定义状态
+	MSG_ERR_TIMEOUT		     =  0xF7, // 消息接收超时
 };
 
 enum ACK_MSG	{

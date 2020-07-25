@@ -144,7 +144,7 @@ void ZMotorStart(void);
 void TMotorStart(void);
 void LMotorStart(void);
 void DMotorStart(void);
-void QuHuoMenMotorStart(void);
+void QuHuoMenMotorStart(u8 flag);
 u8 XMotorAccDec(void);
 u8 YMotorAccDec(void);
 #endif

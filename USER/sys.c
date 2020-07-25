@@ -6,7 +6,8 @@ _sys_status_t Sys;
 _sys_io_state_t IOState;
 _dev_state_t DevState;
 _sys_error_t SysHDError;
-_sys_logic_error_t SysLogicErr;
+//_sys_logic_error_t SysLogicErr;
+u8 SysLogicErr;
 static u8 MotorStuckMonitor(void);
 u8 HuoWuNearDetectFlag=0;//货物检测标志
 u8 HuoWuDetectFlag = 0;
@@ -26,7 +27,7 @@ void SysDataInit(void)
 	SysHDError.E1.ubyte = DEF_False;
 	SysHDError.E2.ubyte = DEF_False;
 	
-	SysLogicErr.logic = 0;
+	SysLogicErr = 0;
 	
 //	Ship_t.state = DEV_ShipStateIDLE;
 }
@@ -38,14 +39,21 @@ void JiaShouProcess(void)
 //		SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
 //	else 
 //		SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-	QuHuoMenMotorStart();
+	StopQuHuoMenMotor();
+	QuHuoMenMotorStart(DEF_False);
+}
+void ClearJiaShouFlag(void)
+{
+	JiaShouCnt = 0;
+	JiaShouFlag = 0;
 }
 
 void QuHuoKouProcess(void)
 {
 //	static u16 timercnt = 0;
 	
-	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{
+	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	
+	{
 		if((QuHuoKouOpenLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Open) || \
 			(QuHuoKouCloseLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close))	{//取货口电机限位  限位失效时超时10s停止
 			StopQuHuoMenMotor();		
@@ -58,22 +66,21 @@ void QuHuoKouProcess(void)
 					SoftTimerStart(&Timer3Soft, 1000);
 				}
 				else if(JiaShouFlag==2)	{//夹手超过3次 保存开门状态
-					JiaShouCnt = 0;
-					JiaShouFlag = 0;
+					ClearJiaShouFlag();
 					SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;	
-					SysLogicErr.logic = LE_QuHuoMenCloseFaileByJiashou;//上报因夹手导致关门失败
+					SysLogicErr = LE_QuHuoMenCloseFaileByJiashou;//上报因夹手导致关门失败
 				}
 			}
 			else if(QuHuoKouCloseLimit_IN==0)	{//关门到位
 				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Max_LimitOpt;
-				JiaShouFlag = 0;
-				JiaShouCnt = 0;
+				ClearJiaShouFlag();
 			}
 		}
 		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//在关门过程有夹手信号
-			if(JiaShouLimit_IN==0)	{//有夹手信号	
-			if(JiaShouLimit_IN==0)	{
-				StopQuHuoMenMotor();//停止关门		
+			if(JiaShouLimit_IN==0)	//有夹手信号	
+			{
+				SYS_PRINTF("jia");
+				StopQuHuoMenMotor();//停止关门			
 				SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
 				SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
 				Timer3Soft.pCallBack = &JiaShouProcess;
@@ -85,7 +92,7 @@ void QuHuoKouProcess(void)
 				else	{//夹手次数小于3次 重新尝试					
 					JiaShouFlag = 1;
 				}
-			}
+				
 			}
 		}
 	}
@@ -176,7 +183,7 @@ void CheckIOState(void)
 	IOState.state1.bits.b6 = !QuHuoKouOpenLimit_IN;
 	IOState.state1.bits.b7 = !QuHuoKouCloseLimit_IN;
 	IOState.state1.bits.b2 = !JiaShouLimit_IN;
-	QuHuoKouProcess();//取货门开关门处理
+//	QuHuoKouProcess();//取货门开关门处理
 	IOState.state2.bits.b0 = !Y_MOTOR_MinLimit_IN;
 	IOState.state2.bits.b1 = !Y_MOTOR_MaxLimit_IN;
 	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
@@ -236,7 +243,7 @@ void CheckIOState(void)
 //		}
 //		MotorStop(DEF_Fail);
 //		SYS_PRINTF("MotorStuck\r\n");
-//		SysLogicErr.logic = LE_MotorCurrentOver;
+//		SysLogicErr = LE_MotorCurrentOver;
 	}
 }
 u8 MotorStuckMonitorCnt = 0;
@@ -301,7 +308,7 @@ void ShipProcess(void)
 			if(ReqShipTimeCnt>15)	{//出货失败
 				ReqShipTimeCnt = 0;
 				ShipResult(ActionState_Fail);
-				SysLogicErr.logic = LE_ReqShipTimeout;
+				SysLogicErr = LE_ReqShipTimeout;
 			}
 		}
 		else if(DevState.bits.SubState == DEV_ShipSubStateCeMenOpening)	{
@@ -387,7 +394,7 @@ void ShipProcess(void)
 						SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
 						DMotorStart();//关闭侧门	
 						ShipResult(ActionState_Fail);
-						SysLogicErr.logic = LE_HuoWuDetectTimeout;
+						SysLogicErr = LE_HuoWuDetectTimeout;
 					}
 					if(SysMotor.motor[MOTOR_L_ID].status.action == ActionState_OK)	{
 						if(LvDaiMotorFlag == 0)	{
@@ -420,7 +427,7 @@ void ShipProcess(void)
 			}
 			if(DevState.bits.SubState == DEV_ShipSubState_QuHuoKouOpening)	{
 //				if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_OK)	{//取货门开门到位
-				if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt)	{
+				if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type == MotorAbort_Min_LimitOpt)	{
 					DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpenOk;					
 				}
 				else if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_Fail)
@@ -433,7 +440,7 @@ void ShipProcess(void)
 					HuoWuTakeawayCnt++;
 					if(HuoWuTakeawayCnt>5)	{
 						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-						QuHuoMenMotorStart();
+						QuHuoMenMotorStart(DEF_True);
 						DevState.bits.SubState = DEV_ShipSubState_QuHuoKouCloseing;
 					}
 				}
@@ -442,9 +449,9 @@ void ShipProcess(void)
 				timecnt ++;
 				if(timecnt > 30)	{//开门30s后货物没取走 关门
 					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-					QuHuoMenMotorStart();
+					QuHuoMenMotorStart(DEF_True);
 					DevState.bits.SubState = DEV_ShipSubState_QuHuoKouCloseing;
-					SysLogicErr.logic = LE_HuoWuTakeawayTimeout;
+					SysLogicErr = LE_HuoWuTakeawayTimeout;
 				}
 			}
 			else if(DevState.bits.SubState == DEV_ShipSubState_QuHuoKouCloseing)	{

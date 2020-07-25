@@ -548,7 +548,7 @@ void TMotorStart(void)
 		SysMotor.ALLMotorState.bits.TMotor = DEF_Run;
 		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_Doing;
 //		SoftTimerStart(&Timer2Soft, 5000);//电机超时控制
-		SoftTimerStart(SysMotor.pTimer[MOTOR_T_ID], 4000);
+		SoftTimerStart(SysMotor.pTimer[MOTOR_T_ID], 2500);
 		SYS_PRINTF("T motor start, %d", SysMotor.motor[MOTOR_T_ID].Param);
 	}
 }
@@ -609,7 +609,7 @@ void LMotorStart(void)
 		SoftTimerStart(SysMotor.pTimer[MOTOR_L_ID], SysMotor.motor[MOTOR_L_ID].Param);
 	}
 }
-void QuHuoMenMotorStart(void)
+void QuHuoMenMotorStart(u8 flag)
 {
 	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	{
 //		SYS_PRINTF("quhuo motor runnig");
@@ -640,9 +640,12 @@ void QuHuoMenMotorStart(void)
 		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
-//		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
-		SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &QuHuoMenMotorCallback;
-		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 1500);//1.5s后 关门速度减半 防夹手
+//		SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &QuHuoMenMotorCallback;
+//		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 1500);//1.5s后 关门速度减半 防夹手
+		SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &StopQuHuoMenMotor;
+		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 5000);
+		if(flag)
+			ClearJiaShouFlag();
 	}
 }
 void MotorStopTypeSet(u8 id, u8 stop_type)
@@ -701,44 +704,44 @@ void MotorStop(u8 stop_type)
 //	}
 }
 
-void MotorStuck(void)
-{
-	static u16 XMotorStuckCnt=0,YMotorStuckCnt=0;
-	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
-		if(X_MotorDuZhuan_IN==0)	{
-			XMotorStuckCnt ++;
-			if(XMotorStuckCnt>100)	{
-				StopXMotor();
-				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Stuck;
-				SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
-				SysHDError.E1.bits.b0 = 1;
-				SysLogicErr.logic = LE_XMOTOR_DuZhuan;
-				XMotorStuckCnt = 0;
-			}
-		}
-		else
-			XMotorStuckCnt = 0;
-	}
-	else
-		XMotorStuckCnt = 0;
-	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
-		if(Y_MotorDuZhuan_IN==0)	{
-			YMotorStuckCnt ++;
-			if(YMotorStuckCnt>100)	{
-				StopYMotor();
-				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Stuck;
-				SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
-				SysHDError.E1.bits.b1 = 1;
-				SysLogicErr.logic = LE_YMOTOR_DuZhuan;	
-				YMotorStuckCnt = 0;
-			}
-		}	
-		else 
-			YMotorStuckCnt = 0;
-	}
-	else
-		YMotorStuckCnt = 0;
-}
+//void MotorStuck(void)
+//{
+//	static u16 XMotorStuckCnt=0,YMotorStuckCnt=0;
+//	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
+//		if(X_MotorDuZhuan_IN==0)	{
+//			XMotorStuckCnt ++;
+//			if(XMotorStuckCnt>100)	{
+//				StopXMotor();
+//				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_Stuck;
+//				SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
+//				SysHDError.E1.bits.b0 = 1;
+//				SysLogicErr = LE_XMOTOR_DuZhuan;
+//				XMotorStuckCnt = 0;
+//			}
+//		}
+//		else
+//			XMotorStuckCnt = 0;
+//	}
+//	else
+//		XMotorStuckCnt = 0;
+//	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{
+//		if(Y_MotorDuZhuan_IN==0)	{
+//			YMotorStuckCnt ++;
+//			if(YMotorStuckCnt>100)	{
+//				StopYMotor();
+//				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Stuck;
+//				SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
+//				SysHDError.E1.bits.b1 = 1;
+//				SysLogicErr = LE_YMOTOR_DuZhuan;	
+//				YMotorStuckCnt = 0;
+//			}
+//		}	
+//		else 
+//			YMotorStuckCnt = 0;
+//	}
+//	else
+//		YMotorStuckCnt = 0;
+//}
 
 void MotorTest(void)
 {
@@ -806,6 +809,8 @@ void StopDMotor(void)
 		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_Fail;
 		SysHDError.E1.bits.b4 = 1;
 	}
+	else 
+		SysHDError.E1.bits.b4 = 0;
 }
 
 void StopLMotor(void)
@@ -843,4 +848,6 @@ void StopQuHuoMenMotor(void)
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;
 		SysHDError.E1.bits.b6 = 1;
 	}
+	else 
+		SysHDError.E1.bits.b6 = 0;
 }

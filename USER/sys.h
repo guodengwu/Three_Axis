@@ -36,7 +36,7 @@ typedef struct _sys_error	{
 }_sys_error_t;
 
 typedef struct _sys_logic_error	{
-	u32 logic;
+	u8 logic;
 }_sys_logic_error_t;
 
 //typedef struct _ship	{
@@ -82,15 +82,16 @@ enum dev_logic_err {
 	LE_QuHuoMen = 70,
 	LE_HuoPanHongWai = 80,
 	LE_QuHuoKouWai = 85,
-	LE_ReqShipTimeout = 200,//请求出货超时
-	LE_HuoWuDetectTimeout = 201,//货物检测超时
-	LE_HuoWuTakeawayTimeout = 202,//货物取走超时
-	LE_MotorCurrentOver = 203,
-	LE_QuHuoMenCloseFaileByJiashou = 204,
 };
+#define	LE_ReqShipTimeout  200//请求出货超时
+#define	LE_HuoWuDetectTimeout  201//货物检测超时
+#define	LE_HuoWuTakeawayTimeout  202//货物取走超时
+#define	LE_MotorCurrentOver  203
+#define	LE_QuHuoMenCloseFaileByJiashou  204
 
-//extern _ship_t Ship_t;
-extern _sys_logic_error_t SysLogicErr;
+
+extern u8 SysLogicErr;
+//extern _sys_logic_error_t SysLogicErr;
 extern _sys_io_state_t IOState;
 extern _dev_state_t DevState;
 extern _sys_status_t Sys;
