@@ -275,8 +275,9 @@ void  UsartCmdProcess (void)
 					else if(iPara==9)	{//取货口门电机
 						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
 						QuHuoMenMotorStart(DEF_True);
-						if(DevState.bits.SubState == DEV_ShipSubState_CeMenClosing)
-							DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpening;	
+//						if(DevState.bits.SubState == DEV_ShipSubState_CeMenClosing)
+//							DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpening;	
+							Sys.DevAction = DevActionState_QuHuoKouOpening;	
 					}
 					MotorTest();
 					pUsart->tx_idx = 0;				

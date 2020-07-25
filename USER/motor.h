@@ -127,7 +127,7 @@ void StopZMotor(void);
 void StopLMotor(void);
 void StopTMotor(void);
 void StopDMotor(void);
-void QuHuoMenMotorCallback(void);
+//void QuHuoMenMotorCallback(void);
 void StopQuHuoMenMotor(void);
 void MotorReset(u8 id);
 void CalcXYMotorPos(void);

@@ -57,6 +57,10 @@ void TM4_Isr() interrupt 20 //using 1
 	for(i=0;i<7;i++)	{
 		if(TimerSoft[i].state == USING)	{//电机运行时间控制
 			TimerSoft[i].cnt ++;
+//			if(i==6)	{
+//				if(TimerSoft[i].cnt==1500)
+//					StartPWM(QUHUOMEN_PWM, MOTOR_PWM_FREQ, 50);//低速关门
+//			}
 			if(TimerSoft[i].cnt>=TimerSoft[i].period)	{
 				TimerSoft[i].cnt = 0;
 				SoftTimerStop(&TimerSoft[i]);
@@ -67,14 +71,6 @@ void TM4_Isr() interrupt 20 //using 1
 			}
 		}
 	}
-//	if(Timer2Soft.state == USING)	{//电机运行超时控制
-//	    Timer2Soft.cnt ++;
-//		if(Timer2Soft.cnt>=Timer2Soft.period)	{
-//			Timer2Soft.cnt = 0;
-//			MotorStop(DEF_Fail);		//电机运行超时
-//			SoftTimerStop(&Timer2Soft);
-//		}
-//	}
 	if(Timer3Soft.state == USING)	{
 		Timer3Soft.cnt ++;
 		if(Timer3Soft.cnt>=Timer3Soft.period)	{

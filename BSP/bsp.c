@@ -180,7 +180,7 @@ void soft_reset(void)
 		QuHuoMen_MOTOR_PWM1 = 0;
 		QuHuoMen_MOTOR_PWM2 = 0;
 		QuHuoMen_MOTOR_ENABLE = 0;
-		delay_us(500);
+		delay_us(100);
 		IAP_CONTR = 0x20;//0x60;
 	}
 }

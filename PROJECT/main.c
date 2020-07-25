@@ -66,8 +66,8 @@ void timer_event(void)
 
 void main(void)
 {	
-	delay_us(1000);
 	bsp();
+	delay_us(1000);	
 	SystickInit_Tmer();	
 	SysDataInit();
 	MotorInit();
