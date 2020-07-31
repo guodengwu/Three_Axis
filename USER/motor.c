@@ -626,10 +626,12 @@ void QuHuoMenMotorStart(u8 flag)
 			}
 			QuHuoMen_MOTOR_PWM1 = 1;
 			QuHuoMen_MOTOR_PWM2 = 0;
+			Sys.DevAction = DevActionState_QuHuoKouCloseing;
 		}
 		else if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Open)	{
 			QuHuoMen_MOTOR_PWM1 = 0;
 			QuHuoMen_MOTOR_PWM2 = 1;
+			Sys.DevAction = DevActionState_QuHuoKouOpening;
 		}
 		else	{
 			return;
@@ -836,7 +838,7 @@ void StopLMotor(void)
 //	SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &StopQuHuoMenMotor;
 //	SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 4000);
 //}
-
+extern u8 JiaShouFlag;
 void StopQuHuoMenMotor(void)
 {
 	QuHuoMen_MOTOR_PWM1 = 0;
@@ -844,7 +846,7 @@ void StopQuHuoMenMotor(void)
 	StartPWM(QUHUOMEN_PWM, MOTOR_PWM_FREQ, 0);
 	SysMotor.ALLMotorState.bits.QuHuoMenMotor =  DEF_Stop;
 	SoftTimerStop(SysMotor.pTimer[MOTOR_QuHuoMen_ID]);
-	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type == MotorAbort_Timeout)	{
+	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type == MotorAbort_Timeout&&JiaShouFlag==0)	{
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;
 		SysHDError.E1.bits.b6 = 1;
 	}

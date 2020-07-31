@@ -277,7 +277,7 @@ void  UsartCmdProcess (void)
 						QuHuoMenMotorStart(DEF_True);
 //						if(DevState.bits.SubState == DEV_ShipSubState_CeMenClosing)
 //							DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpening;	
-							Sys.DevAction = DevActionState_QuHuoKouOpening;	
+//							Sys.DevAction = DevActionState_QuHuoKouOpening;	
 					}
 					MotorTest();
 					pUsart->tx_idx = 0;				

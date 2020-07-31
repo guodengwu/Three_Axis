@@ -22,7 +22,7 @@ typedef struct _softtimer
 	u8 TIM;
 	u32 cnt;
 	u32 period;
-  	u8 state;
+  	volatile u8 state;
 	void (*pCallBack)();
 }_softtimer_t;
 
