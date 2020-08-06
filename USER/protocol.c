@@ -3,13 +3,13 @@
 #include "motor.h"
 
 usart_t      usart;
-#define USART_TXBUFF_SIZE		25
-#define USART_RXBUFF_SIZE		25
+#define USART_TXBUFF_SIZE		22
+#define USART_RXBUFF_SIZE		22
 
 //===================================================================================================
 uint8_t     usart_rx_buf        [USART_RXBUFF_SIZE];
 uint8_t     usart_tx_buf        [USART_TXBUFF_SIZE];
-static uint8_t   xdata    data_buf[20];
+static uint8_t   xdata    data_buf[18];
 
 static uint8_t  UsartRxGetINT8U (uint8_t *buf,uint8_t *idx);
 static uint16_t  UsartRxGetINT16U (uint8_t *buf,uint8_t *idx);
@@ -103,8 +103,8 @@ void UsartCmdReply(void)
 			break;
 		case _CMD_TX_SHIP_OK://0X6b,//回复 _CMD_RX_SHIP_OK
 			PackageSendData(cmd, data_buf, 0);
-			SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
-			ZMotorStart();
+//			SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
+//			ZMotorStart();
 			break;
 		default:
 			break;
@@ -163,9 +163,10 @@ void  UsartCmdProcess (void)
 						SysMotor.motor[MOTOR_L_ID].dir = DEF_Up;
 						LMotorStart();
 						ShipResult(ActionState_Fail);
+						SysLogicErr = LE_HuoWuRetention;//有货物滞留
 					}
 					else	{//取货口无货物 开始出货
-						SYS_PRINTF("Ship Start %ld,%ld \r\n", SysMotor.motor[MOTOR_X_ID].ObjPos, SysMotor.motor[MOTOR_Y_ID].ObjPos);
+//						SYS_PRINTF("Ship Start %ld,%ld \r\n", SysMotor.motor[MOTOR_X_ID].ObjPos, SysMotor.motor[MOTOR_Y_ID].ObjPos);
 						DevState.bits.State = DEV_STATE_SHIPING;
 						DevState.bits.SubState = DEV_ShipSubStateMotorUp;//升降机上升
 						Sys.DevAction = ActionState_Doing;//开始出货
@@ -292,15 +293,16 @@ void  UsartCmdProcess (void)
 				}
 				break;
 			case _CMD_RX_SHIP_OK:	{//0X08,//通知出货完成
-				if(DevState.bits.State == DEV_STATE_SHIPING&&DevState.bits.SubState == DEV_ShipSubStateReqShip)
+				if(DevState.bits.State == DEV_STATE_SHIPING&&DevState.bits.SubState == DEV_ShipSubStateReqShip)	{
 					DevState.bits.SubState = DEV_ShipSubStateCeMenOpening;
+				}
 				pUsart->tx_cmd = _CMD_TX_SHIP_OK;
-//				SYS_PRINTF("Ship compelet. ");
 				break;
 			}
-			default:
+			default:	{
 				pUsart->tx_cmd = _CMD_TX_NONE;
 				break;
+			}
 		}		
 	}else {//数据解析异常
         pUsart->rx_err = MSG_ERR_NONE;        // clear rx error

@@ -310,6 +310,7 @@ void ShipProcess(void)
 			ReqShipTimeCnt ++;
 			if(ReqShipTimeCnt>15)	{//³ö»õÊ§°Ü
 				ReqShipTimeCnt = 0;
+				StopZMotor();
 				ShipResult(ActionState_Fail);
 				SysLogicErr = LE_ReqShipTimeout;
 			}

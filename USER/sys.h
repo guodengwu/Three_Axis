@@ -87,6 +87,7 @@ enum dev_logic_err {
 #define	LE_HuoWuTakeawayTimeout  202//货物取走超时
 #define	LE_MotorCurrentOver  203
 #define	LE_QuHuoMenCloseFaileByJiashou  204
+#define	LE_HuoWuRetention  	205//货物滞留
 
 
 extern u8 SysLogicErr;

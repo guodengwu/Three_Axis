@@ -520,6 +520,8 @@ void ZMotorStart(void)
 	if(SysMotor.motor[MOTOR_Z_ID].status.action==ActionState_Doing)	
 		return;
 	if(SysMotor.ALLMotorState.bits.ZMotor != DEF_Run)	{//测试z电机
+		if(SysMotor.motor[MOTOR_Z_ID].Param>30000)//z电机最大运行时间控制
+			return;
 		Z_MOTOR_PWM1 = 1;
 		Z_MOTOR_PWM2 = 0;
 		SysMotor.ALLMotorState.bits.ZMotor = DEF_Run;
@@ -527,7 +529,7 @@ void ZMotorStart(void)
 		SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_Doing;
 //		SoftTimerStart(&Timer1Soft, SysMotor.motor[MOTOR_Z_ID].Param);//电机运行时间控制
 		SoftTimerStart(SysMotor.pTimer[MOTOR_Z_ID], SysMotor.motor[MOTOR_Z_ID].Param);
-		SYS_PRINTF("z motor T:%ld\r\n",SysMotor.motor[MOTOR_Z_ID].Param);
+//		SYS_PRINTF("z motor T:%ld\r\n",SysMotor.motor[MOTOR_Z_ID].Param);
 	}
 }
 void TMotorStart(void)
@@ -549,7 +551,7 @@ void TMotorStart(void)
 		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_Doing;
 //		SoftTimerStart(&Timer2Soft, 5000);//电机超时控制
 		SoftTimerStart(SysMotor.pTimer[MOTOR_T_ID], 2500);
-		SYS_PRINTF("T motor start, %d", SysMotor.motor[MOTOR_T_ID].Param);
+//		SYS_PRINTF("T motor start, %d", SysMotor.motor[MOTOR_T_ID].Param);
 	}
 }
 void DMotorStart(void)
@@ -578,7 +580,7 @@ void DMotorStart(void)
 		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_Doing;
 //		SoftTimerStart(&Timer2Soft, 10000);//电机超时控制
 		SoftTimerStart(SysMotor.pTimer[MOTOR_D_ID], 3200);
-		SYS_PRINTF("d motor start");
+//		SYS_PRINTF("d motor start");
 	}
 }
 void LMotorStart(void)
@@ -768,6 +770,7 @@ void StopXMotor(void)
 	StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, 0);
 //	StartPWM(XMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 0);
 	SysMotor.ALLMotorState.bits.XMotor = DEF_Stop;
+	SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK;
 }
 
 void StopYMotor(void)
@@ -775,6 +778,7 @@ void StopYMotor(void)
 	StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, 0);
 	StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, 0);
 	SysMotor.ALLMotorState.bits.YMotor = DEF_Stop;
+	SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
 }
 
 void StopZMotor(void)
@@ -787,6 +791,8 @@ void StopZMotor(void)
 	if(SysMotor.motor[MOTOR_Z_ID].status.abort_type == MotorAbort_Timeout)	{
 		SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_OK;
 	}
+	else
+		SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_Fail;
 }
 
 void StopTMotor(void)
@@ -798,6 +804,8 @@ void StopTMotor(void)
 	if(SysMotor.motor[MOTOR_T_ID].status.abort_type == MotorAbort_Timeout)	{
 		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
 	}
+	else
+		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_Fail;
 }
 
 void StopDMotor(void)
@@ -811,19 +819,23 @@ void StopDMotor(void)
 		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_Fail;
 		SysHDError.E1.bits.b4 = 1;
 	}
-	else 
+	else {
 		SysHDError.E1.bits.b4 = 0;
+		SysMotor.motor[MOTOR_D_ID].status.action = ActionState_OK;
+	}
 }
 
 void StopLMotor(void)
 {
 	L_MOTOR_ENABLE = 0;
 	BK_MOTOR_ENABLE = 0;//P6.0
-	SysMotor.ALLMotorState.bits.LMotor = DEF_Stop;
+	SysMotor.ALLMotorState.bits.LMotor = DEF_Stop;	
 	SoftTimerStop(SysMotor.pTimer[MOTOR_L_ID]);
 	if(SysMotor.motor[MOTOR_L_ID].status.abort_type == MotorAbort_Timeout)	{
 		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_OK;
 	}
+	else
+		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_Fail;
 }
 
 //void QuHuoMenMotorCallback(void)
@@ -850,6 +862,8 @@ void StopQuHuoMenMotor(void)
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;
 		SysHDError.E1.bits.b6 = 1;
 	}
-	else 
+	else 	{
+		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_OK;
 		SysHDError.E1.bits.b6 = 0;
+	}
 }
