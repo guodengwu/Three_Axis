@@ -50,60 +50,120 @@ void ClearJiaShouFlag(void)
 
 void QuHuoKouProcess(void)
 {
-//	static u16 timercnt = 0;
+	static u8 QuHuoKouOpenLimitCnt = 0, QuHuoKouCloseLimitCnt = 0, JiaShouLimitCnt = 0;
 	
 	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	
 	{
-		if((QuHuoKouOpenLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Open) || \
-			(QuHuoKouCloseLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close))	{//取货口电机限位  限位失效时超时10s停止
-			StopQuHuoMenMotor();		
-			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_OK;
-			if(QuHuoKouOpenLimit_IN==0)	{//开门到位
-				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-				if(JiaShouFlag==1)	{//夹手未超过3次 重新关门
-					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-					Timer3Soft.pCallBack = &JiaShouProcess;
-					SoftTimerStart(&Timer3Soft, 1500);
+		if(QuHuoKouOpenLimit_IN==0)	{
+			QuHuoKouOpenLimitCnt++;
+			if(QuHuoKouOpenLimitCnt>5)	{
+				if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Open)	{//开门到位
+					StopQuHuoMenMotor();
+					SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;
+					if(JiaShouFlag==1)	{//夹手未超过3次 重新关门
+						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
+						Timer3Soft.pCallBack = &JiaShouProcess;
+						SoftTimerStart(&Timer3Soft, 1500);
+					}
+					else if(JiaShouFlag==2)	{//夹手超过3次 保持开门状态
+						ClearJiaShouFlag();
+						SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;	
+						SysLogicErr = LE_QuHuoMenCloseFaileByJiashou;//上报因夹手导致关门失败
+						Sys.DevAction = DevActionState_QuHuoKouCloseFailed;
+					}
+					else
+						Sys.DevAction = DevActionState_QuHuoKouOpenOk;
 				}
-				else if(JiaShouFlag==2)	{//夹手超过3次 保持开门状态
+			}
+		}
+		else
+			QuHuoKouOpenLimitCnt = 0;
+		if(QuHuoKouCloseLimit_IN == 0)	{
+			QuHuoKouCloseLimitCnt++;
+			if(QuHuoKouCloseLimitCnt>5)	{
+				if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//关门到位
+					StopQuHuoMenMotor();
+					SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+					Sys.DevAction = DevActionState_QuHuoKouCloseOk;
 					ClearJiaShouFlag();
-					SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;	
-					SysLogicErr = LE_QuHuoMenCloseFaileByJiashou;//上报因夹手导致关门失败
-					Sys.DevAction = DevActionState_QuHuoKouCloseFailed;
 				}
-				else
-					Sys.DevAction = DevActionState_QuHuoKouOpenOk;
-			}
-			else if(QuHuoKouCloseLimit_IN==0)	{//关门到位
-				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Max_LimitOpt;
-				Sys.DevAction = DevActionState_QuHuoKouCloseOk;
-				ClearJiaShouFlag();
 			}
 		}
-		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//在关门过程有夹手信号
-			if(JiaShouLimit_IN==0)	//有夹手信号	
-			{
-				StopQuHuoMenMotor();//停止关门			
-				SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
-				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
-				SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
-				Timer3Soft.pCallBack = &JiaShouProcess;
-				SoftTimerStart(&Timer3Soft, 1000);//电机停1s消除反向电动势后开门
-				JiaShouCnt ++;
-				if(JiaShouCnt>3)	{//大于3次 
-					JiaShouFlag = 2;
+		else
+			QuHuoKouCloseLimitCnt = 0;
+		if(JiaShouLimit_IN==0)	{
+			JiaShouLimitCnt ++;
+			if(JiaShouLimitCnt>5)	{
+				if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{
+					StopQuHuoMenMotor();//停止关门			
+					SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
+					SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
+					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
+					Timer3Soft.pCallBack = &JiaShouProcess;
+					SoftTimerStart(&Timer3Soft, 1000);//电机停1s消除反向电动势后开门
+					JiaShouCnt ++;
+					if(JiaShouCnt>3)	{//大于3次 
+						JiaShouFlag = 2;
+					}
+					else	{//夹手次数小于3次 重新尝试					
+						JiaShouFlag = 1;
+					}
 				}
-				else	{//夹手次数小于3次 重新尝试					
-					JiaShouFlag = 1;
-				}				
 			}
 		}
+		else
+			JiaShouLimitCnt = 0;
+//		if((QuHuoKouOpenLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Open) || \
+//			(QuHuoKouCloseLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close))	{//取货口电机限位  限位失效时超时10s停止
+//			StopQuHuoMenMotor();		
+//			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_OK;
+//			if(QuHuoKouOpenLimit_IN==0)	{//开门到位
+//				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;
+//				if(JiaShouFlag==1)	{//夹手未超过3次 重新关门
+//					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
+//					Timer3Soft.pCallBack = &JiaShouProcess;
+//					SoftTimerStart(&Timer3Soft, 1500);
+//				}
+//				else if(JiaShouFlag==2)	{//夹手超过3次 保持开门状态
+//					ClearJiaShouFlag();
+//					SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;	
+//					SysLogicErr = LE_QuHuoMenCloseFaileByJiashou;//上报因夹手导致关门失败
+//					Sys.DevAction = DevActionState_QuHuoKouCloseFailed;
+//				}
+//				else
+//					Sys.DevAction = DevActionState_QuHuoKouOpenOk;
+//			}
+//			else if(QuHuoKouCloseLimit_IN==0)	{//关门到位
+//				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Max_LimitOpt;
+//				Sys.DevAction = DevActionState_QuHuoKouCloseOk;
+//				ClearJiaShouFlag();
+//			}
+//		}
+////		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//在关门过程有夹手信号
+//		if(Sys.DevAction == DevActionState_QuHuoKouCloseing)	{
+//			if(JiaShouLimit_IN==0)	//有夹手信号	
+//			{
+//				StopQuHuoMenMotor();//停止关门			
+//				SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
+//				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
+//				SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
+//				Timer3Soft.pCallBack = &JiaShouProcess;
+//				SoftTimerStart(&Timer3Soft, 1000);//电机停1s消除反向电动势后开门
+//				JiaShouCnt ++;
+//				if(JiaShouCnt>3)	{//大于3次 
+//					JiaShouFlag = 2;
+//				}
+//				else	{//夹手次数小于3次 重新尝试					
+//					JiaShouFlag = 1;
+//				}				
+//			}
+//		}
 	}
-//	if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close&&SysMotor.motor[MOTOR_QuHuoMen_ID].status.action == ActionState_Fail)
-//	{//关门失败
-//		JiaShouFlag = 0;
-//		JiaShouCnt = 0;
-//	}
+	else	{
+		QuHuoKouOpenLimitCnt = 0;
+		QuHuoKouCloseLimitCnt = 0;
+		JiaShouLimitCnt = 0;
+	}
 }
 #include "encoder.h"
 u8 GetHuoWuTimeCnt = 0;
@@ -382,7 +442,7 @@ void ShipProcess(void)
 					ShipStateFlag = 4;
 				}
 			}
-			if(GetHuoWuFlag==0)	
+			if(GetHuoWuFlag==0)
 			{
 				if(HuoWuDetectFlag == 1)	{//货物检测ok
 					StopLMotor();

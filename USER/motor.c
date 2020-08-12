@@ -613,10 +613,10 @@ void LMotorStart(void)
 }
 void QuHuoMenMotorStart(u8 flag)
 {
-	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	{
-//		SYS_PRINTF("quhuo motor runnig");
-		return;
-	}
+//	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	{
+////		SYS_PRINTF("quhuo motor runnig");
+//		return;
+//	}
 	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor != DEF_Run)	{//测试取货门电机
 		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//0关门 ， 1开门
 			if(QuHuoKouCloseLimit_IN==0)	{//门已关 
@@ -646,10 +646,12 @@ void QuHuoMenMotorStart(u8 flag)
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
 //		SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &QuHuoMenMotorCallback;
 //		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 1500);//1.5s后 关门速度减半 防夹手
+		SoftTimerStop(SysMotor.pTimer[MOTOR_QuHuoMen_ID]);
 		SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &StopQuHuoMenMotor;
 		SoftTimerStart(SysMotor.pTimer[MOTOR_QuHuoMen_ID], 6000);
-		if(flag)
+		if(flag)	{
 			ClearJiaShouFlag();
+		}
 	}
 }
 void MotorStopTypeSet(u8 id, u8 stop_type)
@@ -788,11 +790,11 @@ void StopZMotor(void)
 //	Z_MOTOR_ENABLE = 0;
 	SysMotor.ALLMotorState.bits.ZMotor = DEF_Stop;
 	SoftTimerStop(SysMotor.pTimer[MOTOR_Z_ID]);
-	if(SysMotor.motor[MOTOR_Z_ID].status.abort_type == MotorAbort_Timeout)	{
+//	if(SysMotor.motor[MOTOR_Z_ID].status.abort_type == MotorAbort_Timeout)	{
 		SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_OK;
-	}
-	else
-		SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_Fail;
+//	}
+//	else
+//		SysMotor.motor[MOTOR_Z_ID].status.action = ActionState_Fail;
 }
 
 void StopTMotor(void)
@@ -801,11 +803,11 @@ void StopTMotor(void)
 	T_MOTOR_PWM2 = 0;
 	T_MOTOR_ENABLE = 0;	
 	SysMotor.ALLMotorState.bits.TMotor = DEF_Stop;
-	if(SysMotor.motor[MOTOR_T_ID].status.abort_type == MotorAbort_Timeout)	{
+//	if(SysMotor.motor[MOTOR_T_ID].status.abort_type == MotorAbort_Timeout)	{
 		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
-	}
-	else
-		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_Fail;
+//	}
+//	else
+//		SysMotor.motor[MOTOR_T_ID].status.action = ActionState_Fail;
 }
 
 void StopDMotor(void)
@@ -831,11 +833,11 @@ void StopLMotor(void)
 	BK_MOTOR_ENABLE = 0;//P6.0
 	SysMotor.ALLMotorState.bits.LMotor = DEF_Stop;	
 	SoftTimerStop(SysMotor.pTimer[MOTOR_L_ID]);
-	if(SysMotor.motor[MOTOR_L_ID].status.abort_type == MotorAbort_Timeout)	{
+//	if(SysMotor.motor[MOTOR_L_ID].status.abort_type == MotorAbort_Timeout)	{
 		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_OK;
-	}
-	else
-		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_Fail;
+//	}
+//	else
+//		SysMotor.motor[MOTOR_L_ID].status.action = ActionState_Fail;
 }
 
 //void QuHuoMenMotorCallback(void)

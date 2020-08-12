@@ -115,6 +115,7 @@ extern RINGBUFF_T uart4_rxring;
 extern void ShipResult(u8 result);
 extern u8 ShipStateFlag;
 extern u8 HuoWuDetectFlag;
+//extern u8 JiaShouFlag;
 u32 pro_last_t = 0,pro_cur_t = 0;
 s32 time_diff;
 //串口指令处理函数
@@ -209,8 +210,8 @@ void  UsartCmdProcess (void)
 //							Sys.DevAction = ActionState_Idle;
 							ShipResult(ActionState_Idle);
 							MotorReset(MOTOR_X_ID);//X Y电机复位
-//							SysMotor.motor[MOTOR_D_ID].Param=DEF_Close;
-//							DMotorStart();//门复位
+							SysMotor.motor[MOTOR_T_ID].Param = 0;//0收缩 推杆
+							TMotorStart();
 							SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
 							QuHuoMenMotorStart(DEF_True);
 							data_buf[pUsart->tx_idx++] = ActionState_Doing;
@@ -274,11 +275,11 @@ void  UsartCmdProcess (void)
 						LMotorStart();
 					}
 					else if(iPara==9)	{//取货口门电机
-						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
-						QuHuoMenMotorStart(DEF_True);
-//						if(DevState.bits.SubState == DEV_ShipSubState_CeMenClosing)
-//							DevState.bits.SubState = DEV_ShipSubState_QuHuoKouOpening;	
-//							Sys.DevAction = DevActionState_QuHuoKouOpening;	
+//						if(JiaShouFlag==0)	//没有夹手情况发生
+						{
+							SysMotor.motor[MOTOR_QuHuoMen_ID].Param = UsartRxGetINT8U(pUsart->rx_buf,&pUsart->rx_idx);
+							QuHuoMenMotorStart(DEF_True);
+						}
 					}
 					MotorTest();
 					pUsart->tx_idx = 0;				

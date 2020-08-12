@@ -19,7 +19,7 @@ typedef struct
 	u8 *pRXbuf;
 } COMx_Define; 
 
-#define UART4_RXLEN		30
+#define UART4_RXLEN		20
 
 #define		UART4_INT_ENABLE()		IE2 |=  (1<<4)	//允许串口3中断
 #define		UART4_INT_DISABLE()		IE2 &= ~(1<<4)	//允许串口3中断
