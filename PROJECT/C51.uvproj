@@ -398,6 +398,11 @@
               <FileType>1</FileType>
               <FilePath>..\STC_LIB\PWM.c</FilePath>
             </File>
+            <File>
+              <FileName>exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STC_LIB\exti.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -418,11 +423,6 @@
         <Group>
           <GroupName>USER</GroupName>
           <Files>
-            <File>
-              <FileName>ring_buffer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\ring_buffer.c</FilePath>
-            </File>
             <File>
               <FileName>protocol.c</FileName>
               <FileType>1</FileType>

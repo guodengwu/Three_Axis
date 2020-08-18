@@ -173,7 +173,7 @@ void SoftTimerStart(_softtimer_t *psofttimer, u32 value)
 	psofttimer->cnt = 0;
 	psofttimer->period = value;
 	psofttimer->state = USING;
-	TimerStart(Timer4);
+//	TimerStart(Timer4);
 }
 
 void SoftTimerStop(_softtimer_t *psofttimer)

@@ -44,9 +44,9 @@ typedef enum {
 #define MOTOR_NUMS       	(MOTOR_ID_MAX - MOTOR_ID_MIN + 1)
 
 typedef struct {
-    INT8U   is_run;
-    INT8U   action;
-    INT8U   abort_type;
+  volatile  INT8U   is_run;
+  volatile  INT8U   action;
+  volatile  INT8U   abort_type;
 } motor_state_t;
 /*
 typedef struct {	
@@ -60,8 +60,8 @@ typedef struct Motor_t  {
 	motor_state_t       status;
 	INT32S CurPos;
 	INT32S ObjPos;
-	INT32U Param;
-	u8 dir;
+	volatile INT32U Param;
+	volatile u8 dir;
 }TMotor;
 
 typedef union _allmotor_state {
@@ -75,7 +75,7 @@ typedef union _allmotor_state {
 		CPU_INT08U  QuHuoMenMotor	:1;
 		CPU_INT08U  UNUSED	:1;
 	}bits;
-	CPU_INT08U  ubyte;
+	volatile CPU_INT08U  ubyte;
 }allmotor_state_t;
 
 typedef struct _SysMotor  {

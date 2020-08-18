@@ -101,6 +101,8 @@ enum ACK_MSG	{
 	ACK_BUSY=3,
 };
 extern usart_t      usart;
+extern u8 uart_rxflag;
+extern u8 uart_rx_dat;
 void ProDataInit(void);
 void UsartCmdReply(void);
 void  UsartCmdProcess (void);

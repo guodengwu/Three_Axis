@@ -23,7 +23,7 @@ typedef struct _softtimer
 	u32 cnt;
 	u32 period;
   	volatile u8 state;
-	void (*pCallBack)();
+	void (*pCallBack)(void);
 }_softtimer_t;
 
 typedef enum {

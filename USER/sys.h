@@ -12,9 +12,9 @@
 #define SYSSTATE_RESET_TB					DEF_BIT03_MASK
 
 typedef struct _sys_io {
-	BIT8 state1;
-	BIT8 state2;
-	BIT8 HongWaiState;
+	volatile BIT8 state1;
+	volatile BIT8 state2;
+	volatile BIT8 HongWaiState;
 } _sys_io_state_t;
 
 typedef union _dev_state {
@@ -22,21 +22,21 @@ typedef union _dev_state {
 		CPU_INT08U  	SubState		:5;
 		CPU_INT08U	State 			:3;
 	 } bits;
-    CPU_INT08U  ubyte;
+   volatile CPU_INT08U  ubyte;
 } _dev_state_t;
 
 typedef struct _sys_status	{
-	u32 state;
-	u32 DevAction;
+volatile	u32 state;
+volatile	u32 DevAction;
 }_sys_status_t;
 
 typedef struct _sys_error	{
-	BIT8 E1;
-	BIT8 E2;
+	volatile BIT8 E1;
+	volatile BIT8 E2;
 }_sys_error_t;
 
 typedef struct _sys_logic_error	{
-	u8 logic;
+	volatile u8 logic;
 }_sys_logic_error_t;
 
 //typedef struct _ship	{

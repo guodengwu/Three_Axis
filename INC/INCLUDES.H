@@ -32,7 +32,7 @@
 
 #include	"GPIO.h"
 #include  "USART.h"
-#include "ring_buffer.h"
+//#include "ring_buffer.h"
 #include "bsp.h"
 #include "sys.h"
 #include	"timer.h"

@@ -111,13 +111,14 @@ void UsartCmdReply(void)
 	}
 }
 extern u32 GetSysTick(void);
-extern RINGBUFF_T uart4_rxring;
+//extern RINGBUFF_T uart4_rxring;
 extern void ShipResult(u8 result);
 extern u8 ShipStateFlag;
 extern u8 HuoWuDetectFlag;
 //extern u8 JiaShouFlag;
 u32 pro_last_t = 0,pro_cur_t = 0;
 s32 time_diff;
+volatile u8 uart_rxflag,uart_rx_dat;
 //串口指令处理函数
 void  UsartCmdProcess (void)
 {
@@ -125,8 +126,12 @@ void  UsartCmdProcess (void)
 	usart_t *pUsart = &usart;
 	u16 temp;
 
-	if(RingBuffer_Pop(&uart4_rxring, (void *)&rxdat) == 0)//无数据
+//	if(RingBuffer_Pop(&uart4_rxring, (void *)&rxdat) == 0)//无数据
+//		return;
+	if(uart_rxflag==0)
 		return;
+	rxdat = uart_rx_dat;
+	uart_rxflag = 0;
 	pro_cur_t = GetSysTick();
 	time_diff = pro_cur_t - pro_last_t;
 	if(time_diff<0)	{

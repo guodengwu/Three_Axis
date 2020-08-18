@@ -32,27 +32,46 @@ void SysDataInit(void)
 //	Ship_t.state = DEV_ShipStateIDLE;
 }
 u8 JiaShouCnt = 0,JiaShouFlag=0;
-
-void JiaShouProcess(void)
+void JiaShouProcessCallback(void)
 {
-//	if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)
-//		SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
-//	else 
-//		SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-	StopQuHuoMenMotor();
+//	StopQuHuoMenMotor();
 	QuHuoMenMotorStart(DEF_False);
 }
+//由int3中断调用
+void JiaShouProcess(void)
+{
+	if(JiaShouLimit_IN==0)	{
+		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{
+			StopQuHuoMenMotor();//停止关门			
+			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
+			SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
+			SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
+			Timer3Soft.pCallBack = &JiaShouProcessCallback;
+			SoftTimerStart(&Timer3Soft, 1000);//电机停1s消除反向电动势后开门
+			JiaShouCnt ++;
+			if(JiaShouCnt>3)	{//大于3次 
+				JiaShouFlag = 2;
+			}
+			else	{//夹手次数小于3次 重新尝试					
+				JiaShouFlag = 1;
+			}
+//			SYS_PRINTF("Stop, 1s open\r\n");
+		}		
+   }
+}
+
 void ClearJiaShouFlag(void)
 {
 	JiaShouCnt = 0;
 	JiaShouFlag = 0;
 }
-
+extern u8 QuHuoMenMotorState;
 void QuHuoKouProcess(void)
 {
 	static u8 QuHuoKouOpenLimitCnt = 0, QuHuoKouCloseLimitCnt = 0, JiaShouLimitCnt = 0;
 	
-	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	
+//	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	
+	if(QuHuoMenMotorState == DEF_Run)
 	{
 		if(QuHuoKouOpenLimit_IN==0)	{
 			QuHuoKouOpenLimitCnt++;
@@ -62,14 +81,16 @@ void QuHuoKouProcess(void)
 					SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;
 					if(JiaShouFlag==1)	{//夹手未超过3次 重新关门
 						SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-						Timer3Soft.pCallBack = &JiaShouProcess;
+						Timer3Soft.pCallBack = &JiaShouProcessCallback;
 						SoftTimerStart(&Timer3Soft, 1500);
+						SYS_PRINTF("reclose\r\n");
 					}
 					else if(JiaShouFlag==2)	{//夹手超过3次 保持开门状态
 						ClearJiaShouFlag();
 						SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;	
 						SysLogicErr = LE_QuHuoMenCloseFaileByJiashou;//上报因夹手导致关门失败
 						Sys.DevAction = DevActionState_QuHuoKouCloseFailed;
+						SYS_PRINTF("Close fail by JiaShou\r\n");
 					}
 					else
 						Sys.DevAction = DevActionState_QuHuoKouOpenOk;
@@ -91,63 +112,23 @@ void QuHuoKouProcess(void)
 		}
 		else
 			QuHuoKouCloseLimitCnt = 0;
-		if(JiaShouLimit_IN==0)	{
-			JiaShouLimitCnt ++;
-			if(JiaShouLimitCnt>5)	{
-				if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{
-					StopQuHuoMenMotor();//停止关门			
-					SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
-					SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
-					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
-					Timer3Soft.pCallBack = &JiaShouProcess;
-					SoftTimerStart(&Timer3Soft, 1000);//电机停1s消除反向电动势后开门
-					JiaShouCnt ++;
-					if(JiaShouCnt>3)	{//大于3次 
-						JiaShouFlag = 2;
-					}
-					else	{//夹手次数小于3次 重新尝试					
-						JiaShouFlag = 1;
-					}
-				}
-			}
-		}
-		else
-			JiaShouLimitCnt = 0;
-//		if((QuHuoKouOpenLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Open) || \
-//			(QuHuoKouCloseLimit_IN == 0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close))	{//取货口电机限位  限位失效时超时10s停止
-//			StopQuHuoMenMotor();		
-//			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_OK;
-//			if(QuHuoKouOpenLimit_IN==0)	{//开门到位
-//				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Min_LimitOpt;
-//				if(JiaShouFlag==1)	{//夹手未超过3次 重新关门
-//					SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Close;
-//					Timer3Soft.pCallBack = &JiaShouProcess;
-//					SoftTimerStart(&Timer3Soft, 1500);
-//				}
-//				else if(JiaShouFlag==2)	{//夹手超过3次 保持开门状态
-//					ClearJiaShouFlag();
-//					SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;	
-//					SysLogicErr = LE_QuHuoMenCloseFaileByJiashou;//上报因夹手导致关门失败
-//					Sys.DevAction = DevActionState_QuHuoKouCloseFailed;
-//				}
-//				else
-//					Sys.DevAction = DevActionState_QuHuoKouOpenOk;
-//			}
-//			else if(QuHuoKouCloseLimit_IN==0)	{//关门到位
-//				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Max_LimitOpt;
-//				Sys.DevAction = DevActionState_QuHuoKouCloseOk;
-//				ClearJiaShouFlag();
-//			}
-//		}
-////		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//在关门过程有夹手信号
-//		if(Sys.DevAction == DevActionState_QuHuoKouCloseing)	{
-//			if(JiaShouLimit_IN==0)	//有夹手信号	
-//			{
+	}
+	else	{
+		QuHuoKouOpenLimitCnt = 0;
+		QuHuoKouCloseLimitCnt = 0;
+//		JiaShouLimitCnt = 0;
+	}
+//	if(JiaShouLimit_IN==0&&SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{
+//		JiaShouLimitCnt ++;
+//		if(JiaShouLimitCnt>5)	{
+//			SYS_PRINTF("JS,");
+////			if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{
+////				if(Sys.DevAction == DevActionState_QuHuoKouCloseing)	{
 //				StopQuHuoMenMotor();//停止关门			
 //				SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Busy;
 //				SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
 //				SysMotor.motor[MOTOR_QuHuoMen_ID].Param = DEF_Open;
-//				Timer3Soft.pCallBack = &JiaShouProcess;
+//				Timer3Soft.pCallBack = &JiaShouProcessCallback;
 //				SoftTimerStart(&Timer3Soft, 1000);//电机停1s消除反向电动势后开门
 //				JiaShouCnt ++;
 //				if(JiaShouCnt>3)	{//大于3次 
@@ -155,15 +136,13 @@ void QuHuoKouProcess(void)
 //				}
 //				else	{//夹手次数小于3次 重新尝试					
 //					JiaShouFlag = 1;
-//				}				
-//			}
+//				}
+//				SYS_PRINTF("Stop, 1s open\r\n");
+////			}
 //		}
-	}
-	else	{
-		QuHuoKouOpenLimitCnt = 0;
-		QuHuoKouCloseLimitCnt = 0;
-		JiaShouLimitCnt = 0;
-	}
+//	}
+//	else
+//		JiaShouLimitCnt = 0;
 }
 #include "encoder.h"
 u8 GetHuoWuTimeCnt = 0;
@@ -176,7 +155,7 @@ void CheckIOState(void)
 	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{
 		if((X_MOTOR_LeftLimit_IN==0&&SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MIN) || \
 		   (X_MOTOR_RightLimit_IN==0&&SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX))	{//x碰到上限/下限 强制停止电机
-			StopXMotor();SYS_PRINTF("x stop, limit\r\n");
+			StopXMotor();
 			SysMotor.motor[MOTOR_X_ID].status.action = ActionState_OK;
 //			Sys.DevAction = ActionState_OK;
 			if(X_MOTOR_LeftLimit_IN==0)	{
@@ -207,7 +186,7 @@ void CheckIOState(void)
 			if(CeMenMinCnt>=2)	{
 				if(SysMotor.motor[MOTOR_D_ID].Param==DEF_Close)	{
 					StopDMotor();					
-					SYS_PRINTF("d stop, limit\r\n");
+//					SYS_PRINTF("d stop, limit\r\n");
 					SysMotor.motor[MOTOR_D_ID].status.action = ActionState_OK;
 					SysMotor.motor[MOTOR_D_ID].status.abort_type = MotorAbort_Min_LimitOpt;
 				}
@@ -259,13 +238,13 @@ void CheckIOState(void)
 				SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_OK;
 	//			Sys.DevAction = ActionState_OK;
 				if(Y_MOTOR_MinLimit_IN==0)	{
-					SYS_PRINTF("y stop, min limit  \r\n");
-					SYS_PRINTF("arrived.%ld,%ld\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos, encoder[MOTOR_Y_ID].pluse);
+//					SYS_PRINTF("y stop, min limit  \r\n");
+//					SYS_PRINTF("arrived.%ld,%ld\r\n",SysMotor.motor[MOTOR_Y_ID].CurPos, encoder[MOTOR_Y_ID].pluse);
 					encoder[MOTOR_Y_ID].pluse = 0;
 					SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Min_LimitOpt;
 					YMotorResetCheck();
 				}else if(Y_MOTOR_MaxLimit_IN==0)	{
-					SYS_PRINTF("y stop, max limit\r\n");
+//					SYS_PRINTF("y stop, max limit\r\n");
 					SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_Max_LimitOpt;
 				}
 			}
@@ -277,7 +256,7 @@ void CheckIOState(void)
 		GetHuoWuTimeCnt ++;
 		if(GetHuoWuTimeCnt>=5)	{
 			if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{
-				StopLMotor();SYS_PRINTF("HuoWuCheck_IN\r\n");
+				StopLMotor();//SYS_PRINTF("HuoWuCheck_IN\r\n");
 				SysMotor.motor[MOTOR_L_ID].status.action = ActionState_OK;
 //				Sys.DevAction = ActionState_OK;
 			}
@@ -298,7 +277,7 @@ void CheckIOState(void)
 //	}
 //	else
 //		HuoWuNearDetectFlag = 0;
-	if(MotorStuckMonitor())	{		
+//	if(MotorStuckMonitor())	{		
 //		if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//推杆电机根据该信号停止
 //			SysMotor.motor[MOTOR_T_ID].status.action = ActionState_OK;
 ////			SoftTimerStop(&Timer2Soft);
@@ -307,7 +286,7 @@ void CheckIOState(void)
 //		MotorStop(DEF_Fail);
 //		SYS_PRINTF("MotorStuck\r\n");
 //		SysLogicErr = LE_MotorCurrentOver;
-	}
+//	}
 }
 u8 MotorStuckMonitorCnt = 0;
 static u8 MotorStuckMonitor(void)

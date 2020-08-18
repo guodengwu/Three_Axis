@@ -3,7 +3,7 @@
 #include "velocity_profile.h"
 #include "bsp.h"
 
-SysMotor_t xdata SysMotor;
+SysMotor_t SysMotor;
 typedef struct {
     INT16S   AccPos;
     INT16S   DecPos;
@@ -239,7 +239,7 @@ void CheckMaPan(void)
 			if(XPosChangeCnt>100)	{
 				SysHDError.E2.bits.b2 = 1;//X 码盘异常
 				StopXMotor();
-				SYS_PRINTF("x mapan error\r\n");
+//				SYS_PRINTF("x mapan error\r\n");
 				SysMotor.motor[MOTOR_X_ID].status.abort_type = MotorAbort_MaPanError;
 				SysMotor.motor[MOTOR_X_ID].status.action = ActionState_Fail;
 //				Sys.DevAction = ActionState_Fail;
@@ -259,7 +259,7 @@ void CheckMaPan(void)
 			if(YPosChangeCnt>100)	{
 				SysHDError.E2.bits.b3 = 1;//Y 码盘异常
 				StopYMotor();
-				SYS_PRINTF("y mapan error\r\n");
+//				SYS_PRINTF("y mapan error\r\n");
 				SysMotor.motor[MOTOR_Y_ID].status.abort_type = MotorAbort_MaPanError;
 				SysMotor.motor[MOTOR_Y_ID].status.action = ActionState_Fail;
 //				Sys.DevAction = ActionState_Fail;
@@ -352,7 +352,7 @@ u8 XMotorAccDec(void)
 							X_VelCurve.index--;
 					}
 					StartPWM(XMOTOR_PWM, MOTOR_PWM_FREQ, X_VelCurve.Curve[X_VelCurve.index]);			
-					SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);					
+//					SYS_PRINTF("%d-%ld ",X_VelCurve.Curve[X_VelCurve.index],SysMotor.motor[MOTOR_X_ID].CurPos);					
 				}
 			}else if(SysMotor.motor[MOTOR_X_ID].dir == MOTOR_TO_MAX){
 				if(SysMotor.motor[MOTOR_X_ID].CurPos<XAccDecPos.DecPos)	{//加速
@@ -409,7 +409,7 @@ u8 YMotorAccDec(void)
 							Y_VelCurve.index--;
 					}
 					StartPWM(YMOTOR_MIN_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
-					SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
+//					SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);				
 				}
 			}else if(SysMotor.motor[MOTOR_Y_ID].dir == MOTOR_TO_MAX){
 				if(SysMotor.motor[MOTOR_Y_ID].CurPos<YAccDecPos.DecPos)	{//加速
@@ -429,7 +429,7 @@ u8 YMotorAccDec(void)
 							Y_VelCurve.index--;
 					}
 					StartPWM(YMOTOR_MAX_PWM, MOTOR_PWM_FREQ, Y_VelCurve.Curve[Y_VelCurve.index]);			
-					SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);					
+//					SYS_PRINTF("%d-%ld ",Y_VelCurve.Curve[Y_VelCurve.index],SysMotor.motor[MOTOR_Y_ID].CurPos);					
 				}
 			}
 		}
@@ -611,13 +611,15 @@ void LMotorStart(void)
 		SoftTimerStart(SysMotor.pTimer[MOTOR_L_ID], SysMotor.motor[MOTOR_L_ID].Param);
 	}
 }
+volatile u8 QuHuoMenMotorState = DEF_Stop;
 void QuHuoMenMotorStart(u8 flag)
 {
 //	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.action==ActionState_Doing)	{
 ////		SYS_PRINTF("quhuo motor runnig");
 //		return;
 //	}
-	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor != DEF_Run)	{//测试取货门电机
+//	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor != DEF_Run)	{//测试取货门电机
+	if(QuHuoMenMotorState == DEF_Stop)	{
 		if(SysMotor.motor[MOTOR_QuHuoMen_ID].Param==DEF_Close)	{//0关门 ， 1开门
 			if(QuHuoKouCloseLimit_IN==0)	{//门已关 
 				if(QuHuoKouCloseLimit_IN==0)	{
@@ -642,6 +644,7 @@ void QuHuoMenMotorStart(u8 flag)
 		StartPWM(QUHUOMEN_PWM, MOTOR_PWM_FREQ, 100);//全速关门
 		SysMotor.RunningID = MOTOR_QuHuoMen_ID;
 		SysMotor.ALLMotorState.bits.QuHuoMenMotor = DEF_Run;
+		QuHuoMenMotorState = DEF_Run;
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Doing;	
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type = MotorAbort_Normal;
 //		SysMotor.pTimer[MOTOR_QuHuoMen_ID]->pCallBack = &QuHuoMenMotorCallback;
@@ -664,51 +667,51 @@ void MotorStopTypeSet(u8 id, u8 stop_type)
 	//SysMotor.motor[id].status.abort_type = stop_type;
 }
 
-void MotorStop(u8 stop_type)
-{
-//	u8 runing_id;
-	
-//	if(SysMotor.ALLMotorState.ubyte == 0)	{//没有电机需要运行
-//		return;
+//void MotorStop(u8 stop_type)
+//{
+////	u8 runing_id;
+//	
+////	if(SysMotor.ALLMotorState.ubyte == 0)	{//没有电机需要运行
+////		return;
+////	}
+////	runing_id = SysMotor.MotorIDRunning;
+//	if(DevState.bits.State == DEV_STATE_TEST)	{
+//		DevState.bits.SubState = 0;//没有电机运行
 //	}
-//	runing_id = SysMotor.MotorIDRunning;
-	if(DevState.bits.State == DEV_STATE_TEST)	{
-		DevState.bits.SubState = 0;//没有电机运行
-	}
-//	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//停止x电机
-//		StopXMotor();
-//		MotorStopTypeSet(MOTOR_X_ID, stop_type);
+////	if(SysMotor.ALLMotorState.bits.XMotor == DEF_Run)	{//停止x电机
+////		StopXMotor();
+////		MotorStopTypeSet(MOTOR_X_ID, stop_type);
+////	}
+////	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//停止y电机
+////		StopYMotor();
+////		MotorStopTypeSet(MOTOR_Y_ID, stop_type);	
+////	}
+//	if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{//停止z电机
+//		StopZMotor();
+//		MotorStopTypeSet(MOTOR_Z_ID, stop_type);
 //	}
-//	if(SysMotor.ALLMotorState.bits.YMotor == DEF_Run)	{//停止y电机
-//		StopYMotor();
-//		MotorStopTypeSet(MOTOR_Y_ID, stop_type);	
+//	if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//停止推杆电机 使用卡死信号停止
+//		StopTMotor();
+//		MotorStopTypeSet(MOTOR_T_ID, DEF_Success);
 //	}
-	if(SysMotor.ALLMotorState.bits.ZMotor == DEF_Run)	{//停止z电机
-		StopZMotor();
-		MotorStopTypeSet(MOTOR_Z_ID, stop_type);
-	}
-	if(SysMotor.ALLMotorState.bits.TMotor == DEF_Run)	{//停止推杆电机 使用卡死信号停止
-		StopTMotor();
-		MotorStopTypeSet(MOTOR_T_ID, DEF_Success);
-	}
-	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{//停止侧门电机
-		StopDMotor();
-		MotorStopTypeSet(MOTOR_D_ID, stop_type);
-	}
-	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{//停止履带电机
-		StopLMotor();
-		MotorStopTypeSet(MOTOR_L_ID, stop_type);
-	}
-	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{//停止取货门电机
-		StopQuHuoMenMotor();
-		MotorStopTypeSet(MOTOR_QuHuoMen_ID, stop_type);
-	}
-//	if(stop_type==DEF_Success)	{
-//		Sys.DevAction = ActionState_OK;
-//	}else if(stop_type==DEF_Fail)	{
-//		Sys.DevAction = ActionState_Fail;
+//	if(SysMotor.ALLMotorState.bits.DMotor == DEF_Run)	{//停止侧门电机
+//		StopDMotor();
+//		MotorStopTypeSet(MOTOR_D_ID, stop_type);
 //	}
-}
+//	if(SysMotor.ALLMotorState.bits.LMotor == DEF_Run)	{//停止履带电机
+//		StopLMotor();
+//		MotorStopTypeSet(MOTOR_L_ID, stop_type);
+//	}
+//	if(SysMotor.ALLMotorState.bits.QuHuoMenMotor == DEF_Run)	{//停止取货门电机
+//		StopQuHuoMenMotor();
+//		MotorStopTypeSet(MOTOR_QuHuoMen_ID, stop_type);
+//	}
+////	if(stop_type==DEF_Success)	{
+////		Sys.DevAction = ActionState_OK;
+////	}else if(stop_type==DEF_Fail)	{
+////		Sys.DevAction = ActionState_Fail;
+////	}
+//}
 
 //void MotorStuck(void)
 //{
@@ -859,13 +862,18 @@ void StopQuHuoMenMotor(void)
 	QuHuoMen_MOTOR_PWM2 = 0;
 	StartPWM(QUHUOMEN_PWM, MOTOR_PWM_FREQ, 0);
 	SysMotor.ALLMotorState.bits.QuHuoMenMotor =  DEF_Stop;
+	QuHuoMenMotorState = DEF_Stop;
+	SysMotor.motor[MOTOR_QuHuoMen_ID].Param = 0xff;
 	SoftTimerStop(SysMotor.pTimer[MOTOR_QuHuoMen_ID]);
-	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type == MotorAbort_Timeout&&JiaShouFlag==0)	{
-		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;
-		SysHDError.E1.bits.b6 = 1;
+	if(SysMotor.motor[MOTOR_QuHuoMen_ID].status.abort_type == MotorAbort_Timeout)	{
+//		SYS_PRINTF("timout\r\n");
+		if(JiaShouFlag==0)	{
+			SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_Fail;
+			SysHDError.E1.bits.b6 = 1;
+		}
 	}
 	else 	{
 		SysMotor.motor[MOTOR_QuHuoMen_ID].status.action = ActionState_OK;
 		SysHDError.E1.bits.b6 = 0;
-	}
+	}	
 }

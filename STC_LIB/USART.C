@@ -4,8 +4,8 @@ COMx_Define COM3;
 #define BRT_9600             (65536 - (MAIN_Fosc / 9600 / 4))
 #define BRT_57600             (65536 - (MAIN_Fosc / 57600 / 4))
 
-u8 	xdata UART4_RXBuff[UART4_RXLEN];	//接收缓冲
-RINGBUFF_T uart4_rxring;
+//u8 	xdata UART4_RXBuff[UART4_RXLEN];	//接收缓冲
+//RINGBUFF_T uart4_rxring;
 //用于调试 使用定时器3做波特率发生器 57600
 void UART3_config(void)
 {
@@ -64,7 +64,7 @@ void UART4_config(void)
 	T2H = 0xFD;		//设定定时初值
 	AUXR |= 0x10;		//启动定时器2
 	UART4_INT_ENABLE();//允许中断
-	RingBuffer_Init(&uart4_rxring, UART4_RXBuff, 1, UART4_RXLEN);
+//	RingBuffer_Init(&uart4_rxring, UART4_RXBuff, 1, UART4_RXLEN);
 }
 
 void UART4_SendByte(u8 dat) 	//写入发送缓冲，指针+1
@@ -109,7 +109,9 @@ void Uart4Isr() interrupt 18// using 1
         S4CON &= ~0x01;
 		rxdat = S4BUF;
 		//if (usart.rx_indicate != NULL) usart.rx_indicate(&usart, rxdat);
-		RingBuffer_Insert(&uart4_rxring, (const void *)&rxdat);
+//		RingBuffer_Insert(&uart4_rxring, (const void *)&rxdat);
+		uart_rx_dat = rxdat;
+		uart_rxflag = 1;
     }
 	//UART4_INT_ENABLE();
 }

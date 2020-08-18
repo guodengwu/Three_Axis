@@ -69,6 +69,8 @@ void main(void)
 	MotorInit();
 	ProDataInit();	
 	VelocityProfileInit();
+	TimerStart(Timer4);
+	INT3_INIT();
 	ES = 1;
     EA = 1;	
 	SYS_PRINTF("Sys Startup.\r\n");
